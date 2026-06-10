@@ -12,6 +12,7 @@ const messageCount = document.querySelector("#messageCount");
 const existingAttachments = document.querySelector("#existingAttachments");
 const editorTitle = document.querySelector("#editorTitle");
 const statusElement = document.querySelector("#adminStatus");
+const markdownPreview = document.querySelector("#markdownPreview");
 
 let articles = [];
 let comments = [];
@@ -34,10 +35,13 @@ function resetEditor() {
   editingArticle = null;
   articleForm.reset();
   articleForm.elements.articleId.value = "";
+  articleForm.elements.category.value = "随笔";
+  articleForm.elements.published.value = "true";
   editorTitle.textContent = "写文章";
   articleForm.querySelector(".publish-button").textContent = "发布文章";
   existingAttachments.hidden = true;
   existingAttachments.replaceChildren();
+  renderMarkdownPreview();
 }
 
 function renderExistingAttachments(article) {
@@ -70,8 +74,15 @@ function beginEdit(article) {
   articleForm.elements.slug.value = article.slug;
   articleForm.elements.excerpt.value = article.excerpt;
   articleForm.elements.content.value = article.content;
+  articleForm.elements.category.value = article.category || "随笔";
+  articleForm.elements.tags.value = (article.tags || []).join(", ");
+  articleForm.elements.published.value = String(article.published);
+  articleForm.elements.scheduledAt.value = article.scheduled_at
+    ? new Date(article.scheduled_at).toISOString().slice(0, 16)
+    : "";
   articleForm.querySelector(".publish-button").textContent = "保存修改";
   renderExistingAttachments(article);
+  renderMarkdownPreview();
   articleForm.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
@@ -108,6 +119,12 @@ function renderArticleList() {
     row.append(copy, actions);
     articleList.appendChild(row);
   });
+  document.querySelector("#articleMetric").textContent = articles.length;
+  document.querySelector("#viewMetric").textContent = articles.reduce((sum, article) => sum + Number(article.view_count || 0), 0);
+  document.querySelector("#reactionMetric").textContent = articles.reduce(
+    (sum, article) => sum + Number(article.like_count || 0) + Number(article.favorite_count || 0),
+    0,
+  );
 }
 
 async function loadAdminArticles() {
@@ -135,6 +152,26 @@ function createModerationRow(item, type) {
     copy.appendChild(files);
   }
 
+  const actions = document.createElement("div");
+  actions.className = "admin-row-actions";
+  if (type === "comment") {
+    const approvalButton = document.createElement("button");
+    approvalButton.type = "button";
+    approvalButton.className = "text-button";
+    approvalButton.textContent = item.approved ? "隐藏" : "通过";
+    approvalButton.addEventListener("click", async () => {
+      approvalButton.disabled = true;
+      try {
+        await articleService.updateCommentApproval(item.id, !item.approved);
+        await loadModerationContent();
+        setStatus(item.approved ? "评论已隐藏。" : "评论已通过。");
+      } catch (error) {
+        setStatus(`操作失败：${error.message}`, true);
+        approvalButton.disabled = false;
+      }
+    });
+    actions.appendChild(approvalButton);
+  }
   const deleteButton = document.createElement("button");
   deleteButton.type = "button";
   deleteButton.className = "text-button danger";
@@ -143,7 +180,8 @@ function createModerationRow(item, type) {
     if (type === "comment") removeComment(item, deleteButton);
     else removeMessage(item, deleteButton);
   });
-  row.append(copy, deleteButton);
+  actions.appendChild(deleteButton);
+  row.append(copy, actions);
   return row;
 }
 
@@ -152,6 +190,7 @@ function renderModerationLists() {
   messageList.replaceChildren();
   commentCount.textContent = `${comments.length} 条`;
   messageCount.textContent = `${messages.length} 条`;
+  document.querySelector("#pendingMetric").textContent = comments.filter((comment) => !comment.approved).length;
 
   if (!comments.length) {
     commentList.innerHTML = '<p class="article-state">暂无评论。</p>';
@@ -319,9 +358,16 @@ articleForm.addEventListener("submit", async (event) => {
       slug,
       excerpt: form.get("excerpt").trim(),
       content: form.get("content").trim(),
+      category: form.get("category").trim() || "随笔",
+      tags: form.get("tags").split(/[,，]/).map((tag) => tag.trim()).filter(Boolean),
       attachments,
-      published: true,
-      published_at: editingArticle?.published_at || new Date().toISOString(),
+      published: form.get("published") === "true",
+      scheduled_at: form.get("scheduledAt")
+        ? new Date(form.get("scheduledAt")).toISOString()
+        : null,
+      published_at:
+        editingArticle?.published_at ||
+        (form.get("scheduledAt") ? new Date(form.get("scheduledAt")).toISOString() : new Date().toISOString()),
     };
 
     const wasEditing = Boolean(editingArticle);
@@ -338,8 +384,10 @@ articleForm.addEventListener("submit", async (event) => {
 
     resetEditor();
     await loadAdminArticles();
-    setStatus(wasEditing ? "修改已保存。" : "文章已发布。");
-    window.location.href = articleService.articleUrl(article);
+    setStatus(wasEditing ? "修改已保存。" : values.published ? "文章已发布。" : "草稿已保存。");
+    if (values.published && (!values.scheduled_at || new Date(values.scheduled_at) <= new Date())) {
+      window.location.href = articleService.articleUrl(article);
+    }
   } catch (error) {
     if (newAttachments.length) {
       try {
@@ -356,6 +404,15 @@ articleForm.addEventListener("submit", async (event) => {
 
 newArticleButton.addEventListener("click", resetEditor);
 
+function renderMarkdownPreview() {
+  markdownPreview.innerHTML = window.blogMarkdown.render(articleForm.elements.content.value);
+  if (!markdownPreview.textContent.trim()) {
+    markdownPreview.innerHTML = '<p class="article-state">预览会随正文输入实时更新。</p>';
+  }
+}
+
+articleForm.elements.content.addEventListener("input", renderMarkdownPreview);
+
 logoutButton.addEventListener("click", async () => {
   try {
     await articleService.signOut();
@@ -368,3 +425,4 @@ logoutButton.addEventListener("click", async () => {
 });
 
 initialize();
+renderMarkdownPreview();

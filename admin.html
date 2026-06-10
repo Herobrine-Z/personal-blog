@@ -32,6 +32,12 @@
           <div><p class="eyebrow">Owner Console</p><h1 id="editorTitle">写文章</h1></div>
           <button class="text-button" id="logoutButton" type="button">退出登录</button>
         </div>
+        <section class="admin-dashboard" id="adminDashboard" aria-label="博客概览">
+          <div><strong id="articleMetric">0</strong><span>文章</span></div>
+          <div><strong id="viewMetric">0</strong><span>阅读</span></div>
+          <div><strong id="reactionMetric">0</strong><span>互动</span></div>
+          <div><strong id="pendingMetric">0</strong><span>待处理</span></div>
+        </section>
         <section class="admin-article-list">
           <div class="admin-list-heading">
             <h2>文章管理</h2>
@@ -58,7 +64,19 @@
           <label><span>标题</span><input type="text" name="title" maxlength="120" required /></label>
           <label><span>网址标识</span><input type="text" name="slug" maxlength="120" placeholder="例如：my-first-article" required /><small>只能使用小写字母、数字和连字符。</small></label>
           <label><span>摘要</span><textarea name="excerpt" rows="3" maxlength="300" required></textarea></label>
-          <label><span>正文</span><textarea name="content" rows="16" required placeholder="段落之间留一个空行。"></textarea></label>
+          <div class="editor-split-fields">
+            <label><span>分类</span><input type="text" name="category" maxlength="30" value="随笔" required /></label>
+            <label><span>标签</span><input type="text" name="tags" maxlength="160" placeholder="胡桃, 攻略, 随笔" /></label>
+          </div>
+          <div class="editor-split-fields">
+            <label><span>发布状态</span><select name="published"><option value="true">发布</option><option value="false">保存草稿</option></select></label>
+            <label><span>定时发布</span><input type="datetime-local" name="scheduledAt" /></label>
+          </div>
+          <label><span>正文（Markdown）</span><textarea name="content" rows="16" required placeholder="# 标题&#10;&#10;支持列表、引用、链接、图片与代码块。"></textarea></label>
+          <section class="markdown-preview">
+            <div class="admin-list-heading"><h2>实时预览</h2><span>Markdown</span></div>
+            <div class="article-body" id="markdownPreview"></div>
+          </section>
           <label><span>图片与附件</span><input type="file" name="attachments" multiple /><small>首张图片会作为文章封面；单个文件建议不超过 10 MB。</small></label>
           <div class="existing-attachments" id="existingAttachments" hidden></div>
           <button class="ink-button publish-button" type="submit">发布文章</button>
@@ -69,6 +87,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase-config.js"></script>
     <script src="./article-service.js"></script>
+    <script src="./markdown.js"></script>
+    <script src="./theme.js"></script>
     <script src="./admin.js"></script>
   </body>
 </html>

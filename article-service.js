@@ -38,26 +38,83 @@
     return (article.attachments || []).find((file) => file.type?.startsWith("image/"));
   }
 
-  async function listPublished(limit) {
+  function isSchemaMismatch(error) {
+    return /column .* does not exist|schema cache/i.test(error?.message || "");
+  }
+
+  async function listPublishedLegacy(limit) {
     let query = requireClient()
       .from("articles")
       .select("id,title,slug,excerpt,attachments,published_at,created_at")
       .eq("published", true)
       .order("published_at", { ascending: false });
-
     if (limit) query = query.limit(limit);
     const { data, error } = await query;
+    if (error) throw error;
+    return data.map((article) => ({
+      ...article,
+      category: "随笔",
+      tags: [],
+      view_count: 0,
+      like_count: 0,
+      favorite_count: 0,
+    }));
+  }
+
+  function getVisitorToken() {
+    const key = "hutao-visitor-token";
+    let token = localStorage.getItem(key);
+    if (!token) {
+      token = crypto.randomUUID();
+      localStorage.setItem(key, token);
+    }
+    return token;
+  }
+
+  async function listPublished(limit, filters = {}) {
+    let query = requireClient()
+      .from("articles")
+      .select("id,title,slug,excerpt,attachments,category,tags,published_at,created_at,view_count,like_count,favorite_count")
+      .eq("published", true)
+      .or(`scheduled_at.is.null,scheduled_at.lte.${new Date().toISOString()}`)
+      .order("published_at", { ascending: false });
+
+    if (filters.category) query = query.eq("category", filters.category);
+    if (filters.search) {
+      const search = filters.search.replace(/[%_,()]/g, " ").trim();
+      if (search) query = query.or(`title.ilike.%${search}%,excerpt.ilike.%${search}%`);
+    }
+    if (filters.tag) query = query.contains("tags", [filters.tag]);
+    if (limit) query = query.limit(limit);
+    const { data, error } = await query;
+    if (error && isSchemaMismatch(error)) return listPublishedLegacy(limit);
     if (error) throw error;
     return data;
   }
 
   async function getPublished(slug) {
-    const { data, error } = await requireClient()
+    let { data, error } = await requireClient()
       .from("articles")
       .select("*")
       .eq("slug", slug)
       .eq("published", true)
+      .or(`scheduled_at.is.null,scheduled_at.lte.${new Date().toISOString()}`)
       .single();
+    if (error && isSchemaMismatch(error)) {
+      ({ data, error } = await requireClient()
+        .from("articles")
+        .select("*")
+        .eq("slug", slug)
+        .eq("published", true)
+        .single());
+      if (data) {
+        data.category = "随笔";
+        data.tags = [];
+        data.view_count = 0;
+        data.like_count = 0;
+        data.favorite_count = 0;
+      }
+    }
     if (error) throw error;
     return data;
   }
@@ -67,6 +124,29 @@
       .from("articles")
       .select("*")
       .order("updated_at", { ascending: false });
+    if (error) throw error;
+    return data.map((article) => ({
+      category: "随笔",
+      tags: [],
+      view_count: 0,
+      like_count: 0,
+      favorite_count: 0,
+      ...article,
+    }));
+  }
+
+  async function listRelated(article, limit = 3) {
+    let query = requireClient()
+      .from("articles")
+      .select("id,title,slug,excerpt,attachments,category,tags,published_at")
+      .eq("published", true)
+      .neq("id", article.id)
+      .or(`scheduled_at.is.null,scheduled_at.lte.${new Date().toISOString()}`)
+      .order("published_at", { ascending: false })
+      .limit(limit);
+    if (article.category) query = query.eq("category", article.category);
+    const { data, error } = await query;
+    if (error && isSchemaMismatch(error)) return [];
     if (error) throw error;
     return data;
   }
@@ -185,13 +265,27 @@
   }
 
   async function createComment(comment) {
-    const { data, error } = await requireClient()
+    let { data, error } = await requireClient()
       .from("comments")
       .insert(comment)
       .select()
       .single();
+    if (error && isSchemaMismatch(error)) {
+      const legacy = {
+        article_id: comment.article_id,
+        visitor_name: comment.visitor_name,
+        body: comment.body,
+        attachments: comment.attachments,
+      };
+      ({ data, error } = await requireClient().from("comments").insert(legacy).select().single());
+    }
     if (error) throw error;
     return data;
+  }
+
+  async function updateCommentApproval(id, approved) {
+    const { error } = await requireClient().from("comments").update({ approved }).eq("id", id);
+    if (error) throw error;
   }
 
   async function deleteComment(id) {
@@ -231,6 +325,30 @@
     if (error) throw error;
   }
 
+  async function recordView(articleId) {
+    const { data, error } = await requireClient().rpc("record_article_view", {
+      target_article: articleId,
+    });
+    if (error && /function .* does not exist|schema cache/i.test(error.message || "")) return 0;
+    if (error) throw error;
+    return data;
+  }
+
+  async function toggleReaction(articleId, type) {
+    const { data, error } = await requireClient().rpc("toggle_article_reaction", {
+      target_article: articleId,
+      target_token: getVisitorToken(),
+      target_type: type,
+    });
+    if (error) throw error;
+    localStorage.setItem(`hutao-${type}-${articleId}`, String(data.active));
+    return data;
+  }
+
+  function hasReaction(articleId, type) {
+    return localStorage.getItem(`hutao-${type}-${articleId}`) === "true";
+  }
+
   window.articleService = {
     client,
     configured,
@@ -238,9 +356,11 @@
     articleUrl,
     isOwner,
     firstImage,
+    getVisitorToken,
     listPublished,
     getPublished,
     listAllArticles,
+    listRelated,
     getSession,
     signIn,
     signOut,
@@ -253,10 +373,14 @@
     listAllComments,
     uploadCommentFiles,
     createComment,
+    updateCommentApproval,
     deleteComment,
     removeCommentFiles,
     listMessages,
     createMessage,
     deleteMessage,
+    recordView,
+    toggleReaction,
+    hasReaction,
   };
 })();

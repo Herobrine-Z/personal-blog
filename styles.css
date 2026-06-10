@@ -52,8 +52,45 @@ a {
 
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
+}
+
+[data-theme="dark"] {
+  --paper: #171a18;
+  --paper-deep: #252923;
+  --ink: #eee9dc;
+  --ink-soft: #b7b5aa;
+  --cinnabar: #db7168;
+  --peach: #b96f65;
+  --peach-light: #573c39;
+  --moss: #9eae99;
+  --line: rgba(238, 233, 220, 0.18);
+  color-scheme: dark;
+}
+
+[data-theme="dark"] body::before {
+  opacity: 0.28;
+}
+
+[data-theme="dark"] .paper-noise {
+  mix-blend-mode: screen;
+  opacity: 0.05;
+}
+
+.theme-toggle {
+  position: fixed;
+  z-index: 25;
+  bottom: 24px;
+  left: 24px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
 }
 
 button {

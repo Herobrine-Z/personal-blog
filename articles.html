@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="虎桃不会振刀发布的全部文章。" />
+    <meta property="og:title" content="文章 | 虎桃不会振刀" />
+    <meta property="og:description" content="永劫无间、土御门胡桃与生活随笔。" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title="虎桃不会振刀 RSS" href="./rss.xml" />
     <title>文章 | 虎桃不会振刀</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,6 +30,17 @@
         <h1>文章</h1>
         <p>写下游戏里的故事，也记住生活里慢下来的片刻。</p>
       </section>
+      <section class="article-filters" aria-label="文章筛选">
+        <label>
+          <span class="sr-only">搜索文章</span>
+          <input id="articleSearch" type="search" placeholder="搜索标题或摘要……" />
+        </label>
+        <select id="categoryFilter" aria-label="按分类筛选">
+          <option value="">全部分类</option>
+        </select>
+        <button class="text-button" id="clearFilters" type="button">清除筛选</button>
+      </section>
+      <div class="tag-filter-list" id="tagFilters" aria-label="按标签筛选"></div>
       <section class="all-articles-grid" id="articleList" aria-live="polite">
         <p class="article-state">正在翻阅文章……</p>
       </section>
@@ -34,6 +49,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase-config.js"></script>
     <script src="./article-service.js"></script>
+    <script src="./theme.js"></script>
     <script src="./articles.js"></script>
   </body>
 </html>

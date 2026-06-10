@@ -54,7 +54,7 @@ function createHomepageArticleCard(article, index) {
   const meta = document.createElement("div");
   meta.className = "article-meta";
   const category = document.createElement("span");
-  category.textContent = "最新文章";
+  category.textContent = article.category || "最新文章";
   const time = document.createElement("time");
   time.dateTime = article.published_at;
   time.textContent = articleService.formatDate(article.published_at);
@@ -358,6 +358,7 @@ document.querySelector("#messageForm").addEventListener("submit", async (event) 
     await articleService.createMessage({
       visitor_name: name,
       body: values.get("message").trim(),
+      visitor_token: articleService.getVisitorToken(),
     });
     note.textContent = `${name}的墨迹，已留在这卷江湖里。`;
     form.reset();

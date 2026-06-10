@@ -1,0 +1,15 @@
+{
+  "name": "虎桃不会振刀",
+  "short_name": "虎桃",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f3efe4",
+  "theme_color": "#a6342d",
+  "icons": [
+    {
+      "src": "./assets/kurumi-avatar.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
