@@ -254,6 +254,22 @@ document.querySelector("#messageForm").addEventListener("submit", (event) => {
   }
 });
 
+const lightbox = document.querySelector("#imageLightbox");
+const lightboxImage = lightbox.querySelector("img");
+
+document.querySelectorAll("[data-gallery-src]").forEach((button) => {
+  button.addEventListener("click", () => {
+    lightboxImage.src = button.dataset.gallerySrc;
+    lightboxImage.alt = button.dataset.galleryAlt;
+    lightbox.showModal();
+  });
+});
+
+lightbox.querySelector(".lightbox-close").addEventListener("click", () => lightbox.close());
+lightbox.addEventListener("click", (event) => {
+  if (event.target === lightbox) lightbox.close();
+});
+
 if (hasGsap && !reducedMotion) {
   if (finePointer) {
     document.documentElement.classList.add("cursor-ready");
