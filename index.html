@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="虎桃不会振刀的个人博客，记录永劫无间、土御门胡桃与江湖闲谈。" />
     <meta name="theme-color" content="#a6342d" />
+    <link rel="icon" type="image/png" href="./assets/icon.png" />
+    <link rel="apple-touch-icon" href="./assets/icon.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="虎桃不会振刀 RSS" href="./rss.xml" />
     <title>虎桃不会振刀 | 一卷桃花江湖</title>
@@ -23,7 +25,7 @@
 
     <header class="site-header">
       <a class="brand" href="#home" aria-label="返回首页">
-        <span class="brand-seal">虎桃</span>
+        <img class="brand-icon" src="./assets/icon.png" alt="" />
         <span class="brand-name">不会振刀</span>
       </a>
       <button class="menu-toggle" aria-expanded="false" aria-controls="siteNav">
@@ -32,7 +34,7 @@
       <nav class="site-nav" id="siteNav" aria-label="主导航">
         <a class="active" href="#home">卷首</a>
         <a href="./articles.html">文章</a>
-        <a href="#kurumi">胡桃绘卷</a>
+        <a href="./kurumi.html">胡桃绘卷</a>
         <a href="#links">江湖去处</a>
         <a href="#about">侠客志</a>
         <a href="#message">留墨</a>
@@ -41,14 +43,14 @@
 
     <main>
       <section class="hero" id="home">
-        <img class="hero-art" src="./assets/hero-ink-wuxia.png" alt="桃花树下的水墨武侠少女" />
+        <img class="hero-art" src="./assets/ink-hero.png" alt="水墨浪潮与红衣胡桃" />
         <div class="hero-wash" aria-hidden="true"></div>
         <div class="hero-copy">
           <p class="eyebrow">此间江湖 · 随笔一卷</p>
           <h1><span>虎桃</span><span class="title-small">不会振刀</span></h1>
           <p class="hero-verse">振刀是不可能振的，<br />只能在桃花树下写写东西。</p>
           <div class="hero-actions">
-            <a class="ink-button" href="#kurumi"><span>翻开胡桃绘卷</span><span aria-hidden="true">→</span></a>
+            <a class="ink-button" href="./kurumi.html"><span>翻开胡桃绘卷</span><span aria-hidden="true">→</span></a>
             <button class="text-button" id="summonPetals">唤一场桃花</button>
           </div>
         </div>
@@ -66,50 +68,12 @@
         </div>
       </section>
 
-      <section class="kurumi-section" id="kurumi">
-        <div class="section kurumi-inner">
-          <div class="section-heading reveal">
-            <div><p class="eyebrow">Kurumi Collection</p><h2>胡桃绘卷</h2></div>
-            <p>日轮之花，天才阴阳师。<br />此间专藏胡桃的明媚与锋芒。</p>
-          </div>
-          <article class="kurumi-feature reveal">
-            <div class="kurumi-feature-copy">
-              <img class="kurumi-mark" src="./assets/kurumi-avatar.png" alt="" />
-              <p class="eyebrow">土御门胡桃 · CV 陶典</p>
-              <h3>继承古老传承的大小姐</h3>
-              <p>为了探寻天地秘密、掌握阴阳术的终极，胡桃离开日轮国鲸息岛，踏上了属于她的新旅程。</p>
-              <dl class="kurumi-facts">
-                <div><dt>身份</dt><dd>阴阳师</dd></div>
-                <div><dt>喜好</dt><dd>寿司、甜食</dd></div>
-                <div><dt>定位</dt><dd>支援</dd></div>
-              </dl>
-              <a class="source-link" href="https://www.yjwujian.cn/news/official/20240202/33961_1136417.html" target="_blank" rel="noopener noreferrer">查看官方角色资料 <span>↗</span></a>
-            </div>
-            <div class="kurumi-feature-art">
-              <img src="./assets/kurumi-official-art.png" alt="永劫无间土御门胡桃官方角色原画" />
-            </div>
-          </article>
-          <div class="gallery-grid">
-            <figure class="gallery-card gallery-wide reveal">
-              <button class="gallery-image-button" type="button" aria-label="查看土御门胡桃完整官方原画" data-gallery-src="./assets/kurumi-official-art.png" data-gallery-alt="土御门胡桃官方原画">
-                <img src="./assets/kurumi-official-art.png" alt="土御门胡桃官方原画" />
-              </button>
-              <figcaption><span>官方角色原画</span><small>点击查看大图</small></figcaption>
-            </figure>
-            <figure class="gallery-card reveal">
-              <button class="gallery-image-button" type="button" aria-label="查看土御门胡桃官方资料横图" data-gallery-src="./assets/kurumi-profile.png" data-gallery-alt="土御门胡桃官方资料横图">
-                <img src="./assets/kurumi-profile.png" alt="土御门胡桃官方资料横图" />
-              </button>
-              <figcaption><span>角色资料横图</span><small>点击查看大图</small></figcaption>
-            </figure>
-            <figure class="gallery-card gallery-emblem reveal">
-              <button class="gallery-image-button" type="button" aria-label="查看土御门胡桃角色标识" data-gallery-src="./assets/kurumi-avatar.png" data-gallery-alt="土御门胡桃角色标识">
-                <img src="./assets/kurumi-avatar.png" alt="土御门胡桃角色标识" />
-              </button>
-              <figcaption><span>角色标识</span><small>点击查看大图</small></figcaption>
-            </figure>
-          </div>
-          <p class="asset-credit reveal">图片与角色资料来源于 <a href="https://www.yjwujian.cn/" target="_blank" rel="noopener noreferrer">《永劫无间》官方网站</a>，版权归原作者及游戏官方所有。</p>
+      <section class="kurumi-portal reveal" aria-labelledby="kurumiPortalTitle">
+        <div class="kurumi-portal-copy">
+          <p class="eyebrow">Kurumi Collection</p>
+          <h2 id="kurumiPortalTitle">胡桃绘卷</h2>
+          <p>日轮之花，天才阴阳师。她的故事与水墨画卷，已收进一处独立天地。</p>
+          <a class="ink-button" href="./kurumi.html"><span>前往角色介绍</span><span aria-hidden="true">→</span></a>
         </div>
       </section>
 
@@ -140,7 +104,7 @@
       <section class="about-section" id="about">
         <div class="ink-cloud cloud-one" aria-hidden="true"></div><div class="ink-cloud cloud-two" aria-hidden="true"></div>
         <div class="portrait-panel reveal">
-          <div class="portrait-frame"><img src="./assets/hero-ink-wuxia.png" alt="虎桃不会振刀的水墨形象" /></div>
+          <div class="portrait-frame"><img src="./assets/kurumi-portrait-red-moon.png" alt="虎桃不会振刀的水墨形象" /></div>
           <span class="portrait-seal">不振</span>
         </div>
         <div class="about-copy reveal">

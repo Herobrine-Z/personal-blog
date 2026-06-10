@@ -1,9 +1,10 @@
-const CACHE_NAME = "hutao-blog-v2";
+const CACHE_NAME = "hutao-blog-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./articles.html",
   "./article.html",
+  "./kurumi.html",
   "./styles.css",
   "./article-pages.css",
   "./script.js",
@@ -12,7 +13,15 @@ const APP_SHELL = [
   "./article-service.js",
   "./markdown.js",
   "./theme.js",
-  "./assets/kurumi-avatar.png"
+  "./kurumi.js",
+  "./assets/icon.png",
+  "./assets/ink-hero.png",
+  "./assets/ink-scroll.png",
+  "./assets/kurumi-portrait-red-moon.png",
+  "./assets/kurumi-tiger.png",
+  "./assets/kurumi-spring-smile.png",
+  "./assets/kurumi-mountains.png",
+  "./assets/kurumi-vertical.png"
 ];
 
 self.addEventListener("install", (event) => {

@@ -250,6 +250,17 @@ button {
   gap: 12px;
 }
 
+.brand-icon {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(117, 36, 31, 0.45);
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow:
+    0 0 0 3px rgba(243, 239, 228, 0.65),
+    0 6px 20px rgba(35, 25, 22, 0.18);
+}
+
 .brand-seal {
   display: grid;
   width: 45px;
@@ -328,7 +339,7 @@ button {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: saturate(0.88) contrast(0.96);
+  filter: saturate(0.92) contrast(1.02);
   transform: scale(1.025);
 }
 
@@ -337,7 +348,7 @@ button {
   inset: 0;
   z-index: -2;
   background:
-    linear-gradient(90deg, rgba(243, 239, 228, 0.98) 0%, rgba(243, 239, 228, 0.75) 34%, transparent 68%),
+    linear-gradient(90deg, rgba(243, 239, 228, 0.98) 0%, rgba(243, 239, 228, 0.82) 31%, rgba(243, 239, 228, 0.12) 68%, transparent 82%),
     linear-gradient(0deg, var(--paper) 0%, transparent 16%);
 }
 
@@ -883,6 +894,27 @@ button {
   gap: 16px;
 }
 
+.guestbook-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.guestbook-delete {
+  padding: 3px 7px;
+  border: 1px solid rgba(166, 52, 45, 0.35);
+  color: var(--cinnabar);
+  background: transparent;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+}
+
+.guestbook-delete:hover {
+  color: #fff4ea;
+  background: var(--cinnabar);
+}
+
 .guestbook-list time {
   color: var(--ink-soft);
   font-size: 12px;
@@ -1153,6 +1185,248 @@ footer {
   background:
     radial-gradient(circle at 84% 18%, rgba(220, 160, 147, 0.18), transparent 24%),
     linear-gradient(180deg, #ede6d8, var(--paper));
+}
+
+.kurumi-portal {
+  position: relative;
+  display: grid;
+  min-height: 620px;
+  place-items: center start;
+  padding: 90px max(24px, calc((100vw - 1180px) / 2));
+  overflow: hidden;
+  color: #f8efe4;
+  background:
+    linear-gradient(90deg, rgba(14, 15, 14, 0.92) 0%, rgba(14, 15, 14, 0.66) 40%, rgba(14, 15, 14, 0.08) 72%),
+    url("./assets/kurumi-tiger.png") center 36% / cover no-repeat;
+}
+
+.kurumi-portal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 50%, rgba(153, 31, 26, 0.22), transparent 24%),
+    linear-gradient(0deg, rgba(10, 11, 10, 0.36), transparent 30%);
+  mix-blend-mode: screen;
+}
+
+.kurumi-portal-copy {
+  position: relative;
+  z-index: 1;
+  width: min(520px, 88vw);
+}
+
+.kurumi-portal h2 {
+  margin: 0;
+  font-family: var(--brush);
+  font-size: clamp(72px, 10vw, 132px);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.kurumi-portal p:not(.eyebrow) {
+  margin: 24px 0 34px;
+  color: rgba(248, 239, 228, 0.72);
+  font-family: var(--hand);
+  font-size: 24px;
+  line-height: 1.8;
+}
+
+.kurumi-portal .ink-button {
+  color: #f8efe4;
+  background: #8f241f;
+}
+
+.kurumi-page {
+  background:
+    linear-gradient(rgba(244, 239, 229, 0.94), rgba(244, 239, 229, 0.94)),
+    url("./assets/kurumi-mountains.png") center / cover fixed;
+}
+
+.kurumi-header {
+  color: #f8efe4;
+  background: linear-gradient(180deg, rgba(12, 13, 12, 0.34), transparent);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.65);
+}
+
+.kurumi-header.scrolled {
+  color: var(--ink);
+  text-shadow: none;
+}
+
+.kurumi-header .inner-nav {
+  display: flex;
+  gap: 30px;
+}
+
+.kurumi-header .inner-nav a {
+  padding: 6px 0;
+  border-bottom: 1px solid transparent;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+}
+
+.kurumi-header .inner-nav a:hover,
+.kurumi-header .inner-nav a.active {
+  border-color: var(--cinnabar);
+  color: #ef9b90;
+}
+
+.kurumi-header.scrolled .inner-nav a:hover,
+.kurumi-header.scrolled .inner-nav a.active {
+  color: var(--cinnabar);
+}
+
+.kurumi-page-hero {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  color: #f8efe4;
+  background:
+    linear-gradient(90deg, rgba(11, 12, 11, 0.9) 0%, rgba(11, 12, 11, 0.56) 37%, transparent 65%),
+    linear-gradient(0deg, rgba(14, 15, 14, 0.7), transparent 30%),
+    url("./assets/ink-hero.png") center / cover no-repeat;
+}
+
+.kurumi-page-hero::after {
+  content: "桃";
+  position: absolute;
+  right: 4vw;
+  bottom: -7vw;
+  color: rgba(255, 245, 232, 0.08);
+  font-family: var(--brush);
+  font-size: min(40vw, 520px);
+  line-height: 1;
+}
+
+.kurumi-page-hero-copy {
+  position: absolute;
+  z-index: 1;
+  top: 52%;
+  left: max(28px, calc((100vw - 1180px) / 2));
+  width: min(520px, calc(100% - 56px));
+  transform: translateY(-50%);
+}
+
+.kurumi-page-hero h1 {
+  margin: 0;
+  font-family: var(--brush);
+  font-size: clamp(92px, 13vw, 190px);
+  font-weight: 400;
+  line-height: 0.75;
+  text-shadow: 0 12px 35px rgba(0, 0, 0, 0.32);
+}
+
+.kurumi-page-hero-copy > p:last-of-type {
+  margin: 38px 0 32px;
+  color: rgba(248, 239, 228, 0.78);
+  font-family: var(--hand);
+  font-size: 25px;
+  line-height: 1.8;
+}
+
+.kurumi-profile-section,
+.kurumi-gallery-section {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 120px 0;
+}
+
+.kurumi-profile-card {
+  display: grid;
+  grid-template-columns: 0.82fr 1.18fr;
+  min-height: 650px;
+  overflow: hidden;
+  color: #f4eadb;
+  background: #202321;
+  box-shadow: 0 30px 90px rgba(31, 28, 24, 0.18);
+}
+
+.kurumi-profile-copy {
+  align-self: center;
+  padding: clamp(38px, 5vw, 72px);
+}
+
+.kurumi-profile-copy h2 {
+  margin: 8px 0 24px;
+  font-family: var(--brush);
+  font-size: clamp(48px, 6vw, 78px);
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+.kurumi-profile-copy > p:not(.eyebrow) {
+  color: rgba(244, 234, 219, 0.67);
+  font-size: 14px;
+  line-height: 2.1;
+}
+
+.kurumi-profile-card .kurumi-facts {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.kurumi-profile-art {
+  height: 100%;
+  min-height: 650px;
+}
+
+.kurumi-profile-art img {
+  object-position: 58% center;
+}
+
+.kurumi-gallery-section {
+  padding-top: 30px;
+}
+
+.kurumi-art-grid {
+  display: grid;
+  grid-auto-rows: 270px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+.kurumi-art-card {
+  position: relative;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  background: #171918;
+  box-shadow: 0 18px 45px rgba(35, 30, 26, 0.12);
+}
+
+.kurumi-art-card.wide {
+  grid-column: 1 / -1;
+}
+
+.kurumi-art-card.tall {
+  grid-row: span 2;
+}
+
+.kurumi-art-card .gallery-image-button {
+  height: 100%;
+}
+
+.kurumi-art-card img {
+  object-position: center;
+}
+
+.kurumi-art-card.tall img {
+  object-position: center 22%;
+}
+
+.kurumi-art-card figcaption {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  padding: 7px 10px;
+  color: #fff4e9;
+  background: rgba(23, 25, 24, 0.72);
+  font-family: var(--hand);
+  font-size: 19px;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
 }
 
 .kurumi-section::before {
@@ -1540,6 +1814,23 @@ footer {
   .portal-card {
     min-height: 220px;
   }
+
+  .kurumi-portal {
+    min-height: 560px;
+    background-position: 62% center;
+  }
+
+  .kurumi-page-hero {
+    background-position: 62% center;
+  }
+
+  .kurumi-profile-card {
+    grid-template-columns: 1fr;
+  }
+
+  .kurumi-profile-art {
+    min-height: 520px;
+  }
 }
 
 @media (max-width: 560px) {
@@ -1570,5 +1861,66 @@ footer {
 
   .asset-credit {
     text-align: left;
+  }
+
+  .kurumi-header .brand-name {
+    display: none;
+  }
+
+  .kurumi-header .inner-nav {
+    gap: 14px;
+  }
+
+  .kurumi-header .inner-nav a {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+
+  .kurumi-portal {
+    min-height: 520px;
+    background-position: 66% center;
+  }
+
+  .kurumi-portal h2 {
+    font-size: 72px;
+  }
+
+  .kurumi-page-hero {
+    background-position: 68% center;
+  }
+
+  .kurumi-page-hero-copy {
+    top: 57%;
+  }
+
+  .kurumi-page-hero h1 {
+    font-size: 92px;
+  }
+
+  .kurumi-profile-section,
+  .kurumi-gallery-section {
+    width: min(100% - 28px, 1180px);
+    padding: 80px 0;
+  }
+
+  .kurumi-profile-copy {
+    padding: 34px 24px;
+  }
+
+  .kurumi-profile-art {
+    min-height: 420px;
+  }
+
+  .kurumi-art-grid {
+    grid-auto-rows: 240px;
+    grid-template-columns: 1fr;
+  }
+
+  .kurumi-art-card.wide {
+    grid-column: auto;
+  }
+
+  .kurumi-art-card.tall {
+    grid-row: span 2;
   }
 }

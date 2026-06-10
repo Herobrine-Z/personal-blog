@@ -14,6 +14,7 @@ const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matc
 
 let windActive = false;
 let windStrength = 0;
+let ownerSession = null;
 const pieces = new Set();
 const pointer = { x: -1000, y: -1000 };
 
@@ -328,12 +329,39 @@ function renderGuestbook(messages) {
     const time = document.createElement("time");
     time.dateTime = message.created_at;
     time.textContent = articleService.formatDate(message.created_at);
-    header.append(name, time);
+    const meta = document.createElement("span");
+    meta.className = "guestbook-meta";
+    meta.appendChild(time);
+    if (articleService.isOwner(ownerSession)) {
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "guestbook-delete";
+      deleteButton.textContent = "删除";
+      deleteButton.setAttribute("aria-label", `删除 ${message.visitor_name} 的留言`);
+      deleteButton.addEventListener("click", () => removeGuestbookMessage(message, deleteButton));
+      meta.appendChild(deleteButton);
+    }
+    header.append(name, meta);
     const body = document.createElement("p");
     body.textContent = message.body;
     item.append(header, body);
     list.appendChild(item);
   });
+}
+
+async function removeGuestbookMessage(message, button) {
+  if (!window.confirm(`确定删除 ${message.visitor_name} 的这条留言吗？`)) return;
+  const note = document.querySelector("#formNote");
+  button.disabled = true;
+  note.textContent = "正在拂去这笔墨迹……";
+  try {
+    await articleService.deleteMessage(message.id);
+    note.textContent = "留言已删除。";
+    await loadGuestbook();
+  } catch (error) {
+    note.textContent = `删除失败：${error.message}`;
+    button.disabled = false;
+  }
 }
 
 async function loadGuestbook() {
@@ -343,6 +371,16 @@ async function loadGuestbook() {
   } catch (error) {
     document.querySelector("#formNote").textContent = `留言读取失败：${error.message}`;
   }
+}
+
+async function initializeGuestbook() {
+  if (!articleService.configured) return;
+  try {
+    ownerSession = await articleService.getSession();
+  } catch {
+    ownerSession = null;
+  }
+  await loadGuestbook();
 }
 
 document.querySelector("#messageForm").addEventListener("submit", async (event) => {
@@ -467,4 +505,4 @@ if (hasGsap && !reducedMotion) {
 }
 
 loadHomepageArticles();
-loadGuestbook();
+initializeGuestbook();
