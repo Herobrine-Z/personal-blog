@@ -1,13 +1,15 @@
 :root {
-  --paper: #f3efe4;
-  --paper-deep: #e7dfcf;
-  --ink: #20231f;
-  --ink-soft: #5e625a;
-  --cinnabar: #a6342d;
-  --peach: #dca093;
-  --peach-light: #eed0c5;
-  --moss: #687665;
-  --line: rgba(40, 43, 37, 0.2);
+  --paper: #f4f3ed;
+  --paper-deep: #e5e3da;
+  --ink: #18201d;
+  --ink-soft: #56605a;
+  --cinnabar: #9f3029;
+  --peach: #c98d82;
+  --peach-light: #e8c8be;
+  --moss: #53695f;
+  --line: rgba(24, 32, 29, 0.18);
+  --ink-wash: rgba(32, 48, 42, 0.08);
+  --surface: rgba(250, 250, 246, 0.68);
   --serif: "Noto Serif SC", "Songti SC", serif;
   --brush: "Ma Shan Zheng", "STKaiti", cursive;
   --hand: "Long Cang", "STKaiti", cursive;
@@ -26,6 +28,10 @@ body {
   color: var(--ink);
   background: var(--paper);
   font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.75;
+  letter-spacing: 0.015em;
+  text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
@@ -35,9 +41,10 @@ body::before {
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.75), transparent 35%),
-    linear-gradient(90deg, rgba(53, 50, 42, 0.025) 1px, transparent 1px);
-  background-size: auto, 6px 100%;
+    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.88), transparent 34%),
+    radial-gradient(circle at 82% 36%, var(--ink-wash), transparent 30%),
+    linear-gradient(90deg, rgba(31, 43, 38, 0.018) 1px, transparent 1px);
+  background-size: auto, auto, 7px 100%;
 }
 
 ::selection {
@@ -58,15 +65,17 @@ select {
 }
 
 [data-theme="dark"] {
-  --paper: #171a18;
-  --paper-deep: #252923;
-  --ink: #eee9dc;
-  --ink-soft: #b7b5aa;
-  --cinnabar: #db7168;
+  --paper: #121715;
+  --paper-deep: #202824;
+  --ink: #ecece3;
+  --ink-soft: #adb7af;
+  --cinnabar: #d4665d;
   --peach: #b96f65;
-  --peach-light: #573c39;
-  --moss: #9eae99;
-  --line: rgba(238, 233, 220, 0.18);
+  --peach-light: #513a36;
+  --moss: #91aa9d;
+  --line: rgba(236, 236, 227, 0.16);
+  --ink-wash: rgba(174, 194, 183, 0.045);
+  --surface: rgba(29, 37, 33, 0.72);
   color-scheme: dark;
 }
 
@@ -168,24 +177,68 @@ button {
   left: 0;
   border-radius: 50%;
   transform: translate(-50%, -50%);
+  transition: border-color 0.22s, background-color 0.22s, transform 0.22s;
   will-change: transform, opacity;
 }
 
 .ink-cursor-ring {
-  width: 28px;
-  height: 28px;
-  border: 1px solid rgba(32, 35, 31, 0.68);
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 76%, transparent);
+  border-radius: 43% 57% 48% 52% / 55% 43% 57% 45%;
   box-shadow:
-    0 0 0 1px rgba(243, 239, 228, 0.42),
-    inset 4px 2px 7px rgba(32, 35, 31, 0.08);
-  opacity: 0.76;
+    0 0 0 2px color-mix(in srgb, var(--paper) 48%, transparent),
+    inset 5px 2px 9px color-mix(in srgb, var(--ink) 12%, transparent);
+  opacity: 0.92;
 }
 
 .ink-cursor-dot {
-  width: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 70% 30% 62% 38%;
+  background: var(--ink);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--paper) 72%, transparent),
+    0 0 9px color-mix(in srgb, var(--ink) 32%, transparent);
+  transform: translate(-50%, -50%) rotate(-28deg);
+}
+
+.ink-cursor::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: -2px;
+  width: 18px;
+  height: 2px;
+  border-radius: 100%;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ink) 55%, transparent), transparent);
+  transform: rotate(-32deg);
+  transform-origin: left center;
+  opacity: 0.72;
+}
+
+.ink-cursor-trail {
+  position: fixed;
+  z-index: 98;
+  top: 0;
+  left: 0;
+  width: 7px;
   height: 5px;
+  border-radius: 58% 42% 65% 35%;
+  background: color-mix(in srgb, var(--ink) 62%, transparent);
+  filter: blur(0.35px);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.ink-cursor.is-interactive .ink-cursor-ring {
+  border-color: var(--cinnabar);
+  transform: translate(-50%, -50%) rotate(18deg) scale(1.55);
+}
+
+.ink-cursor.is-interactive .ink-cursor-dot {
   background: var(--cinnabar);
-  box-shadow: 0 0 7px rgba(166, 52, 45, 0.35);
+  transform: translate(-50%, -50%) rotate(-28deg) scale(0.72);
 }
 
 .ink-click-ripple,
@@ -200,27 +253,27 @@ button {
 }
 
 .ink-click-ripple {
-  width: 34px;
-  height: 34px;
-  border: 2px solid rgba(42, 46, 40, 0.58);
-  border-radius: 48% 52% 44% 56%;
+  width: 38px;
+  height: 38px;
+  border: 2px solid color-mix(in srgb, var(--ink) 70%, transparent);
+  border-radius: 38% 62% 46% 54% / 58% 42% 61% 39%;
   box-shadow:
-    0 0 0 5px rgba(42, 46, 40, 0.035),
-    inset 0 0 9px rgba(42, 46, 40, 0.08);
+    0 0 0 6px color-mix(in srgb, var(--ink) 4%, transparent),
+    inset 0 0 10px color-mix(in srgb, var(--ink) 12%, transparent);
 }
 
 .ink-click-core {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--cinnabar);
+  width: 10px;
+  height: 10px;
+  border-radius: 66% 34% 58% 42%;
+  background: var(--ink);
 }
 
 .click-petal {
-  width: 10px;
-  height: 6px;
-  border-radius: 90% 15% 85% 20%;
-  background: linear-gradient(135deg, #f0c5bb, #b95755);
+  width: 8px;
+  height: 5px;
+  border-radius: 68% 32% 61% 39%;
+  background: color-mix(in srgb, var(--ink) 84%, var(--cinnabar));
 }
 
 .site-header {
@@ -239,9 +292,9 @@ button {
 .site-header.scrolled {
   padding-top: 12px;
   padding-bottom: 12px;
-  background: rgba(243, 239, 228, 0.88);
-  box-shadow: 0 1px 0 rgba(38, 38, 32, 0.12);
-  backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  box-shadow: 0 1px 0 var(--line), 0 10px 34px color-mix(in srgb, var(--ink) 6%, transparent);
+  backdrop-filter: blur(18px) saturate(0.8);
 }
 
 .brand {
@@ -291,7 +344,7 @@ button {
   position: relative;
   padding: 7px 2px;
   color: var(--ink-soft);
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 0.22em;
   transition: color 0.25s;
 }
@@ -348,7 +401,7 @@ button {
   inset: 0;
   z-index: -2;
   background:
-    linear-gradient(90deg, rgba(243, 239, 228, 0.98) 0%, rgba(243, 239, 228, 0.82) 31%, rgba(243, 239, 228, 0.12) 68%, transparent 82%),
+    linear-gradient(90deg, color-mix(in srgb, var(--paper) 98%, transparent) 0%, color-mix(in srgb, var(--paper) 83%, transparent) 31%, color-mix(in srgb, var(--paper) 14%, transparent) 68%, transparent 82%),
     linear-gradient(0deg, var(--paper) 0%, transparent 16%);
 }
 
@@ -363,7 +416,7 @@ button {
 .eyebrow {
   margin: 0 0 12px;
   color: var(--cinnabar);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.38em;
   text-transform: uppercase;
@@ -413,7 +466,7 @@ button {
   padding: 13px 20px 13px 24px;
   color: var(--paper);
   background: var(--ink);
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 0.18em;
   transition: transform 0.25s, background-color 0.25s;
 }
@@ -521,8 +574,8 @@ button {
   min-height: 290px;
   overflow: hidden;
   border: 1px solid rgba(47, 48, 41, 0.16);
-  background: rgba(250, 247, 238, 0.58);
-  box-shadow: 0 18px 50px rgba(46, 42, 33, 0.045);
+  background: var(--surface);
+  box-shadow: 0 18px 50px color-mix(in srgb, var(--ink) 5%, transparent);
   transition: transform 0.35s, box-shadow 0.35s;
 }
 
@@ -651,7 +704,7 @@ button {
 .card-content p {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 2;
 }
 
@@ -1004,6 +1057,21 @@ footer {
 }
 
 @media (max-width: 840px) {
+  html.cursor-ready,
+  html.cursor-ready body,
+  html.cursor-ready a,
+  html.cursor-ready button,
+  html.cursor-ready input,
+  html.cursor-ready textarea,
+  html.cursor-ready .falling-piece {
+    cursor: auto;
+  }
+
+  .ink-cursor,
+  .ink-cursor-trail {
+    display: none !important;
+  }
+
   .site-header {
     padding: 15px 20px;
   }
@@ -1042,7 +1110,7 @@ footer {
     align-items: center;
     justify-content: center;
     gap: 35px;
-    background: rgba(243, 239, 228, 0.97);
+    background: color-mix(in srgb, var(--paper) 97%, transparent);
     opacity: 0;
     pointer-events: none;
     transform: translateY(-12px);
@@ -1066,7 +1134,7 @@ footer {
 
   .hero-wash {
     background:
-      linear-gradient(90deg, rgba(243, 239, 228, 0.95), rgba(243, 239, 228, 0.48)),
+      linear-gradient(90deg, color-mix(in srgb, var(--paper) 95%, transparent), color-mix(in srgb, var(--paper) 48%, transparent)),
       linear-gradient(0deg, var(--paper), transparent 25%);
   }
 
@@ -1656,7 +1724,7 @@ footer {
   padding: 28px;
   overflow: hidden;
   border: 1px solid rgba(40, 43, 37, 0.16);
-  background: rgba(250, 247, 238, 0.62);
+  background: var(--surface);
   transition: color 0.35s, background-color 0.35s, transform 0.35s;
 }
 

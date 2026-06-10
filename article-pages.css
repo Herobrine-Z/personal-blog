@@ -5,7 +5,7 @@
 .inner-nav {
   display: flex;
   gap: 28px;
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 0.14em;
 }
 
@@ -106,7 +106,7 @@
   min-height: 280px;
   overflow: hidden;
   border: 1px solid var(--line);
-  background: rgba(250, 247, 238, 0.62);
+  background: var(--surface);
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
@@ -147,7 +147,7 @@
 .article-list-copy time,
 .article-card-meta span {
   color: var(--cinnabar);
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.12em;
 }
 
@@ -160,7 +160,7 @@
   margin-top: auto;
   padding-top: 22px;
   color: var(--ink-soft);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .article-list-copy .article-tags {
@@ -176,7 +176,8 @@
 .article-list-copy p {
   margin: 0;
   color: var(--ink-soft);
-  line-height: 1.9;
+  font-size: 16px;
+  line-height: 2;
 }
 
 .read-more {
@@ -235,8 +236,8 @@
   max-width: 650px;
   margin: 30px auto 0;
   color: var(--ink-soft);
-  font-size: 18px;
-  line-height: 1.9;
+  font-size: 19px;
+  line-height: 2;
 }
 
 .article-body {

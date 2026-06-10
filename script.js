@@ -17,6 +17,7 @@ let windStrength = 0;
 let ownerSession = null;
 const pieces = new Set();
 const pointer = { x: -1000, y: -1000 };
+let lastCursorTrailAt = 0;
 
 const random = (min, max) => Math.random() * (max - min) + min;
 
@@ -150,6 +151,35 @@ function createClickEffect(x, y) {
       onComplete: () => petal.remove(),
     });
   }
+}
+
+function createCursorTrail(x, y) {
+  const now = performance.now();
+  if (now - lastCursorTrailAt < 38) return;
+  lastCursorTrailAt = now;
+
+  const trail = document.createElement("i");
+  trail.className = "ink-cursor-trail";
+  document.body.appendChild(trail);
+
+  gsap.set(trail, {
+    x: x + random(-3, 3),
+    y: y + random(-2, 2),
+    xPercent: -50,
+    yPercent: -50,
+    rotation: random(-35, 35),
+    scale: random(0.65, 1.05),
+    opacity: 0.42,
+  });
+  gsap.to(trail, {
+    x: `-=${random(5, 12)}`,
+    y: `+=${random(4, 10)}`,
+    scale: 0.2,
+    opacity: 0,
+    duration: 0.58,
+    ease: "power2.out",
+    onComplete: () => trail.remove(),
+  });
 }
 
 function createPiece(options = {}) {
@@ -437,19 +467,22 @@ if (hasGsap && !reducedMotion) {
     window.addEventListener("pointermove", (event) => {
       cursorX(event.clientX);
       cursorY(event.clientY);
+      createCursorTrail(event.clientX, event.clientY);
       gsap.to(cursor, { autoAlpha: 1, duration: 0.15, overwrite: "auto" });
     });
 
     document.addEventListener("pointerover", (event) => {
       const interactive = event.target.closest("a, button, input, textarea, .falling-piece");
       gsap.to(cursorRing, {
-        scale: interactive ? 1.65 : 1,
-        borderColor: interactive ? "rgba(166, 52, 45, 0.72)" : "rgba(32, 35, 31, 0.68)",
+        scale: interactive ? 1.55 : 1,
+        rotation: interactive ? 18 : 0,
+        borderColor: interactive ? "var(--cinnabar)" : "var(--ink)",
         duration: 0.25,
         overwrite: "auto",
       });
       gsap.to(cursorDot, {
-        scale: interactive ? 0.55 : 1,
+        scale: interactive ? 0.72 : 1,
+        backgroundColor: interactive ? "var(--cinnabar)" : "var(--ink)",
         duration: 0.2,
         overwrite: "auto",
       });
