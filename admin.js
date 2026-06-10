@@ -21,6 +21,8 @@ let comments = [];
 let messages = [];
 let editingArticle = null;
 let workFilter = "all";
+const selectedWorks = new Set();
+let autosaveTimer = null;
 
 function setStatus(message, isError = false) {
   statusElement.textContent = message;
@@ -51,6 +53,7 @@ function updateEditorMode() {
   const type = selectedContentType();
   const isVideo = type === "video";
   videoEditorFields.hidden = !isVideo;
+  document.querySelector(".video-duration-field").hidden = !isVideo;
   contentFieldLabel.textContent = isVideo ? "视频简介（Markdown）" : "正文（Markdown）";
   articleForm.elements.content.placeholder = isVideo
     ? "介绍视频内容、录制背景或精彩看点。"
@@ -72,6 +75,7 @@ function resetEditor(type = "article") {
   existingAttachments.replaceChildren();
   currentVideo.hidden = true;
   currentVideo.textContent = "";
+  document.querySelector("#restoreDraftButton").hidden = !localStorage.getItem(`hutao-editor-draft-${type}`);
   updateEditorMode();
   renderMarkdownPreview();
 }
@@ -119,8 +123,12 @@ function beginEdit(article) {
     : "";
   articleForm.elements.videoUrl.value = article.video_url || "";
   articleForm.elements.videoPoster.value = article.video_poster || "";
+  articleForm.elements.seriesName.value = article.series_name || "";
+  articleForm.elements.episodeNumber.value = article.episode_number || "";
+  articleForm.elements.durationSeconds.value = article.duration_seconds || "";
   currentVideo.hidden = !article.video_url;
   currentVideo.textContent = article.video_url ? `当前视频：${article.video_name || article.video_url}` : "";
+  document.querySelector("#restoreDraftButton").hidden = !localStorage.getItem(`hutao-editor-draft-${article.id}`);
   editorTitle.textContent = `编辑${articleService.contentLabel(article)}`;
   renderExistingAttachments(article);
   updateEditorMode();
@@ -131,7 +139,11 @@ function beginEdit(article) {
 
 function renderArticleList() {
   articleList.replaceChildren();
-  const filtered = articles.filter((article) => workFilter === "all" || (article.content_type || "article") === workFilter);
+  const filtered = articles.filter((article) => {
+    if (workFilter === "trash") return Boolean(article.deleted_at);
+    if (article.deleted_at) return false;
+    return workFilter === "all" || (article.content_type || "article") === workFilter;
+  });
   if (!filtered.length) {
     articleList.innerHTML = '<p class="article-state">当前分类还没有作品。</p>';
   } else {
@@ -139,6 +151,15 @@ function renderArticleList() {
       const row = document.createElement("article");
       row.className = "admin-article-row";
       const copy = document.createElement("div");
+      const select = document.createElement("input");
+      select.type = "checkbox";
+      select.className = "work-select";
+      select.checked = selectedWorks.has(article.id);
+      select.setAttribute("aria-label", `选择《${article.title}》`);
+      select.addEventListener("change", () => {
+        if (select.checked) selectedWorks.add(article.id);
+        else selectedWorks.delete(article.id);
+      });
       const title = document.createElement("h3");
       title.textContent = article.title;
       const meta = document.createElement("p");
@@ -160,25 +181,75 @@ function renderArticleList() {
       const deleteButton = document.createElement("button");
       deleteButton.type = "button";
       deleteButton.className = "text-button danger";
-      deleteButton.textContent = "删除";
-      deleteButton.addEventListener("click", () => removeArticle(article, deleteButton));
-      actions.append(viewLink, editButton, deleteButton);
-      row.append(copy, actions);
+      deleteButton.textContent = article.deleted_at ? "永久删除" : "移入回收站";
+      deleteButton.addEventListener("click", () => article.deleted_at
+        ? permanentlyRemoveArticle(article, deleteButton)
+        : removeArticle(article, deleteButton));
+      if (article.deleted_at) {
+        const restoreButton = document.createElement("button");
+        restoreButton.type = "button";
+        restoreButton.className = "text-button";
+        restoreButton.textContent = "恢复";
+        restoreButton.addEventListener("click", async () => {
+          restoreButton.disabled = true;
+          await articleService.restoreArticle(article.id);
+          await loadAdminArticles();
+          setStatus("作品已从回收站恢复为草稿。");
+        });
+        actions.append(restoreButton, deleteButton);
+      } else {
+        actions.append(viewLink, editButton, deleteButton);
+      }
+      row.append(select, copy, actions);
       articleList.appendChild(row);
     });
   }
-  const articleWorks = articles.filter((item) => (item.content_type || "article") === "article");
-  const videoWorks = articles.filter((item) => item.content_type === "video");
+  const activeWorks = articles.filter((item) => !item.deleted_at);
+  const articleWorks = activeWorks.filter((item) => (item.content_type || "article") === "article");
+  const videoWorks = activeWorks.filter((item) => item.content_type === "video");
   document.querySelector("#articleMetric").textContent = articleWorks.length;
   document.querySelector("#videoMetric").textContent = videoWorks.length;
-  document.querySelector("#viewMetric").textContent = articles.reduce((sum, item) => sum + Number(item.view_count || 0), 0);
-  document.querySelector("#reactionMetric").textContent = articles.reduce((sum, item) => sum + Number(item.like_count || 0), 0);
+  document.querySelector("#viewMetric").textContent = activeWorks.reduce((sum, item) => sum + Number(item.view_count || 0), 0);
+  document.querySelector("#reactionMetric").textContent = activeWorks.reduce((sum, item) => sum + Number(item.like_count || 0), 0);
 }
 
 async function loadAdminArticles() {
   articleList.innerHTML = '<p class="article-state">正在读取作品……</p>';
   articles = await articleService.listAllArticles();
   renderArticleList();
+}
+
+function renderDashboardStats(data) {
+  const chart = document.querySelector("#analyticsChart");
+  const daily = data?.daily || [];
+  chart.replaceChildren();
+  if (!daily.length) {
+    chart.innerHTML = '<p class="article-state">暂无趋势数据，新的访问会从迁移执行后开始记录。</p>';
+  } else {
+    const max = Math.max(1, ...daily.map((day) => Number(day.views || 0)));
+    daily.forEach((day) => {
+      const column = document.createElement("div");
+      column.className = "analytics-column";
+      column.title = `${day.day}：${day.views} 次浏览，${day.completions} 次完播`;
+      column.innerHTML = `<span style="height:${Math.max(6, Number(day.views || 0) / max * 100)}%"></span><small>${String(day.day).slice(5)}</small>`;
+      chart.appendChild(column);
+    });
+  }
+  const top = document.querySelector("#topWorksList");
+  top.replaceChildren();
+  (data?.top_works || []).forEach((work, index) => {
+    const row = document.createElement("p");
+    row.innerHTML = `<strong>${index + 1}. ${work.title}</strong><span>${work.view_count || 0} 浏览 · ${work.like_count || 0} 点赞</span>`;
+    top.appendChild(row);
+  });
+}
+
+async function loadDashboardStats() {
+  try {
+    renderDashboardStats(await articleService.getOwnerDashboard());
+  } catch {
+    renderDashboardStats(null);
+  }
 }
 
 function createModerationRow(item, type) {
@@ -213,6 +284,22 @@ function createModerationRow(item, type) {
       }
     });
     actions.appendChild(approvalButton);
+    const pinButton = document.createElement("button");
+    pinButton.type = "button";
+    pinButton.className = "text-button";
+    pinButton.textContent = item.pinned ? "取消置顶" : "置顶";
+    pinButton.addEventListener("click", async () => {
+      pinButton.disabled = true;
+      await articleService.updateCommentPinned(item.id, !item.pinned);
+      await loadModerationContent();
+      setStatus(item.pinned ? "已取消置顶。" : "评论已置顶。");
+    });
+    const replyButton = document.createElement("button");
+    replyButton.type = "button";
+    replyButton.className = "text-button";
+    replyButton.textContent = "站长回复";
+    replyButton.addEventListener("click", () => replyAsOwner(item, replyButton));
+    actions.append(pinButton, replyButton);
   }
   const deleteButton = document.createElement("button");
   deleteButton.type = "button";
@@ -222,6 +309,28 @@ function createModerationRow(item, type) {
   actions.appendChild(deleteButton);
   row.append(copy, actions);
   return row;
+}
+
+async function replyAsOwner(comment, button) {
+  const body = window.prompt(`回复 ${comment.visitor_name}：`);
+  if (!body?.trim()) return;
+  button.disabled = true;
+  try {
+    await articleService.createComment({
+      article_id: comment.article_id,
+      parent_id: comment.parent_id || comment.id,
+      visitor_name: "虎桃不会振刀",
+      visitor_token: articleService.getVisitorToken(),
+      body: body.trim(),
+      attachments: [],
+      is_owner: true,
+    });
+    await loadModerationContent();
+    setStatus("站长回复已发布。");
+  } catch (error) {
+    setStatus(`回复失败：${error.message}`, true);
+    button.disabled = false;
+  }
 }
 
 function renderModerationLists() {
@@ -269,27 +378,40 @@ async function removeMessage(message, button) {
 }
 
 async function removeArticle(article, button) {
-  if (!window.confirm(`确定删除${articleService.contentLabel(article)}《${article.title}》吗？此操作无法撤销。`)) return;
+  if (!window.confirm(`将${articleService.contentLabel(article)}《${article.title}》移入回收站吗？`)) return;
   button.disabled = true;
   try {
-    const commentAttachments = comments
-      .filter((comment) => comment.article_id === article.id)
-      .flatMap((comment) => comment.attachments || []);
     await articleService.deleteArticle(article.id);
-    if (article.attachments?.length) await articleService.removeFiles(article.attachments).catch(() => {});
-    if (article.video_path) await articleService.removeVideo({ path: article.video_path }).catch(() => {});
-    if (commentAttachments.length) await articleService.removeCommentFiles(commentAttachments).catch(() => {});
     if (editingArticle?.id === article.id) resetEditor();
-    await Promise.all([loadAdminArticles(), loadModerationContent()]);
-    setStatus("作品已删除。");
+    await loadAdminArticles();
+    setStatus("作品已移入回收站。");
   } catch (error) {
     setStatus(`删除失败：${error.message}`, true);
     button.disabled = false;
   }
 }
 
+async function permanentlyRemoveArticle(article, button) {
+  if (!window.confirm(`永久删除《${article.title}》及其评论和文件吗？此操作无法撤销。`)) return;
+  button.disabled = true;
+  try {
+    const commentAttachments = comments
+      .filter((comment) => comment.article_id === article.id)
+      .flatMap((comment) => comment.attachments || []);
+    await articleService.permanentlyDeleteArticle(article.id);
+    if (article.attachments?.length) await articleService.removeFiles(article.attachments).catch(() => {});
+    if (article.video_path) await articleService.removeVideo({ path: article.video_path }).catch(() => {});
+    if (commentAttachments.length) await articleService.removeCommentFiles(commentAttachments).catch(() => {});
+    await Promise.all([loadAdminArticles(), loadModerationContent()]);
+    setStatus("作品已永久删除。");
+  } catch (error) {
+    setStatus(`永久删除失败：${error.message}`, true);
+    button.disabled = false;
+  }
+}
+
 async function loadOwnerConsole() {
-  await Promise.all([loadAdminArticles(), loadModerationContent()]);
+  await Promise.all([loadAdminArticles(), loadModerationContent(), loadDashboardStats()]);
 }
 
 function renderMarkdownPreview() {
@@ -381,6 +503,9 @@ articleForm.addEventListener("submit", async (event) => {
       video_path: contentType === "video" ? (uploadedVideo?.path || editingArticle?.video_path || null) : null,
       video_name: contentType === "video" ? (uploadedVideo?.name || editingArticle?.video_name || null) : null,
       video_poster: contentType === "video" ? (form.get("videoPoster").trim() || articleService.firstImage({ attachments })?.url || null) : null,
+      series_name: form.get("seriesName").trim() || null,
+      episode_number: form.get("episodeNumber") ? Number(form.get("episodeNumber")) : null,
+      duration_seconds: contentType === "video" && form.get("durationSeconds") ? Number(form.get("durationSeconds")) : null,
       published: form.get("published") === "true",
       scheduled_at: scheduledAt,
       published_at: editingArticle?.published_at || scheduledAt || new Date().toISOString(),
@@ -395,6 +520,7 @@ articleForm.addEventListener("submit", async (event) => {
       await articleService.removeVideo({ path: oldVideoPath }).catch(() => {});
     }
     resetEditor(contentType);
+    localStorage.removeItem(`hutao-editor-draft-${contentType}`);
     await loadAdminArticles();
     setStatus(wasEditing ? "作品修改已保存。" : values.published ? "作品已发布。" : "草稿已保存。");
     if (values.published && (!scheduledAt || new Date(scheduledAt) <= new Date())) {
@@ -422,8 +548,62 @@ document.querySelectorAll("[data-work-filter]").forEach((button) => {
     renderArticleList();
   });
 });
+
+document.querySelector("#bulkTrashButton").addEventListener("click", async () => {
+  const targets = articles.filter((article) => selectedWorks.has(article.id) && !article.deleted_at);
+  if (!targets.length) {
+    setStatus("请先选择要移入回收站的作品。", true);
+    return;
+  }
+  if (!window.confirm(`将选中的 ${targets.length} 个作品移入回收站吗？`)) return;
+  await Promise.all(targets.map((article) => articleService.deleteArticle(article.id)));
+  selectedWorks.clear();
+  await loadAdminArticles();
+  setStatus("选中作品已移入回收站。");
+});
 articleForm.elements.contentType.forEach((radio) => radio.addEventListener("change", updateEditorMode));
+articleForm.elements.videoFile.addEventListener("change", () => {
+  const file = articleForm.elements.videoFile.files[0];
+  if (!file) return;
+  const probe = document.createElement("video");
+  probe.preload = "metadata";
+  probe.onloadedmetadata = () => {
+    articleForm.elements.durationSeconds.value = Math.round(probe.duration) || "";
+    URL.revokeObjectURL(probe.src);
+  };
+  probe.src = URL.createObjectURL(file);
+});
 articleForm.elements.content.addEventListener("input", renderMarkdownPreview);
+
+function draftKey() {
+  return `hutao-editor-draft-${editingArticle?.id || selectedContentType()}`;
+}
+
+function saveLocalDraft() {
+  const data = {};
+  ["contentType", "title", "slug", "excerpt", "category", "tags", "published", "scheduledAt", "videoUrl", "videoPoster", "seriesName", "episodeNumber", "durationSeconds", "content"]
+    .forEach((name) => { data[name] = articleForm.elements[name]?.value || ""; });
+  localStorage.setItem(draftKey(), JSON.stringify(data));
+  document.querySelector("#autosaveStatus").textContent = `已自动保存 ${new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
+  document.querySelector("#restoreDraftButton").hidden = false;
+}
+
+articleForm.addEventListener("input", () => {
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(saveLocalDraft, 700);
+});
+
+document.querySelector("#restoreDraftButton").addEventListener("click", () => {
+  const raw = localStorage.getItem(draftKey()) || localStorage.getItem(`hutao-editor-draft-${selectedContentType()}`);
+  if (!raw) return;
+  const draft = JSON.parse(raw);
+  Object.entries(draft).forEach(([name, value]) => {
+    if (articleForm.elements[name]) articleForm.elements[name].value = value;
+  });
+  updateEditorMode();
+  renderMarkdownPreview();
+  setStatus("本地草稿已恢复。");
+});
 document.querySelector("#cancelEditButton").addEventListener("click", () => resetEditor(selectedContentType()));
 logoutButton.addEventListener("click", async () => {
   await articleService.signOut();

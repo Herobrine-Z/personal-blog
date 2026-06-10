@@ -10,8 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" />
-    <link rel="stylesheet" href="./styles.css?v=6" />
-    <link rel="stylesheet" href="./article-pages.css?v=6" />
+    <link rel="stylesheet" href="./styles.css?v=7" />
+    <link rel="stylesheet" href="./article-pages.css?v=7" />
   </head>
   <body class="inner-page">
     <div class="paper-noise" aria-hidden="true"></div>
@@ -49,6 +49,14 @@
             <div><strong id="reactionMetric">0</strong><span>点赞</span></div>
             <div><strong id="pendingMetric">0</strong><span>待处理评论</span></div>
           </div>
+          <section class="analytics-panel">
+            <div class="admin-list-heading"><h2>近 14 天趋势</h2><span>浏览 / 完播</span></div>
+            <div class="analytics-chart" id="analyticsChart"><p class="article-state">正在汇总数据……</p></div>
+          </section>
+          <section class="analytics-panel">
+            <div class="admin-list-heading"><h2>热门作品</h2><span>按浏览量排序</span></div>
+            <div class="top-works-list" id="topWorksList"></div>
+          </section>
           <div class="admin-guide">
             <h2>快捷操作</h2>
             <button class="ink-button" type="button" data-new-work="article">写文章</button>
@@ -68,6 +76,8 @@
             <button class="active" type="button" data-work-filter="all">全部</button>
             <button type="button" data-work-filter="article">文章</button>
             <button type="button" data-work-filter="video">视频</button>
+            <button type="button" data-work-filter="trash">回收站</button>
+            <button class="danger" id="bulkTrashButton" type="button">批量移入回收站</button>
           </div>
           <div id="adminArticleList"><p class="article-state">正在读取作品……</p></div>
         </section>
@@ -87,7 +97,11 @@
           <form id="articleForm" class="editor-form">
             <div class="admin-list-heading">
               <div><p class="eyebrow">Editor</p><h2 id="editorTitle">新建文章</h2></div>
-              <button class="text-button" id="cancelEditButton" type="button">清空编辑器</button>
+              <div class="admin-row-actions">
+                <span class="autosave-status" id="autosaveStatus">自动保存已开启</span>
+                <button class="text-button" id="restoreDraftButton" type="button" hidden>恢复本地草稿</button>
+                <button class="text-button" id="cancelEditButton" type="button">清空编辑器</button>
+              </div>
             </div>
             <input type="hidden" name="articleId" />
             <div class="work-type-picker" role="group" aria-label="作品类型">
@@ -111,6 +125,11 @@
               <label><span>封面图片地址</span><input type="url" name="videoPoster" placeholder="可留空，或使用附件中的首张图片" /></label>
               <p class="current-video" id="currentVideo" hidden></p>
             </div>
+            <div class="editor-split-fields">
+              <label><span>系列 / 合集</span><input type="text" name="seriesName" maxlength="80" placeholder="例如：胡桃进阶课堂" /></label>
+              <label><span>集数</span><input type="number" name="episodeNumber" min="1" max="999" /></label>
+            </div>
+            <label class="video-duration-field" hidden><span>视频时长（秒）</span><input type="number" name="durationSeconds" min="1" max="86400" /><small>可留空，播放器会自动读取。</small></label>
             <label><span id="contentFieldLabel">正文（Markdown）</span><textarea name="content" rows="16" required placeholder="# 标题&#10;&#10;支持列表、引用、链接、图片、代码块与 LaTeX 公式。"></textarea></label>
             <section class="markdown-preview">
               <div class="admin-list-heading"><h2>实时预览</h2><span>Markdown</span></div>
@@ -126,11 +145,11 @@
     </main>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase-config.js"></script>
-    <script src="./article-service.js?v=6"></script>
+    <script src="./article-service.js?v=7"></script>
     <script src="./markdown.js?v=5"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
     <script src="./theme.js?v=4"></script>
-    <script src="./admin.js?v=6"></script>
+    <script src="./admin.js?v=7"></script>
   </body>
 </html>

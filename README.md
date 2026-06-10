@@ -16,9 +16,11 @@ python -m http.server 8000
 
 1. 创建一个 Supabase 项目。
 2. 在 Authentication 的 Users 页面创建唯一的站长用户，关闭公开注册，并复制用户 UUID。
-3. 检查 `supabase-schema.sql` 中的站长 UUID，然后在 Supabase SQL Editor 执行完整脚本。已有项目也需要重新执行，以添加作品类型、视频字段、视频存储桶、阅读与点赞、站点总访问量、评论楼层与审核字段。
+3. 检查 `supabase-schema.sql` 中的站长 UUID，然后在 Supabase SQL Editor 执行完整脚本。已有项目也需要重新执行，以添加作品统计、视频系列与完播、评论点赞与置顶、作品回收站、签到和成就数据。
 4. 在 Supabase 的 Project Settings > API 中复制 Project URL 和 anon public key，填写到 `supabase-config.js`。
-5. 部署后访问 `admin.html`，使用站长邮箱和密码登录，可管理文章和视频、上传不超过 50 MB 的视频、保存草稿、定时发布并管理评论。
+5. 部署后访问 `admin.html`，使用站长邮箱和密码登录，可查看近 14 天统计与热门作品、管理文章和视频、自动保存草稿、使用回收站、置顶或回复评论。
+
+视频支持系列与集数、自动读取时长、播放进度记忆和完播统计。评论支持点赞、站长身份标识与置顶。主页签到以匿名访客令牌计算连续签到和累计成就，不要求访客注册。
 
 文章正文支持 Markdown 与 KaTeX 数学公式。行内公式使用 `$E = mc^2$`，块级公式使用 `$$...$$`。
 

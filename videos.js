@@ -28,13 +28,19 @@ function createVideoCard(video) {
   const copy = document.createElement("div");
   copy.className = "video-card-copy";
   const meta = document.createElement("p");
-  meta.textContent = `${video.category || "视频"} · ${articleService.formatDate(video.published_at)}`;
+  const series = video.series_name
+    ? ` · ${video.series_name}${video.episode_number ? ` 第 ${video.episode_number} 集` : ""}`
+    : "";
+  meta.textContent = `${video.category || "视频"} · ${articleService.formatDate(video.published_at)}${series}`;
   const title = document.createElement("h2");
   title.textContent = video.title;
   const excerpt = document.createElement("p");
   excerpt.textContent = video.excerpt;
   const stats = document.createElement("span");
-  stats.textContent = `${video.view_count || 0} 次播放 · ${video.like_count || 0} 人点赞`;
+  const duration = video.duration_seconds
+    ? ` · ${Math.floor(video.duration_seconds / 60)}:${String(video.duration_seconds % 60).padStart(2, "0")}`
+    : "";
+  stats.textContent = `${video.view_count || 0} 次播放 · ${video.like_count || 0} 人点赞${duration}`;
   copy.append(meta, title, excerpt, stats);
   link.append(visual, copy);
   return link;

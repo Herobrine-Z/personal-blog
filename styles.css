@@ -1328,6 +1328,53 @@ footer {
   color: var(--muted);
 }
 
+.achievement-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 5vw, 4rem);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: center;
+}
+
+.achievement-copy h2 {
+  margin: 0.25rem 0 1rem;
+  font-size: clamp(2.2rem, 5vw, 4rem);
+}
+
+.achievement-status {
+  color: var(--muted);
+}
+
+.achievement-cards {
+  display: grid;
+  gap: 1rem;
+}
+
+.achievement-cards article {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.2rem 1.4rem;
+  color: color-mix(in srgb, var(--muted) 72%, transparent);
+  background: color-mix(in srgb, var(--paper) 86%, white);
+  border: 1px dashed color-mix(in srgb, var(--ink) 18%, transparent);
+  filter: grayscale(1);
+}
+
+.achievement-cards article.unlocked {
+  color: var(--ink);
+  border-color: var(--cinnabar);
+  box-shadow: inset 4px 0 var(--cinnabar);
+  filter: none;
+}
+
+.achievement-cards article.unlocked strong::after {
+  content: " 已解锁";
+  color: var(--cinnabar);
+  font-size: 0.72rem;
+}
+
 .ai-assistant {
   position: fixed;
   right: 1.25rem;
@@ -1430,6 +1477,10 @@ footer {
 
 @media (max-width: 840px) {
   .home-video-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .achievement-section {
     grid-template-columns: 1fr;
   }
 }

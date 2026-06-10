@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=5" />
+    <link rel="stylesheet" href="./styles.css?v=7" />
   </head>
   <body>
     <div class="paper-noise" aria-hidden="true"></div>
@@ -76,6 +76,21 @@
         </div>
         <div class="home-video-grid" id="latestVideos" aria-live="polite">
           <p class="article-state">正在读取最新视频……</p>
+        </div>
+      </section>
+
+      <section class="achievement-section" id="achievements">
+        <div class="achievement-copy reveal">
+          <p class="eyebrow">Jianghu Achievements</p>
+          <h2>江湖成就</h2>
+          <p>每日来桃林留下一枚脚印，连续签到可以解锁新的江湖称号。</p>
+          <button class="ink-button" id="checkinButton" type="button">今日签到</button>
+          <p class="achievement-status" id="achievementStatus" role="status">正在查看你的江湖履历……</p>
+        </div>
+        <div class="achievement-cards reveal" id="achievementCards">
+          <article><strong>初入江湖</strong><span>完成首次签到</span></article>
+          <article><strong>桃林常客</strong><span>连续签到 3 天</span></article>
+          <article><strong>风雨故人</strong><span>累计签到 7 天</span></article>
         </div>
       </section>
 
@@ -166,9 +181,9 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase-config.js"></script>
-    <script src="./article-service.js?v=5"></script>
+    <script src="./article-service.js?v=7"></script>
     <script src="./theme.js?v=4"></script>
     <script src="./ai-assistant.js?v=1"></script>
-    <script src="./script.js?v=6"></script>
+    <script src="./script.js?v=7"></script>
   </body>
 </html>

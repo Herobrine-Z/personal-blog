@@ -30,6 +30,12 @@ function renderArticle(article) {
   header.querySelector(".article-detail-meta span").textContent = (article.tags || [])
     .map((tag) => `#${tag}`)
     .join(" ");
+  if (article.content_type === "video" && article.series_name) {
+    const series = document.createElement("span");
+    series.className = "video-series-label";
+    series.textContent = `${article.series_name}${article.episode_number ? ` · 第 ${article.episode_number} 集` : ""}`;
+    header.querySelector(".article-detail-meta").appendChild(series);
+  }
   header.querySelector(".article-detail-excerpt").textContent = article.excerpt;
 
   const body = document.createElement("div");
@@ -44,6 +50,7 @@ function renderArticle(article) {
     if (article.video_poster) player.poster = article.video_poster;
     player.setAttribute("aria-label", article.title);
     body.appendChild(player);
+    setupVideoExperience(player, article);
     const description = document.createElement("div");
     description.className = "video-description";
     description.innerHTML = window.blogMarkdown.render(article.content || article.excerpt);
@@ -86,6 +93,44 @@ function renderArticle(article) {
   const cover = articleService.firstImage(article);
   if (cover) setMeta("og:image", cover.url, true);
   createToc(body);
+}
+
+function formatDuration(seconds) {
+  const value = Math.max(0, Math.round(Number(seconds) || 0));
+  const minutes = Math.floor(value / 60);
+  return `${minutes}:${String(value % 60).padStart(2, "0")}`;
+}
+
+function setupVideoExperience(player, article) {
+  const progressKey = `hutao-video-progress-${article.id}`;
+  const completedKey = `hutao-video-complete-${article.id}`;
+  const saved = Number(localStorage.getItem(progressKey) || 0);
+  const info = document.createElement("div");
+  info.className = "video-playback-info";
+  info.innerHTML = `<span>播放进度会自动保存</span><span class="video-duration"></span>`;
+  player.insertAdjacentElement("afterend", info);
+
+  player.addEventListener("loadedmetadata", () => {
+    const duration = article.duration_seconds || player.duration;
+    info.querySelector(".video-duration").textContent = duration ? `时长 ${formatDuration(duration)}` : "";
+    if (saved > 5 && saved < player.duration - 5) {
+      player.currentTime = saved;
+      info.firstElementChild.textContent = `已恢复到 ${formatDuration(saved)}`;
+    }
+  });
+  player.addEventListener("timeupdate", () => {
+    if (Math.floor(player.currentTime) % 5 === 0) {
+      localStorage.setItem(progressKey, String(player.currentTime));
+    }
+  });
+  player.addEventListener("ended", async () => {
+    localStorage.removeItem(progressKey);
+    if (localStorage.getItem(completedKey)) return;
+    localStorage.setItem(completedKey, "1");
+    try {
+      await articleService.recordVideoComplete(article.id);
+    } catch {}
+  });
 }
 
 function renderArticleMath(root) {
@@ -206,12 +251,24 @@ function createCommentItem(comment, floor, isReply) {
   const header = document.createElement("header");
   const name = document.createElement("strong");
   name.textContent = comment.visitor_name;
+  if (comment.is_owner) {
+    const badge = document.createElement("small");
+    badge.className = "owner-comment-badge";
+    badge.textContent = "站长";
+    name.appendChild(badge);
+  }
   const meta = document.createElement("span");
   const time = document.createElement("time");
   time.dateTime = comment.created_at;
   time.textContent = articleService.formatDate(comment.created_at);
   meta.textContent = isReply ? `回复 ${floor} 楼 · ` : `${floor} 楼 · `;
   meta.appendChild(time);
+  if (comment.pinned) {
+    const pinned = document.createElement("b");
+    pinned.className = "pinned-comment-badge";
+    pinned.textContent = "置顶";
+    meta.append(" · ", pinned);
+  }
   header.append(name, meta);
   const body = document.createElement("p");
   body.textContent = comment.body;
@@ -220,6 +277,26 @@ function createCommentItem(comment, floor, isReply) {
   reply.className = "comment-reply-button";
   reply.textContent = "回复";
   reply.addEventListener("click", () => beginReply(isReply ? comment.parent_id : comment.id, floor));
+  const actions = document.createElement("div");
+  actions.className = "comment-item-actions";
+  const like = document.createElement("button");
+  like.type = "button";
+  like.className = "comment-reply-button comment-like-button";
+  like.textContent = `赞 ${comment.like_count || 0}`;
+  like.classList.toggle("active", articleService.hasCommentReaction(comment.id));
+  like.addEventListener("click", async () => {
+    like.disabled = true;
+    try {
+      const result = await articleService.toggleCommentReaction(comment.id);
+      like.textContent = `赞 ${result.count}`;
+      like.classList.toggle("active", result.active);
+    } catch {
+      like.title = "请先执行最新的 Supabase 数据库迁移";
+    } finally {
+      like.disabled = false;
+    }
+  });
+  actions.append(reply, like);
   item.append(header, body);
   if (comment.attachments?.length) {
     const files = document.createElement("div");
@@ -227,7 +304,7 @@ function createCommentItem(comment, floor, isReply) {
     comment.attachments.forEach((file) => files.appendChild(createAttachmentLink(file)));
     item.appendChild(files);
   }
-  item.appendChild(reply);
+  item.appendChild(actions);
   return item;
 }
 
@@ -303,7 +380,7 @@ async function setupArticleExtras(article) {
       sessionStorage.setItem(viewKey, "1");
     } catch {}
   }
-  viewCount.textContent = `${views} 次阅读`;
+  viewCount.textContent = `${views} ${article.content_type === "video" ? "次播放" : "次阅读"}`;
 
   actions.querySelectorAll("[data-reaction]").forEach((button) => {
     button.querySelector(".like-count").textContent = article.like_count || 0;

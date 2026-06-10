@@ -43,7 +43,7 @@
   }
 
   function isSchemaMismatch(error) {
-    return /column .* does not exist|schema cache/i.test(error?.message || "");
+    return /column .* does not exist|schema cache|could not find|deleted_at|pinned|series_name|duration_seconds/i.test(error?.message || "");
   }
 
   async function listPublishedLegacy(limit, filters = {}) {
@@ -71,6 +71,32 @@
     }));
   }
 
+  async function listPublishedV6(limit, filters = {}) {
+    let query = requireClient()
+      .from("articles")
+      .select("id,title,slug,excerpt,attachments,category,tags,published_at,created_at,view_count,like_count,favorite_count,content_type,video_url,video_poster,video_path,video_name")
+      .eq("published", true)
+      .or(`scheduled_at.is.null,scheduled_at.lte.${new Date().toISOString()}`)
+      .order("published_at", { ascending: false });
+    if (filters.category) query = query.eq("category", filters.category);
+    if (filters.contentType) query = query.eq("content_type", filters.contentType);
+    if (filters.search) {
+      const search = filters.search.replace(/[%_,()]/g, " ").trim();
+      if (search) query = query.or(`title.ilike.%${search}%,excerpt.ilike.%${search}%`);
+    }
+    if (filters.tag) query = query.contains("tags", [filters.tag]);
+    if (limit) query = query.limit(limit);
+    const { data, error } = await query;
+    if (error && isSchemaMismatch(error)) return listPublishedLegacy(limit, filters);
+    if (error) throw error;
+    return data.map((item) => ({
+      ...item,
+      series_name: null,
+      episode_number: null,
+      duration_seconds: null,
+    }));
+  }
+
   function getVisitorToken() {
     const key = "hutao-visitor-token";
     let token = localStorage.getItem(key);
@@ -84,8 +110,9 @@
   async function listPublished(limit, filters = {}) {
     let query = requireClient()
       .from("articles")
-      .select("id,title,slug,excerpt,attachments,category,tags,published_at,created_at,view_count,like_count,favorite_count,content_type,video_url,video_poster,video_path,video_name")
+      .select("id,title,slug,excerpt,attachments,category,tags,published_at,created_at,view_count,like_count,favorite_count,content_type,video_url,video_poster,video_path,video_name,series_name,episode_number,duration_seconds")
       .eq("published", true)
+      .is("deleted_at", null)
       .or(`scheduled_at.is.null,scheduled_at.lte.${new Date().toISOString()}`)
       .order("published_at", { ascending: false });
 
@@ -98,7 +125,7 @@
     if (filters.tag) query = query.contains("tags", [filters.tag]);
     if (limit) query = query.limit(limit);
     const { data, error } = await query;
-    if (error && isSchemaMismatch(error)) return listPublishedLegacy(limit, filters);
+    if (error && isSchemaMismatch(error)) return listPublishedV6(limit, filters);
     if (error) throw error;
     return data;
   }
@@ -109,6 +136,7 @@
       .select("*")
       .eq("slug", slug)
       .eq("published", true)
+      .is("deleted_at", null)
       .or(`scheduled_at.is.null,scheduled_at.lte.${new Date().toISOString()}`)
       .single();
     if (error && isSchemaMismatch(error)) {
@@ -119,16 +147,19 @@
         .eq("published", true)
         .single());
       if (data) {
-        data.category = "随笔";
-        data.tags = [];
-        data.view_count = 0;
-        data.like_count = 0;
-        data.favorite_count = 0;
-        data.content_type = "article";
-        data.video_url = null;
-        data.video_poster = null;
-        data.video_path = null;
-        data.video_name = null;
+        data.category ||= "随笔";
+        data.tags ||= [];
+        data.view_count ||= 0;
+        data.like_count ||= 0;
+        data.favorite_count ||= 0;
+        data.content_type ||= "article";
+        data.video_url ||= null;
+        data.video_poster ||= null;
+        data.video_path ||= null;
+        data.video_name ||= null;
+        data.series_name = null;
+        data.episode_number = null;
+        data.duration_seconds = null;
       }
     }
     if (error) throw error;
@@ -159,8 +190,9 @@
   async function listRelated(article, limit = 3) {
     let query = requireClient()
       .from("articles")
-      .select("id,title,slug,excerpt,attachments,category,tags,published_at,content_type,video_url,video_poster")
+      .select("id,title,slug,excerpt,attachments,category,tags,published_at,content_type,video_url,video_poster,series_name,episode_number")
       .eq("published", true)
+      .is("deleted_at", null)
       .neq("id", article.id)
       .eq("content_type", article.content_type || "article")
       .or(`scheduled_at.is.null,scheduled_at.lte.${new Date().toISOString()}`)
@@ -168,7 +200,20 @@
       .limit(limit);
     if (article.category) query = query.eq("category", article.category);
     const { data, error } = await query;
-    if (error && isSchemaMismatch(error)) return [];
+    if (error && isSchemaMismatch(error)) {
+      let legacyQuery = requireClient()
+        .from("articles")
+        .select("id,title,slug,excerpt,attachments,category,tags,published_at,content_type,video_url,video_poster")
+        .eq("published", true)
+        .neq("id", article.id)
+        .eq("content_type", article.content_type || "article")
+        .order("published_at", { ascending: false })
+        .limit(limit);
+      if (article.category) legacyQuery = legacyQuery.eq("category", article.category);
+      const legacy = await legacyQuery;
+      if (legacy.error) return [];
+      return legacy.data;
+    }
     if (error) throw error;
     return data;
   }
@@ -264,16 +309,45 @@
   }
 
   async function deleteArticle(id) {
+    const { error } = await requireClient()
+      .from("articles")
+      .update({ deleted_at: new Date().toISOString(), published: false })
+      .eq("id", id);
+    if (error) throw error;
+  }
+
+  async function restoreArticle(id) {
+    const { error } = await requireClient().from("articles").update({ deleted_at: null }).eq("id", id);
+    if (error) throw error;
+  }
+
+  async function permanentlyDeleteArticle(id) {
     const { error } = await requireClient().from("articles").delete().eq("id", id);
     if (error) throw error;
   }
 
   async function listComments(articleId) {
-    const { data, error } = await requireClient()
+    let { data, error } = await requireClient()
       .from("comments")
       .select("*")
       .eq("article_id", articleId)
+      .order("pinned", { ascending: false })
       .order("created_at", { ascending: true });
+    if (error && isSchemaMismatch(error)) {
+      ({ data, error } = await requireClient()
+        .from("comments")
+        .select("*")
+        .eq("article_id", articleId)
+        .order("created_at", { ascending: true }));
+      if (data) {
+        data = data.map((comment) => ({
+          like_count: 0,
+          pinned: false,
+          is_owner: false,
+          ...comment,
+        }));
+      }
+    }
     if (error) throw error;
     return data;
   }
@@ -333,6 +407,25 @@
     if (error) throw error;
   }
 
+  async function updateCommentPinned(id, pinned) {
+    const { error } = await requireClient().from("comments").update({ pinned }).eq("id", id);
+    if (error) throw error;
+  }
+
+  async function toggleCommentReaction(commentId) {
+    const { data, error } = await requireClient().rpc("toggle_comment_reaction", {
+      target_comment: commentId,
+      target_token: getVisitorToken(),
+    });
+    if (error) throw error;
+    localStorage.setItem(`hutao-comment-like-${commentId}`, String(data.active));
+    return data;
+  }
+
+  function hasCommentReaction(commentId) {
+    return localStorage.getItem(`hutao-comment-like-${commentId}`) === "true";
+  }
+
   async function deleteComment(id) {
     const { error } = await requireClient().from("comments").delete().eq("id", id);
     if (error) throw error;
@@ -373,8 +466,36 @@
   async function recordView(articleId) {
     const { data, error } = await requireClient().rpc("record_article_view", {
       target_article: articleId,
+      target_token: getVisitorToken(),
     });
     if (error && /function .* does not exist|schema cache/i.test(error.message || "")) return 0;
+    if (error) throw error;
+    return data;
+  }
+
+  async function recordVideoComplete(articleId) {
+    const { error } = await requireClient().rpc("record_video_complete", {
+      target_article: articleId,
+      target_token: getVisitorToken(),
+    });
+    if (error) throw error;
+  }
+
+  async function checkIn() {
+    const { data, error } = await requireClient().rpc("visitor_check_in", {
+      target_token: getVisitorToken(),
+    });
+    if (error) throw error;
+    localStorage.setItem("hutao-last-checkin", new Date().toISOString().slice(0, 10));
+    return data;
+  }
+
+  function checkedInToday() {
+    return localStorage.getItem("hutao-last-checkin") === new Date().toISOString().slice(0, 10);
+  }
+
+  async function getOwnerDashboard() {
+    const { data, error } = await requireClient().rpc("get_owner_dashboard");
     if (error) throw error;
     return data;
   }
@@ -432,18 +553,27 @@
     publishArticle,
     updateArticle,
     deleteArticle,
+    restoreArticle,
+    permanentlyDeleteArticle,
     listComments,
     listAllComments,
     uploadCommentFiles,
     createComment,
     updateCommentApproval,
+    updateCommentPinned,
+    toggleCommentReaction,
+    hasCommentReaction,
     deleteComment,
     removeCommentFiles,
     listMessages,
     createMessage,
     deleteMessage,
     recordView,
+    recordVideoComplete,
     recordSiteVisit,
+    checkIn,
+    checkedInToday,
+    getOwnerDashboard,
     toggleReaction,
     hasReaction,
   };

@@ -160,6 +160,43 @@ async function loadHomepageVideos() {
   }
 }
 
+function renderAchievements(result) {
+  const total = Number(result?.total_days || 0);
+  const streak = Number(result?.streak || 0);
+  const cards = [...document.querySelectorAll("#achievementCards article")];
+  cards[0]?.classList.toggle("unlocked", total >= 1);
+  cards[1]?.classList.toggle("unlocked", streak >= 3);
+  cards[2]?.classList.toggle("unlocked", total >= 7);
+  document.querySelector("#achievementStatus").textContent =
+    `累计签到 ${total} 天 · 当前连续 ${streak} 天`;
+  const button = document.querySelector("#checkinButton");
+  button.textContent = articleService.checkedInToday() ? "今日已签到" : "今日签到";
+  button.disabled = articleService.checkedInToday();
+}
+
+async function setupAchievements() {
+  const button = document.querySelector("#checkinButton");
+  if (!button || !articleService.configured) return;
+  const cached = JSON.parse(localStorage.getItem("hutao-achievement-state") || "null");
+  if (cached) renderAchievements(cached);
+  else document.querySelector("#achievementStatus").textContent = "尚未签到，今天就从第一步开始。";
+  if (articleService.checkedInToday()) {
+    button.disabled = true;
+    button.textContent = "今日已签到";
+  }
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    try {
+      const result = await articleService.checkIn();
+      localStorage.setItem("hutao-achievement-state", JSON.stringify(result));
+      renderAchievements(result);
+    } catch (error) {
+      document.querySelector("#achievementStatus").textContent = `签到失败：${error.message}`;
+      button.disabled = false;
+    }
+  });
+}
+
 function createClickEffect(x, y) {
   if (!hasGsap || reducedMotion) return;
 
@@ -605,3 +642,4 @@ loadHomepageArticles();
 loadHomepageVideos();
 loadSiteVisitCount();
 initializeGuestbook();
+setupAchievements();
