@@ -30,6 +30,13 @@ function renderArticle(article) {
   header.querySelector(".article-detail-meta span").textContent = (article.tags || [])
     .map((tag) => `#${tag}`)
     .join(" ");
+  const readingMeta = document.createElement("span");
+  const plainText = (article.content || article.excerpt || "").replace(/[#*_>`~\[\]()!-]/g, " ");
+  const characterCount = plainText.replace(/\s/g, "").length;
+  readingMeta.textContent = article.content_type === "video"
+    ? "视频作品"
+    : `约 ${Math.max(1, Math.ceil(characterCount / 420))} 分钟阅读`;
+  header.querySelector(".article-detail-meta").appendChild(readingMeta);
   if (article.content_type === "video" && article.series_name) {
     const series = document.createElement("span");
     series.className = "video-series-label";
@@ -93,6 +100,55 @@ function renderArticle(article) {
   const cover = articleService.firstImage(article);
   if (cover) setMeta("og:image", cover.url, true);
   createToc(body);
+  setupReadingTools(article);
+}
+
+function setupReadingTools(article) {
+  if (article.content_type === "video") return;
+  const tools = document.querySelector("#readingTools");
+  const root = document.documentElement;
+  const scaleKey = "hutao-reading-scale";
+  const bookmarkKey = "hutao-bookmarked-articles";
+  let scale = Math.min(1.2, Math.max(0.9, Number(localStorage.getItem(scaleKey)) || 1));
+
+  const applyScale = () => {
+    root.style.setProperty("--article-font-scale", scale);
+    localStorage.setItem(scaleKey, String(scale));
+  };
+  const getBookmarks = () => {
+    try {
+      return JSON.parse(localStorage.getItem(bookmarkKey) || "[]");
+    } catch {
+      return [];
+    }
+  };
+  const bookmark = document.querySelector("#bookmarkArticle");
+  const renderBookmark = () => {
+    const active = getBookmarks().some((item) => item.id === article.id);
+    bookmark.classList.toggle("active", active);
+    bookmark.setAttribute("aria-pressed", String(active));
+    bookmark.textContent = active ? "已收藏" : "收藏此卷";
+  };
+
+  applyScale();
+  renderBookmark();
+  tools.hidden = false;
+  document.querySelector("#decreaseFont").addEventListener("click", () => {
+    scale = Math.max(0.9, Number((scale - 0.1).toFixed(1)));
+    applyScale();
+  });
+  document.querySelector("#increaseFont").addEventListener("click", () => {
+    scale = Math.min(1.2, Number((scale + 0.1).toFixed(1)));
+    applyScale();
+  });
+  bookmark.addEventListener("click", () => {
+    const items = getBookmarks();
+    const index = items.findIndex((item) => item.id === article.id);
+    if (index >= 0) items.splice(index, 1);
+    else items.unshift({ id: article.id, slug: article.slug, title: article.title, savedAt: Date.now() });
+    localStorage.setItem(bookmarkKey, JSON.stringify(items.slice(0, 50)));
+    renderBookmark();
+  });
 }
 
 function formatDuration(seconds) {
@@ -205,6 +261,15 @@ function createToc(body) {
   });
   toc.appendChild(list);
   toc.hidden = false;
+  const links = [...list.querySelectorAll("a")];
+  const observer = new IntersectionObserver((entries) => {
+    const visible = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+    if (!visible) return;
+    links.forEach((link) => link.classList.toggle("active", link.hash === `#${visible.target.id}`));
+  }, { rootMargin: "-18% 0px -68% 0px", threshold: 0 });
+  headings.forEach((heading) => observer.observe(heading));
 }
 
 function createAttachmentLink(file) {
@@ -405,11 +470,13 @@ async function setupArticleExtras(article) {
 
   document.querySelector("#shareArticle").addEventListener("click", async () => {
     const data = { title: article.title, text: article.excerpt, url: location.href };
-    if (navigator.share) await navigator.share(data);
-    else {
-      await navigator.clipboard.writeText(location.href);
-      document.querySelector("#shareArticle").textContent = "链接已复制";
-    }
+    try {
+      if (navigator.share) await navigator.share(data);
+      else {
+        await navigator.clipboard.writeText(location.href);
+        document.querySelector("#shareArticle").textContent = "链接已复制";
+      }
+    } catch {}
   });
 
   const all = await articleService.listPublished(null, { contentType: article.content_type || "article" });

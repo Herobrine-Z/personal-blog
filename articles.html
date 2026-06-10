@@ -14,8 +14,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=7" />
-    <link rel="stylesheet" href="./article-pages.css?v=7" />
+    <link rel="stylesheet" href="./styles.css?v=9" />
+    <link rel="stylesheet" href="./article-pages.css?v=9" />
   </head>
   <body class="inner-page">
     <div class="paper-noise" aria-hidden="true"></div>
@@ -42,9 +42,17 @@
         <select id="categoryFilter" aria-label="按分类筛选">
           <option value="">全部分类</option>
         </select>
+        <select id="sortArticles" aria-label="文章排序">
+          <option value="newest">最新发布</option>
+          <option value="popular">最多阅读</option>
+          <option value="liked">最多点赞</option>
+        </select>
         <button class="text-button" id="clearFilters" type="button">清除筛选</button>
       </section>
-      <div class="tag-filter-list" id="tagFilters" aria-label="按标签筛选"></div>
+      <div class="filter-summary">
+        <div class="tag-filter-list" id="tagFilters" aria-label="按标签筛选"></div>
+        <p id="articleResultCount" role="status"></p>
+      </div>
       <section class="all-articles-grid" id="articleList" aria-live="polite">
         <p class="article-state">正在翻阅文章……</p>
       </section>
@@ -53,8 +61,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase-config.js"></script>
     <script src="./article-service.js?v=7"></script>
-    <script src="./theme.js?v=4"></script>
+    <script src="./theme.js?v=6"></script>
     <script src="./ai-assistant.js?v=1"></script>
-    <script src="./articles.js?v=5"></script>
+    <script src="./articles.js?v=6"></script>
   </body>
 </html>

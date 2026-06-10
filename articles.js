@@ -3,9 +3,27 @@ const searchInput = document.querySelector("#articleSearch");
 const categoryFilter = document.querySelector("#categoryFilter");
 const tagFilters = document.querySelector("#tagFilters");
 const clearFilters = document.querySelector("#clearFilters");
+const sortArticles = document.querySelector("#sortArticles");
+const resultCount = document.querySelector("#articleResultCount");
 
 let allArticles = [];
 let activeTag = "";
+
+function restoreFilterState() {
+  const params = new URLSearchParams(location.search);
+  searchInput.value = params.get("q") || "";
+  activeTag = params.get("tag") || "";
+  sortArticles.value = params.get("sort") || "newest";
+}
+
+function updateFilterUrl() {
+  const params = new URLSearchParams();
+  if (searchInput.value.trim()) params.set("q", searchInput.value.trim());
+  if (categoryFilter.value) params.set("category", categoryFilter.value);
+  if (activeTag) params.set("tag", activeTag);
+  if (sortArticles.value !== "newest") params.set("sort", sortArticles.value);
+  history.replaceState(null, "", `${location.pathname}${params.size ? `?${params}` : ""}`);
+}
 
 function createListCard(article) {
   const link = document.createElement("a");
@@ -66,6 +84,7 @@ function renderFilters() {
     option.textContent = category;
     categoryFilter.appendChild(option);
   });
+  categoryFilter.value = new URLSearchParams(location.search).get("category") || "";
 
   const tags = [...new Set(allArticles.flatMap((article) => article.tags || []))];
   tags.forEach((tag) => {
@@ -92,11 +111,19 @@ function renderArticles() {
       (!category || article.category === category) &&
       (!activeTag || (article.tags || []).includes(activeTag));
   });
+  const sorters = {
+    newest: (a, b) => new Date(b.published_at) - new Date(a.published_at),
+    popular: (a, b) => (b.view_count || 0) - (a.view_count || 0),
+    liked: (a, b) => (b.like_count || 0) - (a.like_count || 0),
+  };
+  filtered.sort(sorters[sortArticles.value] || sorters.newest);
 
   [...tagFilters.children].forEach((button) => {
     button.classList.toggle("active", button.textContent === `# ${activeTag}`);
   });
   articleContainer.replaceChildren();
+  resultCount.textContent = `共找到 ${filtered.length} 篇文章`;
+  updateFilterUrl();
   if (!filtered.length) {
     articleContainer.innerHTML = '<p class="article-state">没有找到相合的文章。</p>';
     return;
@@ -111,6 +138,7 @@ async function loadArticles() {
   }
   try {
     allArticles = await articleService.listPublished();
+    restoreFilterState();
     renderFilters();
     renderArticles();
   } catch (error) {
@@ -120,10 +148,12 @@ async function loadArticles() {
 
 searchInput.addEventListener("input", renderArticles);
 categoryFilter.addEventListener("change", renderArticles);
+sortArticles.addEventListener("change", renderArticles);
 clearFilters.addEventListener("click", () => {
   searchInput.value = "";
   categoryFilter.value = "";
   activeTag = "";
+  sortArticles.value = "newest";
   renderArticles();
 });
 
