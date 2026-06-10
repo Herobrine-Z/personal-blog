@@ -109,6 +109,7 @@ async function loadHomepageArticles() {
       return;
     }
     articles.forEach((article, index) => container.appendChild(createHomepageArticleCard(article, index)));
+    setupInkHoverEffects();
   } catch (error) {
     container.innerHTML = `<p class="article-state">文章读取失败：${error.message}</p>`;
   }
@@ -155,6 +156,7 @@ async function loadHomepageVideos() {
       return;
     }
     videos.forEach((video) => container.appendChild(createHomepageVideoCard(video)));
+    setupInkHoverEffects();
   } catch (error) {
     container.innerHTML = `<p class="article-state">视频读取失败：${error.message}</p>`;
   }
@@ -170,26 +172,150 @@ function renderAchievements(result) {
   document.querySelector("#achievementStatus").textContent =
     `累计签到 ${total} 天 · 当前连续 ${streak} 天`;
   const button = document.querySelector("#checkinButton");
-  button.textContent = articleService.checkedInToday() ? "今日已签到" : "今日签到";
-  button.disabled = articleService.checkedInToday();
+  button.textContent = articleService.checkedInToday() ? "查看今日运势" : "今日签到";
+  button.disabled = false;
+}
+
+const fortuneRanks = ["下下吉", "下吉", "中吉", "上吉", "上上吉"];
+const fortuneGoodPool = [
+  "写下新的灵感",
+  "与故友闲谈",
+  "整理旧日收藏",
+  "听风看云",
+  "开启一局游戏",
+  "品一盏清茶",
+  "完成搁置的小事",
+  "早些休息",
+  "去有花木的地方",
+  "分享真诚的赞美",
+];
+const fortuneBadPool = [
+  "冲动做决定",
+  "与人争一时长短",
+  "熬夜逞强",
+  "空腹饮浓茶",
+  "反复纠结旧事",
+  "急于求成",
+  "忘记回复消息",
+  "临时改变计划",
+  "把情绪藏得太深",
+  "沉迷下一局",
+];
+const fortuneVerses = [
+  "桃枝轻动，旧愿正在风里悄悄发芽。",
+  "山路虽有薄雾，慢行自会遇见清光。",
+  "今日宜守心定气，转角处自有好消息。",
+  "一瓣桃花落入砚中，寻常小事也能成诗。",
+  "风从远山来，带走迟疑，也带来新缘。",
+  "不必追赶所有答案，水到之处自成溪。",
+  "刀光可避，花期莫负，今日当尽兴而归。",
+];
+
+function localDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function pickFortuneItems(pool, count) {
+  const copy = [...pool];
+  const selected = [];
+  while (selected.length < count && copy.length) {
+    selected.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
+  }
+  return selected;
+}
+
+function getTodayFortune() {
+  const key = "hutao-daily-fortune";
+  const today = localDateKey();
+  try {
+    const cached = JSON.parse(localStorage.getItem(key) || "null");
+    if (cached?.date === today) return cached;
+  } catch {
+    localStorage.removeItem(key);
+  }
+
+  const fortune = {
+    date: today,
+    rank: fortuneRanks[Math.floor(Math.random() * fortuneRanks.length)],
+    verse: fortuneVerses[Math.floor(Math.random() * fortuneVerses.length)],
+    good: pickFortuneItems(fortuneGoodPool, 3),
+    bad: pickFortuneItems(fortuneBadPool, 3),
+  };
+  localStorage.setItem(key, JSON.stringify(fortune));
+  return fortune;
+}
+
+function showFortune() {
+  const dialog = document.querySelector("#fortuneDialog");
+  const fortune = getTodayFortune();
+  const date = new Date(`${fortune.date}T12:00:00`);
+  document.querySelector("#fortuneDate").textContent = new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "long",
+  }).format(date);
+  document.querySelector("#fortuneTitle").textContent = fortune.rank;
+  document.querySelector("#fortuneVerse").textContent = fortune.verse;
+
+  const renderList = (selector, items) => {
+    const list = document.querySelector(selector);
+    list.replaceChildren(...items.map((item) => {
+      const entry = document.createElement("li");
+      entry.textContent = item;
+      return entry;
+    }));
+  };
+  renderList("#fortuneGood", fortune.good);
+  renderList("#fortuneBad", fortune.bad);
+
+  if (!dialog.open) dialog.showModal();
+  if (hasGsap && !reducedMotion) {
+    gsap.fromTo(
+      ".fortune-scroll",
+      { scaleY: 0.72, scaleX: 0.92, y: 24, autoAlpha: 0, transformOrigin: "center top" },
+      { scaleY: 1, scaleX: 1, y: 0, autoAlpha: 1, duration: 0.65, ease: "power3.out" },
+    );
+    gsap.from(".fortune-rank-wrap, .fortune-verse, .fortune-guidance section", {
+      y: 18,
+      autoAlpha: 0,
+      stagger: 0.1,
+      duration: 0.5,
+      delay: 0.18,
+      ease: "power2.out",
+    });
+  }
+  summonPetals();
 }
 
 async function setupAchievements() {
   const button = document.querySelector("#checkinButton");
-  if (!button || !articleService.configured) return;
+  if (!button) return;
   const cached = JSON.parse(localStorage.getItem("hutao-achievement-state") || "null");
   if (cached) renderAchievements(cached);
   else document.querySelector("#achievementStatus").textContent = "尚未签到，今天就从第一步开始。";
   if (articleService.checkedInToday()) {
-    button.disabled = true;
-    button.textContent = "今日已签到";
+    button.textContent = "查看今日运势";
   }
   button.addEventListener("click", async () => {
+    if (articleService.checkedInToday()) {
+      showFortune();
+      return;
+    }
     button.disabled = true;
     try {
-      const result = await articleService.checkIn();
+      const result = articleService.configured
+        ? await articleService.checkIn()
+        : { total_days: 1, streak: 1 };
+      if (!articleService.configured) {
+        localStorage.setItem("hutao-last-checkin", localDateKey());
+      }
       localStorage.setItem("hutao-achievement-state", JSON.stringify(result));
       renderAchievements(result);
+      showFortune();
     } catch (error) {
       document.querySelector("#achievementStatus").textContent = `签到失败：${error.message}`;
       button.disabled = false;
@@ -545,6 +671,7 @@ document.querySelector("#messageForm").addEventListener("submit", async (event) 
 
 const lightbox = document.querySelector("#imageLightbox");
 const lightboxImage = lightbox.querySelector("img");
+const fortuneDialog = document.querySelector("#fortuneDialog");
 
 document.querySelectorAll("[data-gallery-src]").forEach((button) => {
   button.addEventListener("click", () => {
@@ -558,6 +685,46 @@ lightbox.querySelector(".lightbox-close").addEventListener("click", () => lightb
 lightbox.addEventListener("click", (event) => {
   if (event.target === lightbox) lightbox.close();
 });
+
+fortuneDialog.querySelector(".fortune-close").addEventListener("click", () => fortuneDialog.close());
+fortuneDialog.addEventListener("click", (event) => {
+  if (event.target === fortuneDialog) fortuneDialog.close();
+});
+
+function setupInkHoverEffects() {
+  if (!finePointer || reducedMotion) return;
+  const targets = document.querySelectorAll(
+    ".article-card, .home-video-card, .portal-card, .achievement-cards article",
+  );
+  targets.forEach((target) => {
+    if (target.classList.contains("ink-reactive")) return;
+    target.classList.add("ink-reactive");
+    target.addEventListener("pointermove", (event) => {
+      const rect = target.getBoundingClientRect();
+      target.style.setProperty("--ink-x", `${event.clientX - rect.left}px`);
+      target.style.setProperty("--ink-y", `${event.clientY - rect.top}px`);
+      target.style.setProperty("--ink-opacity", "1");
+    });
+    target.addEventListener("pointerleave", () => {
+      target.style.setProperty("--ink-opacity", "0");
+    });
+  });
+
+  const hero = document.querySelector(".hero");
+  const heroArt = document.querySelector(".hero-art");
+  hero.addEventListener("pointermove", (event) => {
+    const x = (event.clientX / window.innerWidth - 0.5) * 12;
+    const y = (event.clientY / window.innerHeight - 0.5) * 8;
+    if (hasGsap) {
+      gsap.to(heroArt, { x, y, scale: 1.04, duration: 1.1, ease: "power2.out", overwrite: "auto" });
+    }
+  });
+  hero.addEventListener("pointerleave", () => {
+    if (hasGsap) {
+      gsap.to(heroArt, { x: 0, y: 0, scale: 1.025, duration: 1.2, ease: "power2.out" });
+    }
+  });
+}
 
 if (hasGsap && !reducedMotion) {
   if (finePointer) {
@@ -643,3 +810,4 @@ loadHomepageVideos();
 loadSiteVisitCount();
 initializeGuestbook();
 setupAchievements();
+setupInkHoverEffects();

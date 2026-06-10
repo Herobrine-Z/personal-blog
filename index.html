@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./styles.css?v=7" />
+    <link rel="stylesheet" href="./styles.css?v=8" />
   </head>
   <body>
     <div class="paper-noise" aria-hidden="true"></div>
@@ -177,13 +177,40 @@
     <dialog class="image-lightbox" id="imageLightbox">
       <button class="lightbox-close" type="button" aria-label="关闭大图">×</button><img src="" alt="" />
     </dialog>
+    <dialog class="fortune-dialog" id="fortuneDialog" aria-labelledby="fortuneTitle">
+      <div class="fortune-scroll">
+        <button class="fortune-close" type="button" aria-label="收起今日运势">×</button>
+        <span class="fortune-knot" aria-hidden="true"></span>
+        <header>
+          <p>桃林灵签 · 今日运势</p>
+          <time id="fortuneDate"></time>
+        </header>
+        <div class="fortune-rank-wrap">
+          <span>运势</span>
+          <strong id="fortuneTitle">上上吉</strong>
+          <i aria-hidden="true">签</i>
+        </div>
+        <p class="fortune-verse" id="fortuneVerse"></p>
+        <div class="fortune-guidance">
+          <section>
+            <h3><span>宜</span> 顺势而为</h3>
+            <ul id="fortuneGood"></ul>
+          </section>
+          <section>
+            <h3><span>忌</span> 稍安勿躁</h3>
+            <ul id="fortuneBad"></ul>
+          </section>
+        </div>
+        <p class="fortune-footnote">一日一签，心诚则灵</p>
+      </div>
+    </dialog>
     <button class="wind-toggle" id="windToggle" aria-pressed="false"><span class="wind-icon" aria-hidden="true">〰</span><span class="wind-label">风止</span></button>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./supabase-config.js"></script>
-    <script src="./article-service.js?v=7"></script>
+    <script src="./article-service.js?v=8"></script>
     <script src="./theme.js?v=4"></script>
     <script src="./ai-assistant.js?v=1"></script>
-    <script src="./script.js?v=7"></script>
+    <script src="./script.js?v=8"></script>
   </body>
 </html>

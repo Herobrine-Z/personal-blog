@@ -486,12 +486,24 @@
       target_token: getVisitorToken(),
     });
     if (error) throw error;
-    localStorage.setItem("hutao-last-checkin", new Date().toISOString().slice(0, 10));
+    const now = new Date();
+    const localDate = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+    ].join("-");
+    localStorage.setItem("hutao-last-checkin", localDate);
     return data;
   }
 
   function checkedInToday() {
-    return localStorage.getItem("hutao-last-checkin") === new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const localDate = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+    ].join("-");
+    return localStorage.getItem("hutao-last-checkin") === localDate;
   }
 
   async function getOwnerDashboard() {

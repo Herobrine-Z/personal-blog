@@ -1369,6 +1369,281 @@ footer {
   filter: none;
 }
 
+.ink-reactive {
+  position: relative;
+  isolation: isolate;
+}
+
+.ink-reactive::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: var(--ink-opacity, 0);
+  background:
+    radial-gradient(
+      circle 145px at var(--ink-x, 50%) var(--ink-y, 50%),
+      color-mix(in srgb, var(--cinnabar) 10%, transparent),
+      color-mix(in srgb, var(--ink) 5%, transparent) 42%,
+      transparent 72%
+    );
+  mix-blend-mode: multiply;
+  transition: opacity 0.45s ease;
+}
+
+[data-theme="dark"] .ink-reactive::after {
+  mix-blend-mode: screen;
+}
+
+.fortune-dialog {
+  width: min(620px, calc(100% - 28px));
+  max-width: none;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  color: var(--ink);
+  background: transparent;
+}
+
+.fortune-dialog::backdrop {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(45, 54, 49, 0.28), rgba(10, 14, 12, 0.82)),
+    rgba(10, 14, 12, 0.72);
+  backdrop-filter: blur(7px) saturate(0.7);
+}
+
+.fortune-scroll {
+  position: relative;
+  padding: clamp(38px, 7vw, 62px) clamp(28px, 7vw, 66px) 34px;
+  overflow: hidden;
+  border: 1px solid rgba(74, 64, 48, 0.24);
+  color: #18201d;
+  background:
+    linear-gradient(90deg, rgba(95, 72, 43, 0.08), transparent 8% 92%, rgba(95, 72, 43, 0.08)),
+    radial-gradient(circle at 80% 18%, rgba(159, 48, 41, 0.08), transparent 24%),
+    #eee9dc;
+  box-shadow:
+    0 28px 90px rgba(5, 10, 8, 0.42),
+    inset 0 0 70px rgba(95, 72, 43, 0.08);
+}
+
+.fortune-scroll::before,
+.fortune-scroll::after {
+  content: "";
+  position: absolute;
+  right: -60px;
+  width: 310px;
+  height: 150px;
+  border: 24px solid rgba(34, 48, 42, 0.055);
+  border-radius: 50%;
+  transform: rotate(-12deg);
+}
+
+.fortune-scroll::before {
+  top: -95px;
+}
+
+.fortune-scroll::after {
+  bottom: -112px;
+  left: -75px;
+  transform: rotate(15deg);
+}
+
+.fortune-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  z-index: 5;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(24, 32, 29, 0.24);
+  border-radius: 50%;
+  background: rgba(244, 243, 237, 0.48);
+  color: #18201d;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fortune-knot {
+  position: absolute;
+  top: 0;
+  left: 28px;
+  width: 10px;
+  height: 76px;
+  background: var(--cinnabar);
+  box-shadow: 15px 10px 0 -3px rgba(159, 48, 41, 0.68);
+  transform: rotate(3deg);
+}
+
+.fortune-scroll header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(24, 32, 29, 0.18);
+}
+
+.fortune-scroll header p,
+.fortune-scroll header time {
+  margin: 0;
+}
+
+.fortune-scroll header p {
+  color: var(--cinnabar);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+}
+
+.fortune-scroll header time {
+  color: #69685f;
+  font-family: var(--hand);
+  font-size: 18px;
+}
+
+.fortune-rank-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  min-height: 155px;
+}
+
+.fortune-rank-wrap > span {
+  color: #77756b;
+  font-size: 11px;
+  letter-spacing: 0.4em;
+  writing-mode: vertical-rl;
+}
+
+.fortune-rank-wrap strong {
+  font-family: var(--brush);
+  font-size: clamp(68px, 15vw, 104px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-shadow: 3px 4px 0 rgba(159, 48, 41, 0.08);
+}
+
+.fortune-rank-wrap i {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 3px double rgba(255, 230, 212, 0.72);
+  color: #f8e6d7;
+  background: var(--cinnabar);
+  font-family: var(--brush);
+  font-size: 23px;
+  font-style: normal;
+  transform: rotate(7deg);
+}
+
+.fortune-verse {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 28px;
+  color: #414740;
+  font-family: var(--hand);
+  font-size: clamp(23px, 5vw, 31px);
+  line-height: 1.55;
+  text-align: center;
+}
+
+.fortune-guidance {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.fortune-guidance section {
+  padding: 18px 20px;
+  border: 1px solid rgba(24, 32, 29, 0.14);
+  background: rgba(255, 254, 248, 0.42);
+}
+
+.fortune-guidance h3 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.fortune-guidance h3 span {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+  place-items: center;
+  border-radius: 50%;
+  color: #f8ece0;
+  background: var(--cinnabar);
+  font-family: var(--brush);
+  font-size: 19px;
+}
+
+.fortune-guidance section:last-child h3 span {
+  background: #46554e;
+}
+
+.fortune-guidance ul {
+  margin: 0;
+  padding: 0;
+  color: #585e57;
+  list-style: none;
+  font-size: 13px;
+  line-height: 2;
+}
+
+.fortune-guidance li::before {
+  content: "·";
+  margin-right: 8px;
+  color: var(--cinnabar);
+}
+
+.fortune-footnote {
+  position: relative;
+  z-index: 1;
+  margin: 24px 0 0;
+  color: #77756c;
+  font-family: var(--hand);
+  font-size: 17px;
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+
+body:has(.fortune-dialog[open]) {
+  overflow: hidden;
+}
+
+@media (max-width: 560px) {
+  .fortune-scroll {
+    padding: 46px 22px 28px;
+  }
+
+  .fortune-scroll header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .fortune-rank-wrap {
+    min-height: 130px;
+  }
+
+  .fortune-guidance {
+    grid-template-columns: 1fr;
+  }
+}
+
 .achievement-cards article.unlocked strong::after {
   content: " 已解锁";
   color: var(--cinnabar);
