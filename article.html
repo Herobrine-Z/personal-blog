@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文章 | 虎桃不会振刀</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./article-pages.css" />
+  </head>
+  <body class="inner-page">
+    <div class="paper-noise" aria-hidden="true"></div>
+    <header class="site-header scrolled">
+      <a class="brand" href="./index.html"><span class="brand-seal">虎桃</span><span class="brand-name">不会振刀</span></a>
+      <nav class="inner-nav"><a href="./index.html">首页</a><a href="./articles.html">全部文章</a></nav>
+    </header>
+    <main class="article-detail-shell">
+      <article id="articleDetail" aria-live="polite"><p class="article-state">正在展开此卷……</p></article>
+      <section class="comment-section" id="comments" hidden>
+        <div class="comment-heading">
+          <p class="eyebrow">Comments</p>
+          <h2>卷后留评</h2>
+          <p>所有访客都可以评论，也可以附上一份文件。</p>
+        </div>
+        <form class="comment-form" id="commentForm">
+          <label><span>江湖名号</span><input type="text" name="visitorName" maxlength="40" required /></label>
+          <label><span>评论</span><textarea name="body" rows="4" maxlength="2000" required></textarea></label>
+          <label><span>文件</span><input type="file" name="attachments" multiple /><small>最多 3 个文件，单个不超过 10 MB。</small></label>
+          <button class="ink-button" type="submit">留下评论</button>
+          <p class="comment-status" id="commentStatus" role="status"></p>
+        </form>
+        <div class="comment-list" id="commentList" aria-live="polite"></div>
+      </section>
+    </main>
+    <footer><p>© 2026 虎桃不会振刀</p><a href="./articles.html">返回文章页</a></footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./supabase-config.js"></script>
+    <script src="./article-service.js"></script>
+    <script src="./article-detail.js"></script>
+  </body>
+</html>

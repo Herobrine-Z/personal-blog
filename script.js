@@ -19,6 +19,81 @@ const pointer = { x: -1000, y: -1000 };
 
 const random = (min, max) => Math.random() * (max - min) + min;
 
+function createHomepageArticleCard(article, index) {
+  const card = document.createElement("article");
+  const cover = articleService.firstImage(article);
+  card.className = `article-card ${index === 0 ? "featured" : ""} reveal`;
+
+  const visual = document.createElement("div");
+  visual.className = `card-visual ${cover ? "article-cover" : index === 0 ? "peach-mountain" : "moon-lake"}`;
+  if (cover) {
+    const image = document.createElement("img");
+    image.src = cover.url;
+    image.alt = "";
+    image.loading = "lazy";
+    visual.appendChild(image);
+  } else if (index === 0) {
+    const mountain = document.createElement("div");
+    mountain.className = "ink-mountain";
+    mountain.setAttribute("aria-hidden", "true");
+    visual.appendChild(mountain);
+  } else {
+    const moon = document.createElement("div");
+    moon.className = "moon";
+    moon.setAttribute("aria-hidden", "true");
+    visual.appendChild(moon);
+  }
+
+  const badge = document.createElement("span");
+  badge.className = "card-index";
+  badge.textContent = index === 0 ? "新" : "次";
+  visual.prepend(badge);
+
+  const content = document.createElement("div");
+  content.className = "card-content";
+  const meta = document.createElement("div");
+  meta.className = "article-meta";
+  const category = document.createElement("span");
+  category.textContent = "最新文章";
+  const time = document.createElement("time");
+  time.dateTime = article.published_at;
+  time.textContent = articleService.formatDate(article.published_at);
+  meta.append(category, time);
+
+  const title = document.createElement("h3");
+  title.textContent = article.title;
+  const excerpt = document.createElement("p");
+  excerpt.textContent = article.excerpt;
+  const link = document.createElement("a");
+  link.href = articleService.articleUrl(article);
+  link.innerHTML = "展开此卷 <span>→</span>";
+  content.append(meta, title, excerpt, link);
+  card.append(visual, content);
+  return card;
+}
+
+async function loadHomepageArticles() {
+  const container = document.querySelector("#latestArticles");
+  if (!container || !window.articleService) return;
+
+  if (!articleService.configured) {
+    container.innerHTML = '<p class="article-state">文章功能尚待站长完成配置。</p>';
+    return;
+  }
+
+  try {
+    const articles = await articleService.listPublished(2);
+    container.replaceChildren();
+    if (!articles.length) {
+      container.innerHTML = '<p class="article-state">还没有发布文章，第一卷正在酝酿中。</p>';
+      return;
+    }
+    articles.forEach((article, index) => container.appendChild(createHomepageArticleCard(article, index)));
+  } catch (error) {
+    container.innerHTML = `<p class="article-state">文章读取失败：${error.message}</p>`;
+  }
+}
+
 function createClickEffect(x, y) {
   if (!hasGsap || reducedMotion) return;
 
@@ -242,12 +317,56 @@ nav.addEventListener("click", (event) => {
   }
 });
 
-document.querySelector("#messageForm").addEventListener("submit", (event) => {
+function renderGuestbook(messages) {
+  const list = document.querySelector("#guestbookList");
+  list.replaceChildren();
+  messages.forEach((message) => {
+    const item = document.createElement("article");
+    const header = document.createElement("div");
+    const name = document.createElement("strong");
+    name.textContent = message.visitor_name;
+    const time = document.createElement("time");
+    time.dateTime = message.created_at;
+    time.textContent = articleService.formatDate(message.created_at);
+    header.append(name, time);
+    const body = document.createElement("p");
+    body.textContent = message.body;
+    item.append(header, body);
+    list.appendChild(item);
+  });
+}
+
+async function loadGuestbook() {
+  if (!articleService.configured) return;
+  try {
+    renderGuestbook(await articleService.listMessages());
+  } catch (error) {
+    document.querySelector("#formNote").textContent = `留言读取失败：${error.message}`;
+  }
+}
+
+document.querySelector("#messageForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   const note = document.querySelector("#formNote");
-  const name = new FormData(event.currentTarget).get("name").trim();
-  note.textContent = `${name}的墨迹，已留在这卷江湖里。`;
-  event.currentTarget.reset();
+  const form = event.currentTarget;
+  const button = form.querySelector("button");
+  const values = new FormData(form);
+  const name = values.get("name").trim();
+  button.disabled = true;
+  note.textContent = "正在落印……";
+  try {
+    await articleService.createMessage({
+      visitor_name: name,
+      body: values.get("message").trim(),
+    });
+    note.textContent = `${name}的墨迹，已留在这卷江湖里。`;
+    form.reset();
+    await loadGuestbook();
+  } catch (error) {
+    note.textContent = `留言失败：${error.message}`;
+  } finally {
+    button.disabled = false;
+  }
 
   if (hasGsap && !reducedMotion) {
     gsap.fromTo(note, { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.45 });
@@ -345,3 +464,6 @@ if (hasGsap && !reducedMotion) {
     window.setTimeout(createPiece, i * 280);
   }
 }
+
+loadHomepageArticles();
+loadGuestbook();

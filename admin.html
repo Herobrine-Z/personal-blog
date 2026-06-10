@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>文章管理 | 虎桃不会振刀</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./article-pages.css" />
+  </head>
+  <body class="inner-page">
+    <div class="paper-noise" aria-hidden="true"></div>
+    <header class="site-header scrolled">
+      <a class="brand" href="./index.html"><span class="brand-seal">虎桃</span><span class="brand-name">不会振刀</span></a>
+      <nav class="inner-nav"><a href="./index.html">首页</a><a href="./articles.html">文章</a></nav>
+    </header>
+    <main class="admin-shell">
+      <section class="auth-panel" id="authPanel">
+        <p class="eyebrow">Owner Only</p>
+        <h1>站长登录</h1>
+        <form id="loginForm" class="editor-form">
+          <label><span>邮箱</span><input type="email" name="email" autocomplete="username" required /></label>
+          <label><span>密码</span><input type="password" name="password" autocomplete="current-password" required /></label>
+          <button class="ink-button" type="submit">登录</button>
+        </form>
+      </section>
+      <section class="editor-panel" id="editorPanel" hidden>
+        <div class="editor-heading">
+          <div><p class="eyebrow">Owner Console</p><h1 id="editorTitle">写文章</h1></div>
+          <button class="text-button" id="logoutButton" type="button">退出登录</button>
+        </div>
+        <section class="admin-article-list">
+          <div class="admin-list-heading">
+            <h2>文章管理</h2>
+            <button class="text-button" id="newArticleButton" type="button">新建文章</button>
+          </div>
+          <div id="adminArticleList"><p class="article-state">正在读取文章……</p></div>
+        </section>
+        <form id="articleForm" class="editor-form">
+          <input type="hidden" name="articleId" />
+          <label><span>标题</span><input type="text" name="title" maxlength="120" required /></label>
+          <label><span>网址标识</span><input type="text" name="slug" maxlength="120" placeholder="例如：my-first-article" required /><small>只能使用小写字母、数字和连字符。</small></label>
+          <label><span>摘要</span><textarea name="excerpt" rows="3" maxlength="300" required></textarea></label>
+          <label><span>正文</span><textarea name="content" rows="16" required placeholder="段落之间留一个空行。"></textarea></label>
+          <label><span>图片与附件</span><input type="file" name="attachments" multiple /><small>首张图片会作为文章封面；单个文件建议不超过 10 MB。</small></label>
+          <div class="existing-attachments" id="existingAttachments" hidden></div>
+          <button class="ink-button publish-button" type="submit">发布文章</button>
+        </form>
+      </section>
+      <p class="admin-status" id="adminStatus" role="status"></p>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./supabase-config.js"></script>
+    <script src="./article-service.js"></script>
+    <script src="./admin.js"></script>
+  </body>
+</html>

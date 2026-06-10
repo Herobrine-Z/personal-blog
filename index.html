@@ -28,7 +28,7 @@
       </button>
       <nav class="site-nav" id="siteNav" aria-label="主导航">
         <a class="active" href="#home">卷首</a>
-        <a href="#articles">游记</a>
+        <a href="./articles.html">文章</a>
         <a href="#kurumi">胡桃绘卷</a>
         <a href="#links">江湖去处</a>
         <a href="#about">侠客志</a>
@@ -55,37 +55,11 @@
 
       <section class="section articles-section" id="articles">
         <div class="section-heading reveal">
-          <div><p class="eyebrow">Jianghu Notes</p><h2>近来游记</h2></div>
-          <p>游戏里的胜负很快，<br />值得记下的故事很慢。</p>
+          <div><p class="eyebrow">Latest Articles</p><h2>最新文章</h2></div>
+          <p>新写下的两卷文字，<br /><a class="section-heading-link" href="./articles.html">查看全部文章 →</a></p>
         </div>
-        <div class="article-grid">
-          <article class="article-card featured reveal">
-            <div class="card-visual peach-mountain"><span class="card-index">壹</span><div class="ink-mountain" aria-hidden="true"></div></div>
-            <div class="card-content">
-              <div class="article-meta"><span>永劫闲谈</span><time datetime="2026-06-06">六月初六</time></div>
-              <h3>这一次，我依然没有振出那一刀</h3>
-              <p>有些人博弈于毫秒之间，有些人在振刀键前反复横跳。关于一场落日寺里的、不甚英勇的相遇。</p>
-              <a href="#message">展开此卷 <span>→</span></a>
-            </div>
-          </article>
-          <article class="article-card reveal">
-            <div class="card-visual moon-lake"><span class="card-index">贰</span><div class="moon" aria-hidden="true"></div></div>
-            <div class="card-content">
-              <div class="article-meta"><span>浮生杂记</span><time datetime="2026-05-22">五月廿二</time></div>
-              <h3>春桃笑时，适合慢一点</h3>
-              <p>把急着赶路的日子放在门外，泡一壶茶，听檐角的风。</p>
-              <a href="#message">展开此卷 <span>→</span></a>
-            </div>
-          </article>
-          <article class="article-card reveal">
-            <div class="card-visual bamboo"><span class="card-index">叁</span><div class="bamboo-stalks" aria-hidden="true"></div></div>
-            <div class="card-content">
-              <div class="article-meta"><span>设计手札</span><time datetime="2026-05-10">五月初十</time></div>
-              <h3>在屏幕里留一寸空白</h3>
-              <p>水墨并不是黑与白，而是让没有落笔的地方也开始说话。</p>
-              <a href="#message">展开此卷 <span>→</span></a>
-            </div>
-          </article>
+        <div class="article-grid" id="latestArticles" aria-live="polite">
+          <p class="article-state">正在翻阅最新文章……</p>
         </div>
       </section>
 
@@ -180,11 +154,12 @@
           <p class="eyebrow">Leave A Mark</p><h2>雁过留声，侠过留墨</h2>
           <p>留下一句话，等下一阵江湖风吹来时，我会看见。</p>
           <form class="message-form" id="messageForm">
-            <label><span>江湖名号</span><input type="text" name="name" placeholder="如何称呼阁下" required /></label>
-            <label><span>只言片语</span><textarea name="message" rows="3" placeholder="落笔于此……" required></textarea></label>
+            <label><span>江湖名号</span><input type="text" name="name" maxlength="40" placeholder="如何称呼阁下" required /></label>
+            <label><span>只言片语</span><textarea name="message" rows="3" maxlength="500" placeholder="落笔于此……" required></textarea></label>
             <button class="seal-button" type="submit">落印</button>
           </form>
           <p class="form-note" id="formNote" role="status"></p>
+          <div class="guestbook-list" id="guestbookList" aria-live="polite"></div>
         </div>
       </section>
     </main>
@@ -195,6 +170,9 @@
     </dialog>
     <button class="wind-toggle" id="windToggle" aria-pressed="false"><span class="wind-icon" aria-hidden="true">〰</span><span class="wind-label">风止</span></button>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./supabase-config.js"></script>
+    <script src="./article-service.js"></script>
     <script src="./script.js"></script>
   </body>
 </html>

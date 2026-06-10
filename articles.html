@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="虎桃不会振刀发布的全部文章。" />
+    <title>文章 | 虎桃不会振刀</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./article-pages.css" />
+  </head>
+  <body class="inner-page">
+    <div class="paper-noise" aria-hidden="true"></div>
+    <header class="site-header scrolled">
+      <a class="brand" href="./index.html"><span class="brand-seal">虎桃</span><span class="brand-name">不会振刀</span></a>
+      <nav class="inner-nav" aria-label="文章导航">
+        <a href="./index.html">首页</a>
+        <a class="active" href="./articles.html">文章</a>
+      </nav>
+    </header>
+    <main class="article-page-shell">
+      <section class="page-title">
+        <p class="eyebrow">All Articles</p>
+        <h1>文章</h1>
+        <p>写下游戏里的故事，也记住生活里慢下来的片刻。</p>
+      </section>
+      <section class="all-articles-grid" id="articleList" aria-live="polite">
+        <p class="article-state">正在翻阅文章……</p>
+      </section>
+    </main>
+    <footer><p>© 2026 虎桃不会振刀</p><a href="./admin.html">站长入口</a></footer>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./supabase-config.js"></script>
+    <script src="./article-service.js"></script>
+    <script src="./articles.js"></script>
+  </body>
+</html>

@@ -827,6 +827,36 @@ button {
   border-color: var(--cinnabar);
 }
 
+.guestbook-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 34px;
+}
+
+.guestbook-list article {
+  padding: 18px 20px;
+  border: 1px solid rgba(40, 43, 37, 0.14);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.guestbook-list article > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.guestbook-list time {
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.guestbook-list p {
+  margin: 10px 0 0;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
 .seal-button {
   width: 62px;
   height: 62px;
