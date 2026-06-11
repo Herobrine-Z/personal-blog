@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="胡桃桌宠小屋：可以抚摸、喂食、玩耍、休息、拖拽和培养好感的互动桌宠页面。"
+    />
+    <meta name="theme-color" content="#7d1f2b" />
+    <link rel="icon" type="image/png" href="./assets/icon.png" />
+    <link rel="apple-touch-icon" href="./assets/icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <title>胡桃桌宠 | 虎桃不会振刀</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=13" />
+    <link rel="stylesheet" href="./pet.css?v=1" />
+  </head>
+  <body class="pet-page">
+    <div class="paper-noise" aria-hidden="true"></div>
+    <div class="pet-sky" aria-hidden="true">
+      <span class="pet-cloud cloud-a"></span>
+      <span class="pet-cloud cloud-b"></span>
+      <span class="pet-cloud cloud-c"></span>
+      <span class="pet-lantern lantern-a"></span>
+      <span class="pet-lantern lantern-b"></span>
+    </div>
+
+    <header class="site-header scrolled pet-header">
+      <a class="brand" href="./index.html" aria-label="返回首页">
+        <img class="brand-icon" src="./assets/icon.png" alt="" />
+        <span class="brand-name">不会振刀</span>
+      </a>
+      <nav class="inner-nav" aria-label="桌宠小屋导航">
+        <a href="./index.html">首页</a>
+        <a href="./articles.html">文章</a>
+        <a href="./videos.html">视频</a>
+        <a href="./kurumi.html">胡桃绘卷</a>
+        <a class="active" href="./pet.html">桌宠小屋</a>
+      </nav>
+    </header>
+
+    <main class="pet-shell">
+      <section class="pet-intro">
+        <div>
+          <p class="eyebrow">HU TAO DESKTOP COMPANION</p>
+          <h1>胡桃桌宠小屋</h1>
+          <p>陪她吃点心、玩游戏、睡个午觉。轻点角色可以摸摸头，也可以把她拖到房间里的任意位置。</p>
+        </div>
+        <div class="pet-day-card">
+          <span id="petGreeting">今日相伴</span>
+          <strong id="petClock">--:--</strong>
+          <small id="petDayText">正在看看窗外的天色……</small>
+        </div>
+      </section>
+
+      <section class="pet-room" id="petRoom" aria-label="胡桃桌宠互动区域">
+        <div class="room-window" aria-hidden="true">
+          <span class="window-moon"></span>
+          <span class="window-mountain mountain-far"></span>
+          <span class="window-mountain mountain-near"></span>
+        </div>
+        <div class="room-decoration decoration-scroll" aria-hidden="true">桃</div>
+        <div class="room-decoration decoration-vase" aria-hidden="true">
+          <i></i><span></span><span></span><span></span>
+        </div>
+        <div class="room-floor" aria-hidden="true"></div>
+
+        <aside class="pet-status-panel" aria-label="桌宠状态">
+          <div class="pet-level-row">
+            <span class="pet-avatar"><img src="./assets/hutao-pet.png" alt="" /></span>
+            <div><small>亲密等级</small><strong>Lv.<span id="petLevel">1</span> 小桃</strong></div>
+            <span class="pet-coins" title="桃花币">✿ <b id="petCoins">20</b></span>
+          </div>
+          <div class="pet-xp-track" title="亲密经验">
+            <i id="petXpBar"></i><span id="petXpText">0 / 100</span>
+          </div>
+          <div class="pet-stat-list">
+            <div class="pet-stat" data-stat="hunger">
+              <span><i>食</i>饱食</span><b id="hungerValue">80</b>
+              <div><i id="hungerBar"></i></div>
+            </div>
+            <div class="pet-stat" data-stat="mood">
+              <span><i>乐</i>心情</span><b id="moodValue">80</b>
+              <div><i id="moodBar"></i></div>
+            </div>
+            <div class="pet-stat" data-stat="energy">
+              <span><i>气</i>精力</span><b id="energyValue">80</b>
+              <div><i id="energyBar"></i></div>
+            </div>
+          </div>
+          <button class="daily-gift" id="dailyGift" type="button">
+            <span>今日小礼</span><strong>领取 10 枚桃花币</strong>
+          </button>
+        </aside>
+
+        <div class="pet-dialogue" id="petDialogue" role="status" aria-live="polite">
+          <span class="dialogue-name">小桃</span>
+          <p id="petSpeech">你来啦！今天也一起玩吧。</p>
+        </div>
+
+        <div class="pet-stage" id="petStage">
+          <div class="pet-shadow" aria-hidden="true"></div>
+          <button
+            class="pet-character"
+            id="petCharacter"
+            type="button"
+            aria-label="摸摸胡桃，按住可拖动"
+            title="轻点摸摸头，按住拖动"
+          >
+            <span class="pet-aura" aria-hidden="true"></span>
+            <span class="pet-visual" id="petVisual">
+              <img src="./assets/hutao-pet.png" alt="穿着舞狮新年服装的胡桃桌宠" draggable="false" />
+              <span class="sleep-mark" aria-hidden="true">Z</span>
+            </span>
+          </button>
+          <div class="pet-particles" id="petParticles" aria-hidden="true"></div>
+        </div>
+
+        <div class="pet-action-dock" aria-label="桌宠互动">
+          <button type="button" data-action="pet"><span>♡</span><strong>摸摸</strong><small>心情 +5</small></button>
+          <button type="button" data-action="feed"><span>食</span><strong>投喂</strong><small>花费 3</small></button>
+          <button type="button" data-action="play"><span>跃</span><strong>玩耍</strong><small>精力 -8</small></button>
+          <button type="button" data-action="dance"><span>舞</span><strong>跳舞</strong><small>心情 +10</small></button>
+          <button type="button" data-action="sleep"><span>眠</span><strong>休息</strong><small>恢复精力</small></button>
+          <button type="button" data-action="talk"><span>言</span><strong>聊聊</strong><small>随机对话</small></button>
+        </div>
+
+        <div class="pet-room-tools" aria-label="桌宠设置">
+          <button id="soundToggle" type="button" aria-pressed="true" title="切换音效">♪<span>音效</span></button>
+          <button id="motionToggle" type="button" aria-pressed="true" title="暂停动作">动<span>动作</span></button>
+          <button id="sceneToggle" type="button" title="切换昼夜">夜<span>昼夜</span></button>
+          <button id="resetPet" type="button" title="重置桌宠位置">归<span>归位</span></button>
+        </div>
+      </section>
+
+      <section class="pet-lower-grid">
+        <article class="pet-card pet-memory-card">
+          <p class="eyebrow">Companion Notes</p>
+          <h2>相伴手札</h2>
+          <div class="memory-stats">
+            <div><strong id="daysTogether">1</strong><span>相伴天数</span></div>
+            <div><strong id="interactionCount">0</strong><span>互动次数</span></div>
+            <div><strong id="bestMood">80</strong><span>最高心情</span></div>
+          </div>
+          <p id="memoryNote">第一天见面，小桃已经记住你啦。</p>
+        </article>
+
+        <article class="pet-card pet-achievement-card">
+          <div class="pet-card-heading">
+            <div><p class="eyebrow">Achievements</p><h2>小屋成就</h2></div>
+            <span id="achievementCount">0 / 6</span>
+          </div>
+          <div class="achievement-list" id="petAchievements"></div>
+        </article>
+
+        <article class="pet-card pet-guide-card">
+          <p class="eyebrow">How To Play</p>
+          <h2>玩法提示</h2>
+          <ul>
+            <li><span>01</span>轻点角色摸摸头，按住角色可自由拖动。</li>
+            <li><span>02</span>投喂、玩耍和休息会改变状态并提升亲密度。</li>
+            <li><span>03</span>每天回来领取桃花币，连续陪伴会解锁成就。</li>
+            <li><span>04</span>所有进度只保存在你的浏览器本地。</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+
+    <footer><p>© 2026 虎桃不会振刀</p><a href="./index.html">返回卷首</a></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="./theme.js?v=7"></script>
+    <script src="./pet.js?v=1"></script>
+  </body>
+</html>

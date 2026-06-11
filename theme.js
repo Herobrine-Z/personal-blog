@@ -55,6 +55,7 @@
         <a href="./articles.html">文章</a>
         <a href="./videos.html">视频</a>
         <a href="./kurumi.html">胡桃绘卷</a>
+        <a href="./pet.html">桌宠小屋</a>
       </nav>
       <div class="site-search-results" aria-live="polite">
         <p>输入关键词开始搜索，也可以使用上方快捷入口。</p>
