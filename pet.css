@@ -566,11 +566,11 @@
 }
 
 .pet-rig.rig-active .pet-rig-fallback {
-  opacity: 0;
+  opacity: 1;
 }
 
 .pet-rig.rig-active .puppet {
-  opacity: 1;
+  opacity: 0;
 }
 
 .puppet-part {
