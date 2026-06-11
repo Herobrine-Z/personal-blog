@@ -447,6 +447,26 @@ function setupFlowingLandscape() {
   });
 }
 
+function setupAmbientInk() {
+  if (!hasGsap || reducedMotion) return;
+  const drifts = gsap.utils.toArray(".ink-drift");
+  if (!drifts.length) return;
+
+  drifts.forEach((drift, index) => {
+    gsap.to(drift, {
+      xPercent: index % 2 ? -18 : 20,
+      yPercent: index % 2 ? 14 : -12,
+      rotation: index % 2 ? "+=9" : "-=8",
+      scale: index === 1 ? 1.28 : 1.08,
+      opacity: index === 1 ? 0.34 : 0.44,
+      duration: 14 + index * 3,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    });
+  });
+}
+
 function createPiece(options = {}) {
   if (reducedMotion || !hasGsap || pieces.size > 42) return;
 
@@ -851,3 +871,4 @@ initializeGuestbook();
 setupAchievements();
 setupInkHoverEffects();
 setupFlowingLandscape();
+setupAmbientInk();
