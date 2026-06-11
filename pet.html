@@ -19,7 +19,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css?v=13" />
-    <link rel="stylesheet" href="./pet.css?v=4" />
+    <link rel="stylesheet" href="./pet.css?v=5" />
   </head>
   <body class="pet-page">
     <div class="paper-noise" aria-hidden="true"></div>
@@ -117,12 +117,27 @@
             <span class="pet-visual" id="petVisual">
               <span class="pet-rig" id="petRig" aria-hidden="true">
                 <span class="pet-canvas" id="petCanvas"></span>
-                <img
-                  class="pet-rig-fallback"
-                  src="./assets/hutao.png"
-                  alt=""
-                  draggable="false"
-                />
+                <span class="pet-artwork" data-artwork>
+                  <img
+                    class="pet-rig-fallback"
+                    src="./assets/hutao.png"
+                    alt=""
+                    draggable="false"
+                  />
+                  <span class="facial-rig">
+                    <span class="eye-control eye-control-left">
+                      <span class="gaze-pupil"></span>
+                      <span class="blink-lid"></span>
+                    </span>
+                    <span class="eye-control eye-control-right">
+                      <span class="gaze-pupil"></span>
+                      <span class="blink-lid"></span>
+                    </span>
+                    <span class="mouth-control">
+                      <span class="mouth-open"></span>
+                    </span>
+                  </span>
+                </span>
                 <span class="face-control cheek-control cheek-left"></span>
                 <span class="face-control cheek-control cheek-right"></span>
               </span>
@@ -179,8 +194,9 @@
           <ul>
             <li><span>01</span>轻点角色摸摸头，按住角色可自由拖动。</li>
             <li><span>02</span>投喂、玩耍和休息会改变状态并提升亲密度。</li>
-            <li><span>03</span>每天回来领取桃花币，连续陪伴会解锁成就。</li>
-            <li><span>04</span>所有进度只保存在你的浏览器本地。</li>
+            <li><span>03</span>移动光标时胡桃会跟随你的视线，并会自然眨眼和张嘴。</li>
+            <li><span>04</span>每天回来领取桃花币，连续陪伴会解锁成就。</li>
+            <li><span>05</span>所有进度只保存在你的浏览器本地。</li>
           </ul>
         </article>
       </section>
@@ -190,7 +206,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
     <script src="./theme.js?v=7"></script>
-    <script src="./pet-rig.js?v=4"></script>
+    <script src="./pet-rig.js?v=5"></script>
     <script src="./pet.js?v=3"></script>
   </body>
 </html>

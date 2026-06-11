@@ -12,6 +12,7 @@
       this.dragging = false;
       this.actionTimeline = null;
       this.idleTimeline = null;
+      this.blinkTimeline = null;
       this.blinkTimer = null;
       this.pointer = { x: 0, y: 0 };
     }
@@ -77,15 +78,20 @@
         hat: this.host.querySelector(".hat-part"),
       };
       this.rigRoot = this.host.closest(".pet-rig");
-      this.parts.artwork = this.rigRoot?.querySelector(".pet-rig-fallback");
+      this.parts.artwork = this.rigRoot?.querySelector("[data-artwork]");
+      this.parts.gazePupils = [...this.rigRoot?.querySelectorAll(".gaze-pupil") || []];
+      this.parts.blinkLids = [...this.rigRoot?.querySelectorAll(".blink-lid") || []];
+      this.parts.mouthOpen = this.rigRoot?.querySelector(".mouth-open");
       this.rigRoot?.classList.add("rig-ready", "artwork-locked");
       this.startIdle();
+      this.scheduleBlink();
     }
 
     setMotion(enabled) {
       this.motion = enabled;
       if (enabled) {
         this.startIdle();
+        this.scheduleBlink();
       } else {
         this.stop();
       }
@@ -98,13 +104,15 @@
     }
 
     trackPointer(clientX, clientY) {
-      if (!this.motion || this.dragging || this.actionTimeline || !window.gsap) return;
+      if (!this.motion || !window.gsap || !this.parts?.gazePupils?.length) return;
       const rect = this.host.getBoundingClientRect();
       const x = clamp(((clientX - rect.left) / rect.width) * 2 - 1);
-      this.pointer = { x, y: clamp(((clientY - rect.top) / rect.height) * 2 - 1) };
-      gsap.to(this.parts.artwork, {
-        rotation: x * 0.8,
-        duration: 0.45,
+      const y = clamp(((clientY - rect.top) / rect.height) * 2 - 1);
+      this.pointer = { x, y };
+      gsap.to(this.parts.gazePupils, {
+        x: x * 5,
+        y: y * 3.5,
+        duration: 0.18,
         overwrite: "auto",
         ease: "power2.out",
       });
@@ -127,7 +135,24 @@
     }
 
     blink(duration = 0.1) {
-      return duration;
+      if (!window.gsap || !this.parts?.blinkLids?.length) return null;
+      this.blinkTimeline?.kill();
+      this.blinkTimeline = gsap.timeline({
+        onComplete: () => {
+          this.blinkTimeline = null;
+        },
+      })
+        .to(this.parts.blinkLids, {
+          scaleY: 1,
+          duration,
+          ease: "power2.in",
+        })
+        .to(this.parts.blinkLids, {
+          scaleY: 0,
+          duration: duration * 1.35,
+          ease: "power2.out",
+        });
+      return this.blinkTimeline;
     }
 
     resetParts(duration = 0) {
@@ -142,10 +167,24 @@
         overwrite: true,
         ease: duration ? "back.out(1.4)" : "none",
       });
+      gsap.to(this.parts.mouthOpen, {
+        autoAlpha: 0,
+        scaleX: 0.72,
+        scaleY: 0.12,
+        duration,
+        overwrite: true,
+      });
+      gsap.to(this.parts.blinkLids, {
+        scaleY: 0,
+        duration,
+        overwrite: true,
+      });
     }
 
     stop() {
       clearTimeout(this.blinkTimer);
+      this.blinkTimeline?.kill();
+      this.blinkTimeline = null;
       this.actionTimeline?.kill();
       this.actionTimeline = null;
       this.idleTimeline?.kill();
@@ -185,12 +224,15 @@
       if (type === "pet") {
         timeline
           .to(p.artwork, { y: 5, scale: 0.992, duration: 0.18 })
+          .add(() => this.blink(0.1), 0.03)
           .to(p.artwork, { y: -2, scale: 1.004, duration: 0.24 });
         settle();
       } else if (type === "feed") {
         timeline
           .to(p.artwork, { rotation: -1.8, y: 3, duration: 0.18 })
+          .to(p.mouthOpen, { autoAlpha: 1, scaleX: 0.9, scaleY: 1, duration: 0.12 }, 0.07)
           .to(p.artwork, { rotation: 1.8, y: 0, duration: 0.18 })
+          .to(p.mouthOpen, { autoAlpha: 0, scaleX: 0.72, scaleY: 0.12, duration: 0.12 }, "<")
           .to(p.artwork, { rotation: -1.2, y: 2, duration: 0.16 });
         settle();
       } else if (type === "play") {
@@ -208,7 +250,9 @@
       } else if (type === "sleep") {
         timeline
           .to(p.artwork, { rotation: 3.5, y: 7, scale: 0.995, duration: 0.38, ease: "sine.inOut" })
+          .to(p.blinkLids, { scaleY: 1, duration: 0.16, ease: "power2.in" }, 0.12)
           .to(p.artwork, { y: 10, duration: 0.7, repeat: 1, yoyo: true, ease: "sine.inOut" });
+        timeline.to(p.blinkLids, { scaleY: 0, duration: 0.18, ease: "power2.out" });
         settle();
       } else if (type === "wave") {
         timeline
@@ -218,13 +262,26 @@
       } else if (type === "nod" || type === "talk") {
         timeline
           .to(p.artwork, { y: 6, rotation: 0.8, duration: 0.18 })
+          .add(() => this.blink(0.09), 0.06)
           .to(p.artwork, { y: -2, rotation: -0.8, duration: 0.2 })
           .to(p.artwork, { y: 4, rotation: 0.6, duration: 0.17 });
+        if (type === "talk") {
+          timeline.to(p.mouthOpen, {
+            autoAlpha: 1,
+            scaleX: 0.82,
+            scaleY: 0.75,
+            duration: 0.1,
+            repeat: 3,
+            yoyo: true,
+          }, 0.08);
+        }
         settle();
       } else if (type === "surprise") {
         timeline
           .to(p.artwork, { y: -15, scale: 1.035, duration: 0.2, ease: "back.out(2)" })
+          .to(p.mouthOpen, { autoAlpha: 1, scaleX: 1, scaleY: 1.15, duration: 0.14 }, 0)
           .to(p.artwork, { y: -5, scale: 1.012, duration: 0.2 });
+        timeline.to(p.mouthOpen, { autoAlpha: 0, scaleX: 0.72, scaleY: 0.12, duration: 0.12 });
         settle();
       } else {
         timeline.to(p.artwork, { rotation: 2, duration: 0.2 });
