@@ -528,15 +528,6 @@
   display: block;
 }
 
-.pet-canvas canvas {
-  display: block;
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain;
-  filter: drop-shadow(0 16px 12px rgba(75, 33, 33, 0.19));
-  pointer-events: none;
-}
-
 .pet-rig-fallback {
   position: absolute;
   inset: 0;
@@ -551,66 +542,168 @@
   visibility: hidden;
 }
 
+.puppet,
+.puppet-bone {
+  position: absolute;
+  display: block;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.puppet {
+  inset: 0;
+  filter: drop-shadow(0 16px 12px rgba(75, 33, 33, 0.19));
+  pointer-events: none;
+}
+
+.puppet-part {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.body-bone {
+  z-index: 5;
+  top: 47.8%;
+  left: 25.2%;
+  width: 49.6%;
+  height: 33.4%;
+  transform-origin: 50% 12%;
+}
+
+.head-bone {
+  z-index: 10;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60.5%;
+  transform-origin: 50% 84%;
+}
+
+.head-bone .face-part {
+  z-index: 1;
+  top: 33%;
+  left: 20%;
+  width: 60%;
+  height: 59%;
+}
+
+.head-bone .eye-part {
+  z-index: 3;
+  top: 51.5%;
+  width: 15.5%;
+  height: 22%;
+  transform-origin: 50% 58%;
+}
+
+.head-bone .eye-part-left {
+  left: 28.2%;
+}
+
+.head-bone .eye-part-right {
+  right: 28.2%;
+}
+
+.head-bone .mouth-part {
+  z-index: 4;
+  top: 76%;
+  left: 46.1%;
+  width: 8.2%;
+  height: 2.8%;
+  transform-origin: 50% 50%;
+}
+
+.head-bone .hair-part {
+  z-index: 5;
+  top: 24.5%;
+  left: 10.5%;
+  width: 79%;
+  height: 66%;
+}
+
+.head-bone .hat-part {
+  z-index: 7;
+  top: 0;
+  left: 1.5%;
+  width: 97%;
+  height: 67%;
+  transform-origin: 50% 70%;
+}
+
+.arm-bone {
+  z-index: 6;
+  top: 51.5%;
+  width: 18%;
+  height: 21%;
+}
+
+.arm-left {
+  left: 26.8%;
+  transform-origin: 72% 14%;
+}
+
+.arm-right {
+  right: 26.8%;
+  transform-origin: 28% 14%;
+}
+
+.arm-bone .upper-arm-part {
+  inset: 0;
+}
+
+.forearm-bone {
+  top: 54%;
+  width: 100%;
+  height: 82%;
+}
+
+.arm-left .forearm-bone {
+  left: -34%;
+  transform-origin: 73% 11%;
+}
+
+.arm-right .forearm-bone {
+  right: -34%;
+  transform-origin: 27% 11%;
+}
+
+.leg-bone {
+  z-index: 3;
+  top: 69.5%;
+  width: 14.5%;
+  height: 13.5%;
+  transform-origin: 50% 10%;
+}
+
+.leg-left {
+  left: 35.5%;
+}
+
+.leg-right {
+  right: 35.5%;
+}
+
+.leg-bone .thigh-part {
+  inset: 0;
+}
+
+.calf-bone {
+  top: 68%;
+  left: -20%;
+  width: 140%;
+  height: 134%;
+  transform-origin: 50% 8%;
+}
+
 .face-control {
   position: absolute;
   z-index: 2;
   display: block;
   pointer-events: none;
-}
-
-.eye-control {
-  top: 34.3%;
-  width: 12.7%;
-  height: 9.8%;
-  overflow: hidden;
-  border-radius: 44% 44% 52% 52%;
-}
-
-.eye-left {
-  left: 26.7%;
-}
-
-.eye-right {
-  right: 26.5%;
-}
-
-.eye-control::before {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  inset: -4% -5% 0;
-  border-bottom: 4px solid #6a1720;
-  border-radius: 48% 48% 52% 52%;
-  background: linear-gradient(#f7d7c5 12%, #f6cbb9 100%);
-  transform: translateY(var(--blink-offset));
-  will-change: transform;
-}
-
-.eye-control i {
-  position: absolute;
-  z-index: 3;
-  top: 34%;
-  left: 46%;
-  width: 12%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: rgba(255, 249, 224, 0.92);
-  box-shadow: 0 0 5px rgba(255, 221, 118, 0.8);
-  transform: translate(var(--gaze-x), var(--gaze-y));
-  will-change: transform;
-}
-
-.mouth-control {
-  top: 49.2%;
-  left: 47.4%;
-  width: 6.1%;
-  height: var(--mouth-height);
-  border: 2px solid #721e26;
-  border-top: 0;
-  border-radius: 0 0 50% 50%;
-  background: rgba(126, 36, 45, var(--mouth-alpha));
-  transform: translateY(var(--mouth-y)) scaleX(var(--mouth-scale));
-  transform-origin: center top;
 }
 
 .cheek-control {
@@ -1048,7 +1141,8 @@
 
 @media (max-width: 840px) {
   .pet-shell {
-    width: min(100% - 28px, 700px);
+    width: auto;
+    margin-inline: 14px;
     padding-top: 104px;
   }
 
@@ -1142,7 +1236,8 @@
 
 @media (max-width: 560px) {
   .pet-shell {
-    width: min(100% - 18px, 520px);
+    width: auto;
+    margin-inline: 9px;
   }
 
   .pet-intro h1 {
@@ -1165,7 +1260,7 @@
   }
 
   .pet-room-tools {
-    top: 320px;
+    top: 285px;
     left: 15px;
     grid-template-columns: repeat(4, 48px);
   }
@@ -1182,7 +1277,7 @@
   }
 
   .pet-dialogue {
-    top: 390px;
+    top: 340px;
     left: 14px;
     width: calc(100% - 28px);
     min-height: 80px;
