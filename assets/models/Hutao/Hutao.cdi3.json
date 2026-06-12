@@ -1,0 +1,270 @@
+{
+	"Version": 3,
+	"Parameters": [
+		{
+			"Id": "ParamAngleX",
+			"GroupId": "",
+			"Name": "角度 X"
+		},
+		{
+			"Id": "ParamAngleY",
+			"GroupId": "",
+			"Name": "角度 Y"
+		},
+		{
+			"Id": "ParamAngleZ",
+			"GroupId": "",
+			"Name": "角度 Z"
+		},
+		{
+			"Id": "ParamEyeLOpen",
+			"GroupId": "",
+			"Name": "左眼 开闭"
+		},
+		{
+			"Id": "ParamEyeLSmile",
+			"GroupId": "",
+			"Name": "左眼 微笑"
+		},
+		{
+			"Id": "ParamEyeROpen",
+			"GroupId": "",
+			"Name": "右眼 开闭"
+		},
+		{
+			"Id": "ParamEyeRSmile",
+			"GroupId": "",
+			"Name": "右眼 微笑"
+		},
+		{
+			"Id": "ParamEyeBallX",
+			"GroupId": "",
+			"Name": "眼珠 X"
+		},
+		{
+			"Id": "ParamEyeBallY",
+			"GroupId": "",
+			"Name": "眼珠 Y"
+		},
+		{
+			"Id": "ParamBrowLY",
+			"GroupId": "",
+			"Name": "左眉 上下"
+		},
+		{
+			"Id": "ParamBrowRY",
+			"GroupId": "",
+			"Name": "右眉 上下"
+		},
+		{
+			"Id": "ParamBrowLX",
+			"GroupId": "",
+			"Name": "左眉 左右"
+		},
+		{
+			"Id": "ParamBrowRX",
+			"GroupId": "",
+			"Name": "右眉 左右"
+		},
+		{
+			"Id": "ParamBrowLAngle",
+			"GroupId": "",
+			"Name": "左眉 角度"
+		},
+		{
+			"Id": "ParamBrowRAngle",
+			"GroupId": "",
+			"Name": "右眉 角度"
+		},
+		{
+			"Id": "ParamBrowLForm",
+			"GroupId": "",
+			"Name": "左眉 変形"
+		},
+		{
+			"Id": "ParamBrowRForm",
+			"GroupId": "",
+			"Name": "右眉 変形"
+		},
+		{
+			"Id": "ParamMouthForm",
+			"GroupId": "",
+			"Name": "嘴 变形"
+		},
+		{
+			"Id": "ParamMouthOpenY",
+			"GroupId": "",
+			"Name": "嘴 开闭"
+		},
+		{
+			"Id": "ParamCheek",
+			"GroupId": "",
+			"Name": "脸颊泛红"
+		},
+		{
+			"Id": "ParamBodyAngleX",
+			"GroupId": "",
+			"Name": "身体旋转 X"
+		},
+		{
+			"Id": "ParamBodyAngleY",
+			"GroupId": "",
+			"Name": "身体旋转 Y"
+		},
+		{
+			"Id": "ParamBodyAngleZ",
+			"GroupId": "",
+			"Name": "身体旋转 Z"
+		},
+		{
+			"Id": "ParamBreath",
+			"GroupId": "",
+			"Name": "呼吸"
+		},
+		{
+			"Id": "ParamHairFront",
+			"GroupId": "",
+			"Name": "摇动 前发"
+		},
+		{
+			"Id": "ParamHairSide",
+			"GroupId": "",
+			"Name": "摇动 侧发"
+		},
+		{
+			"Id": "ParamHairBack",
+			"GroupId": "",
+			"Name": "摇动 后发"
+		},
+		{
+			"Id": "ParamShoulder",
+			"GroupId": "ParamGroupBody",
+			"Name": "Shoulder"
+		},
+		{
+			"Id": "ParamLeg",
+			"GroupId": "ParamGroupBody",
+			"Name": "Leg"
+		},
+		{
+			"Id": "ParamArmRA",
+			"GroupId": "ParamGroupArms",
+			"Name": "Arm R A"
+		},
+		{
+			"Id": "ParamArmLB",
+			"GroupId": "ParamGroupArms",
+			"Name": "Arm L B"
+		},
+		{
+			"Id": "ParamBustY",
+			"GroupId": "ParamGroupSway",
+			"Name": "Bust Bounce"
+		},
+		{
+			"Id": "Param_Angle_Rotation_1_ArtMesh55",
+			"GroupId": "ParamGroup4",
+			"Name": "[0]Hair Front L"
+		}
+	],
+	"ParameterGroups": [
+		{
+			"Id": "ParamGroupBody",
+			"GroupId": "",
+			"Name": "Body"
+		},
+		{
+			"Id": "ParamGroupArms",
+			"GroupId": "",
+			"Name": "Arm"
+		},
+		{
+			"Id": "ParamGroupSway",
+			"GroupId": "",
+			"Name": "Move"
+		},
+		{
+			"Id": "ParamGroup4",
+			"GroupId": "",
+			"Name": "Move Hair Front L"
+		}
+	],
+	"Parts": [
+		{
+			"Id": "PartLowerBody",
+			"Name": "下半身"
+		},
+		{
+			"Id": "PartLegs",
+			"Name": "腿"
+		},
+		{
+			"Id": "PartNeck",
+			"Name": "脖子"
+		},
+		{
+			"Id": "PartUpperBody",
+			"Name": "上半身"
+		},
+		{
+			"Id": "PartCore",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartCore2",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartEye",
+			"Name": "Eye"
+		},
+		{
+			"Id": "PartNose",
+			"Name": "Nose"
+		},
+		{
+			"Id": "PartMouth",
+			"Name": "Mouth"
+		},
+		{
+			"Id": "PartFace",
+			"Name": "Face"
+		},
+		{
+			"Id": "PartHairSide",
+			"Name": "Hair Side"
+		},
+		{
+			"Id": "PartHairBack",
+			"Name": "Hair Back"
+		},
+		{
+			"Id": "PartNeck2",
+			"Name": "Neck"
+		},
+		{
+			"Id": "PartArmA",
+			"Name": "Arm A"
+		},
+		{
+			"Id": "PartArmB",
+			"Name": "Arm B"
+		},
+		{
+			"Id": "PartBody",
+			"Name": "Body"
+		},
+		{
+			"Id": "PartEyeBall",
+			"Name": "Eyeball"
+		},
+		{
+			"Id": "ArtMesh55_Skinning",
+			"Name": "Hair Front L Skinning"
+		},
+		{
+			"Id": "Part4",
+			"Name": "Hair Front L Rotation"
+		}
+	]
+}

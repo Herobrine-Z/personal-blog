@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const ASSET_ROOT = "./assets/live2d";
+  const MODEL_URL = "./assets/models/Hutao/Hutao.model3.json";
   const clamp = (value, min = -1, max = 1) => Math.min(max, Math.max(min, value));
 
   class HutaoRig {
@@ -11,279 +11,222 @@
       this.reducedMotion = Boolean(options.reducedMotion);
       this.motion = true;
       this.dragging = false;
+      this.ready = false;
       this.actionTimeline = null;
-      this.idleTimeline = null;
       this.blinkTimeline = null;
       this.blinkTimer = null;
       this.expressionTimer = null;
-      this.expression = "default";
+      this.gaze = { x: 0, y: 0 };
+      this.values = this.defaults();
     }
 
     static async create(host, faceRoot, options) {
       const rig = new HutaoRig(host, faceRoot, options);
-      rig.init();
+      await rig.init();
       return rig;
     }
 
-    asset(path, className = "") {
-      return `<img class="puppet-part ${className}" src="${ASSET_ROOT}/${path}.png" alt="" draggable="false" />`;
-    }
-
-    eye(side) {
-      return `
-        <span class="eye-rig eye-${side}" data-eye="${side}">
-          ${this.asset(`eyes/eye_${side}_white`, "eye-white")}
-          ${this.asset(`eyes/eye_${side}_iris`, "eye-iris")}
-          ${this.asset(`eyes/eye_${side}_highlight`, "eye-highlight")}
-          ${this.asset(`eyes/eye_${side}_lower_lash`, "eye-lower-lash")}
-          ${this.asset(`eyes/eye_${side}_upper_lash`, "eye-upper-lash")}
-          ${this.asset(`eyes/eye_${side}_closed`, "eye-state eye-state-closed")}
-          ${this.asset(`eyes/eye_${side}_smile`, "eye-state eye-state-smile")}
-          ${this.asset(`eyes/eye_${side}_surprised`, "eye-state eye-state-surprised")}
-          ${this.asset(`eyes/eye_${side}_star`, "eye-state eye-state-star")}
-          ${this.asset(`eyes/eye_${side}_cry`, "eye-state eye-state-cry")}
-        </span>`;
-    }
-
-    init() {
-      if (!this.host) return;
-      this.host.innerHTML = `
-        <span class="puppet" data-puppet>
-          <span class="puppet-bone leg-bone leg-left" data-bone="legLeft">
-            ${this.asset("body/leg_L_upper", "leg-upper-part")}
-            <span class="puppet-bone lower-leg-bone" data-bone="calfLeft">
-              ${this.asset("body/leg_L_lower", "leg-lower-part")}
-              <span class="puppet-bone foot-bone" data-bone="footLeft">
-                ${this.asset("body/foot_L", "foot-part")}
-              </span>
-            </span>
-          </span>
-          <span class="puppet-bone leg-bone leg-right" data-bone="legRight">
-            ${this.asset("body/leg_R_upper", "leg-upper-part")}
-            <span class="puppet-bone lower-leg-bone" data-bone="calfRight">
-              ${this.asset("body/leg_R_lower", "leg-lower-part")}
-              <span class="puppet-bone foot-bone" data-bone="footRight">
-                ${this.asset("body/foot_R", "foot-part")}
-              </span>
-            </span>
-          </span>
-
-          <span class="puppet-bone arm-bone arm-left" data-bone="armLeft">
-            ${this.asset("body/arm_L_upper", "arm-upper-part")}
-            <span class="puppet-bone forearm-bone" data-bone="forearmLeft">
-              ${this.asset("body/arm_L_lower", "arm-lower-part")}
-              <span class="puppet-bone hand-bone" data-bone="handLeft">
-                ${this.asset("body/hand_L", "hand-part")}
-              </span>
-            </span>
-          </span>
-          <span class="puppet-bone arm-bone arm-right" data-bone="armRight">
-            ${this.asset("body/arm_R_upper", "arm-upper-part")}
-            <span class="puppet-bone forearm-bone" data-bone="forearmRight">
-              ${this.asset("body/arm_R_lower", "arm-lower-part")}
-              <span class="puppet-bone hand-bone" data-bone="handRight">
-                ${this.asset("body/hand_R", "hand-part")}
-              </span>
-            </span>
-          </span>
-
-          <span class="puppet-bone body-bone" data-bone="body">
-            ${this.asset("body/costume_full_front", "costume-front")}
-          </span>
-
-          <span class="puppet-bone head-bone" data-bone="head">
-            ${this.asset("hair/back_hair", "back-hair")}
-            ${this.asset("head/left_ear", "ear ear-left")}
-            ${this.asset("head/right_ear", "ear ear-right")}
-            ${this.asset("head/head_base", "head-base")}
-            ${this.eye("L")}
-            ${this.eye("R")}
-            ${this.asset("eyes/eyebrow_L_default", "eyebrow eyebrow-left")}
-            ${this.asset("eyes/eyebrow_R_default", "eyebrow eyebrow-right")}
-            ${this.asset("mouth/mouth_closed_lip", "mouth-part")}
-            ${this.asset("hair/side_hair_L", "side-hair side-hair-left")}
-            ${this.asset("hair/side_hair_R", "side-hair side-hair-right")}
-            ${this.asset("hair/bang", "bang")}
-            ${this.asset("hair/ahoge", "ahoge")}
-            ${this.asset("hair/hat", "hat-part")}
-          </span>
-        </span>`;
-
-      const find = (selector) => this.host.querySelector(selector);
-      this.parts = {
-        puppet: find("[data-puppet]"),
-        body: find('[data-bone="body"]'),
-        head: find('[data-bone="head"]'),
-        hat: find(".hat-part"),
-        bang: find(".bang"),
-        ahoge: find(".ahoge"),
-        armLeft: find('[data-bone="armLeft"]'),
-        armRight: find('[data-bone="armRight"]'),
-        forearmLeft: find('[data-bone="forearmLeft"]'),
-        forearmRight: find('[data-bone="forearmRight"]'),
-        handLeft: find('[data-bone="handLeft"]'),
-        handRight: find('[data-bone="handRight"]'),
-        legLeft: find('[data-bone="legLeft"]'),
-        legRight: find('[data-bone="legRight"]'),
-        calfLeft: find('[data-bone="calfLeft"]'),
-        calfRight: find('[data-bone="calfRight"]'),
-        footLeft: find('[data-bone="footLeft"]'),
-        footRight: find('[data-bone="footRight"]'),
-        irisLeft: find(".eye-L .eye-iris"),
-        irisRight: find(".eye-R .eye-iris"),
-        eyebrowLeft: find(".eyebrow-left"),
-        eyebrowRight: find(".eyebrow-right"),
-        mouth: find(".mouth-part"),
-        eyeStates: [...this.host.querySelectorAll(".eye-state")],
+    defaults() {
+      return {
+        angleX: 0,
+        angleY: 0,
+        angleZ: 0,
+        bodyX: 0,
+        bodyY: 0,
+        bodyZ: 0,
+        eyeX: 0,
+        eyeY: 0,
+        eyeOpen: 1,
+        eyeSmile: 0,
+        browY: 0,
+        browAngle: 0,
+        mouthForm: 0,
+        mouthOpen: 0,
+        cheek: 0,
+        breath: 0,
+        shoulder: 0,
+        leg: 0,
+        armR: 0,
+        armL: 0,
       };
-      this.rigRoot = this.host.closest(".pet-rig");
-      this.rigRoot?.classList.add("rig-ready", "layered-rig");
-      this.setExpression("default");
-      this.startIdle();
-      this.scheduleBlink();
+    }
+
+    async init() {
+      if (!this.host || !window.PIXI?.live2d?.Live2DModel) return;
+
+      const canvas = document.createElement("canvas");
+      canvas.className = "live2d-canvas";
+      this.host.replaceChildren(canvas);
+
+      try {
+        this.app = new PIXI.Application({
+          view: canvas,
+          resizeTo: this.host,
+          autoDensity: true,
+          antialias: true,
+          backgroundAlpha: 0,
+          resolution: Math.min(window.devicePixelRatio || 1, 2),
+        });
+        this.model = await PIXI.live2d.Live2DModel.from(MODEL_URL, {
+          autoInteract: false,
+        });
+        this.model.anchor.set(0.5, 0.5);
+        this.app.stage.addChild(this.model);
+        this.host.hutaoRig = this;
+        this.fitModel();
+        this.resizeObserver = new ResizeObserver(() => this.fitModel());
+        this.resizeObserver.observe(this.host);
+        this.app.ticker.add(() => this.updateParameters());
+        this.ready = true;
+        this.host.closest(".pet-rig")?.classList.add("rig-ready", "live2d-ready");
+        this.scheduleBlink();
+      } catch (error) {
+        console.error("Live2D model failed to load:", error);
+        this.app?.destroy(true);
+        this.host.replaceChildren();
+      }
+    }
+
+    fitModel() {
+      if (!this.model || !this.host.clientWidth || !this.host.clientHeight) return;
+      this.model.scale.set(1);
+      const modelWidth = this.model.width;
+      const modelHeight = this.model.height;
+      const scale = Math.min(
+        this.host.clientWidth / modelWidth,
+        this.host.clientHeight / modelHeight,
+      ) * 1.48;
+      this.model.scale.set(scale);
+      this.model.position.set(this.host.clientWidth / 2, this.host.clientHeight / 2);
+    }
+
+    setParameter(id, value) {
+      this.model?.internalModel?.coreModel?.setParameterValueById(id, value);
+    }
+
+    updateParameters() {
+      if (!this.ready) return;
+      const value = this.values;
+      const idle = this.motion && !this.dragging && !this.actionTimeline
+        ? Math.sin(performance.now() / 900)
+        : 0;
+      value.breath = this.motion ? (idle + 1) / 2 : 0;
+
+      this.setParameter("ParamAngleX", value.angleX + this.gaze.x * 22);
+      this.setParameter("ParamAngleY", value.angleY + this.gaze.y * 16);
+      this.setParameter("ParamAngleZ", value.angleZ + this.gaze.x * 5);
+      this.setParameter("ParamBodyAngleX", value.bodyX + this.gaze.x * 5);
+      this.setParameter("ParamBodyAngleY", value.bodyY + this.gaze.y * 3);
+      this.setParameter("ParamBodyAngleZ", value.bodyZ + idle * 1.4);
+      this.setParameter("ParamEyeBallX", value.eyeX + this.gaze.x);
+      this.setParameter("ParamEyeBallY", value.eyeY - this.gaze.y);
+      this.setParameter("ParamEyeLOpen", value.eyeOpen);
+      this.setParameter("ParamEyeROpen", value.eyeOpen);
+      this.setParameter("ParamEyeLSmile", value.eyeSmile);
+      this.setParameter("ParamEyeRSmile", value.eyeSmile);
+      this.setParameter("ParamBrowLY", value.browY);
+      this.setParameter("ParamBrowRY", value.browY);
+      this.setParameter("ParamBrowLAngle", value.browAngle);
+      this.setParameter("ParamBrowRAngle", -value.browAngle);
+      this.setParameter("ParamMouthForm", value.mouthForm);
+      this.setParameter("ParamMouthOpenY", value.mouthOpen);
+      this.setParameter("ParamCheek", value.cheek);
+      this.setParameter("ParamBreath", value.breath);
+      this.setParameter("ParamShoulder", value.shoulder);
+      this.setParameter("ParamLeg", value.leg);
+      this.setParameter("ParamArmRA", value.armR);
+      this.setParameter("ParamArmLB", value.armL);
     }
 
     setMotion(enabled) {
       this.motion = enabled;
-      if (enabled) {
-        this.startIdle();
-        this.scheduleBlink();
-      } else {
-        this.stop();
-      }
+      if (enabled) this.scheduleBlink();
+      else this.stop();
     }
 
     setDragging(dragging) {
       this.dragging = dragging;
-      if (dragging) this.idleTimeline?.pause();
-      else if (this.motion) this.idleTimeline?.resume();
+      if (window.gsap) {
+        gsap.to(this.gaze, {
+          x: 0,
+          y: dragging ? -0.18 : 0,
+          duration: 0.25,
+          overwrite: true,
+        });
+      }
     }
 
     setExpression(name = "default", duration = 0) {
-      if (!this.parts) return;
       window.clearTimeout(this.expressionTimer);
-      this.expression = name;
-      const state = {
-        sleep: "closed",
-        smile: "smile",
-        surprised: "surprised",
-        star: "star",
-        cry: "cry",
-      }[name] || "";
-      this.rigRoot.dataset.expression = name;
-      this.rigRoot.dataset.eyeState = state || "open";
-      this.parts.eyeStates.forEach((eye) => {
-        eye.style.opacity = state && eye.classList.contains(`eye-state-${state}`) ? "1" : "0";
-      });
-
-      const eyebrowName = {
-        happy: "smile",
-        smile: "smile",
-        surprised: "surprised",
-        star: "star",
-        cry: "cry",
-        angry: "angry",
-      }[name] || "default";
-      this.parts.eyebrowLeft.src = `${ASSET_ROOT}/eyes/eyebrow_L_${eyebrowName}.png`;
-      this.parts.eyebrowRight.src = `${ASSET_ROOT}/eyes/eyebrow_R_${eyebrowName}.png`;
-
-      const mouthName = {
-        happy: "smile",
-        smile: "smile",
-        surprised: "O",
-        star: "smile",
-        cry: "pressed",
-        angry: "pressed",
-        talk: "small",
-        eat: "A",
-        sleep: "closed",
-      }[name] || "closed";
-      this.parts.mouth.src = `${ASSET_ROOT}/mouth/mouth_${mouthName}_lip.png`;
-
+      const expression = {
+        happy: { eyeSmile: 0.75, mouthForm: 0.8, mouthOpen: 0.18, cheek: 0.45, browY: 0.15 },
+        smile: { eyeSmile: 1, mouthForm: 0.9, mouthOpen: 0.1, cheek: 0.35 },
+        surprised: { eyeOpen: 1, mouthForm: -0.15, mouthOpen: 0.85, browY: 0.65 },
+        star: { eyeOpen: 1, mouthForm: 0.8, mouthOpen: 0.45, cheek: 0.55 },
+        cry: { eyeSmile: 0.2, mouthForm: -0.8, mouthOpen: 0.18, browAngle: -0.7 },
+        angry: { mouthForm: -0.7, browY: -0.35, browAngle: 0.8 },
+        talk: { mouthForm: 0.35, mouthOpen: 0.55 },
+        eat: { mouthForm: 0.45, mouthOpen: 0.8, cheek: 0.3 },
+        sleep: { eyeOpen: 0, eyeSmile: 1, mouthForm: 0.25, mouthOpen: 0.05 },
+      }[name] || {};
+      Object.assign(this.values, {
+        eyeOpen: 1,
+        eyeSmile: 0,
+        browY: 0,
+        browAngle: 0,
+        mouthForm: 0,
+        mouthOpen: 0,
+        cheek: 0,
+      }, expression);
       if (duration > 0) {
         this.expressionTimer = window.setTimeout(() => this.setExpression("default"), duration);
       }
     }
 
     trackPointer(clientX, clientY) {
-      if (!this.motion || this.dragging || this.actionTimeline || !window.gsap || !this.parts) return;
+      if (!this.motion || this.dragging || this.actionTimeline || !window.gsap) return;
       const rect = this.host.getBoundingClientRect();
       const x = clamp(((clientX - rect.left) / rect.width) * 2 - 1);
       const y = clamp(((clientY - rect.top) / rect.height) * 2 - 1);
-      gsap.to([this.parts.irisLeft, this.parts.irisRight], {
-        x: x * 4,
-        y: y * 2.5,
-        duration: 0.22,
-        overwrite: "auto",
-        ease: "power2.out",
-      });
-      gsap.to(this.parts.head, {
-        x: x * 2.4,
-        y: y * 1.5,
-        rotation: x * 0.7,
+      gsap.to(this.gaze, {
+        x,
+        y,
         duration: 0.42,
         overwrite: "auto",
         ease: "power2.out",
       });
     }
 
-    startIdle() {
-      this.idleTimeline?.kill();
-      if (!window.gsap || this.reducedMotion || !this.motion || this.dragging || !this.parts) return;
-      const p = this.parts;
-      this.idleTimeline = gsap.timeline({
-        repeat: -1,
-        yoyo: true,
-        defaults: { duration: 1.8, ease: "sine.inOut" },
-      })
-        .to(p.puppet, { y: -3 }, 0)
-        .to(p.body, { scaleY: 1.006, scaleX: 0.997 }, 0)
-        .to(p.head, { y: -2, rotation: 0.35 }, 0)
-        .to(p.ahoge, { rotation: 3 }, 0)
-        .to(p.armLeft, { rotation: -0.8 }, 0)
-        .to(p.armRight, { rotation: 0.8 }, 0);
-    }
-
     scheduleBlink() {
       window.clearTimeout(this.blinkTimer);
       if (!this.motion || this.reducedMotion) return;
       this.blinkTimer = window.setTimeout(() => {
-        if (!this.actionTimeline && !this.dragging && this.expression === "default") this.blink();
+        if (!this.actionTimeline && !this.dragging) this.blink();
         this.scheduleBlink();
-      }, 2600 + Math.random() * 3000);
+      }, 2400 + Math.random() * 3200);
     }
 
     blink() {
-      if (!window.gsap || !this.parts) return;
-      const closed = this.parts.eyeStates.filter((eye) => eye.classList.contains("eye-state-closed"));
+      if (!window.gsap) return;
       this.blinkTimeline?.kill();
       this.blinkTimeline = gsap.timeline({
         onComplete: () => {
           this.blinkTimeline = null;
         },
       })
-        .to(closed, { autoAlpha: 1, duration: 0.07, ease: "power2.in" })
-        .to(closed, { autoAlpha: 0, duration: 0.11, ease: "power2.out" }, "+=0.045");
+        .to(this.values, { eyeOpen: 0, duration: 0.07, ease: "power2.in" })
+        .to(this.values, { eyeOpen: 1, duration: 0.12, ease: "power2.out" }, "+=0.04");
     }
 
-    resetParts(duration = 0) {
-      if (!window.gsap || !this.parts) return;
-      const p = this.parts;
-      gsap.to([
-        p.puppet, p.body, p.head, p.hat, p.bang, p.ahoge,
-        p.armLeft, p.armRight, p.forearmLeft, p.forearmRight, p.handLeft, p.handRight,
-        p.legLeft, p.legRight, p.calfLeft, p.calfRight, p.footLeft, p.footRight,
-      ], {
-        x: 0,
-        y: 0,
-        rotation: 0,
-        scaleX: 1,
-        scaleY: 1,
-        duration,
-        overwrite: true,
-        ease: duration ? "back.out(1.35)" : "none",
-      });
-      if (!this.expressionTimer) this.setExpression("default");
+    resetValues(duration = 0) {
+      const target = this.defaults();
+      delete target.breath;
+      if (window.gsap && duration) {
+        gsap.to(this.values, { ...target, duration, overwrite: true, ease: "back.out(1.2)" });
+      } else {
+        Object.assign(this.values, target);
+      }
+      this.setExpression("default");
     }
 
     stop() {
@@ -291,30 +234,23 @@
       window.clearTimeout(this.expressionTimer);
       this.blinkTimeline?.kill();
       this.actionTimeline?.kill();
-      this.idleTimeline?.kill();
       this.blinkTimeline = null;
       this.actionTimeline = null;
-      this.idleTimeline = null;
-      this.resetParts(0);
-      this.setExpression("default");
+      this.resetValues(0);
     }
 
     play(type, onComplete) {
-      this.actionTimeline?.kill();
-      this.idleTimeline?.pause();
-      if (!window.gsap || this.reducedMotion || !this.motion || !this.parts) {
+      if (!window.gsap || this.reducedMotion || !this.motion || !this.ready) {
         onComplete?.();
         return null;
       }
 
-      const p = this.parts;
+      const value = this.values;
       const timeline = gsap.timeline({
         defaults: { ease: "power2.out" },
         onComplete: () => {
           this.actionTimeline = null;
-          this.resetParts(0.24);
-          this.setExpression("default");
-          this.startIdle();
+          this.resetValues(0.25);
           onComplete?.();
         },
       });
@@ -322,72 +258,42 @@
 
       if (type === "pet") {
         this.setExpression("happy");
-        timeline
-          .to(p.head, { y: 7, scaleX: 1.018, scaleY: 0.985, duration: 0.18 })
-          .to(p.hat, { y: 3, rotation: -0.8, duration: 0.16 }, 0)
-          .to(p.ahoge, { rotation: -8, duration: 0.18 }, 0)
-          .to(p.head, { y: -2, scaleX: 0.995, scaleY: 1.008, duration: 0.24 });
+        timeline.to(value, { angleY: -10, bodyY: -5, duration: 0.18 })
+          .to(value, { angleY: 5, bodyY: 2, duration: 0.24 });
       } else if (type === "feed") {
         this.setExpression("eat");
-        timeline
-          .to(p.head, { rotation: -2.5, y: 2, duration: 0.18 })
-          .to(p.head, { rotation: 2.5, y: 0, duration: 0.18 })
-          .add(() => this.setExpression("happy"), ">-0.02")
-          .to(p.head, { rotation: -1.4, duration: 0.17 });
+        timeline.to(value, { angleZ: -7, mouthOpen: 0.15, duration: 0.18 })
+          .to(value, { angleZ: 7, mouthOpen: 0.8, duration: 0.18, repeat: 2, yoyo: true })
+          .add(() => this.setExpression("happy"));
       } else if (type === "play" || type === "surprise") {
-        this.setExpression(type === "surprise" ? "surprised" : "star");
-        timeline
-          .to(p.puppet, { y: 10, scaleX: 1.025, scaleY: 0.975, duration: 0.15, ease: "power2.in" })
-          .to([p.armLeft, p.armRight], { rotation: (index) => index ? -16 : 16, duration: 0.16 }, 0)
-          .to(p.puppet, { y: -42, scaleX: 0.99, scaleY: 1.016, duration: 0.28, ease: "power3.out" })
-          .to([p.calfLeft, p.calfRight], { rotation: (index) => index ? -8 : 8, duration: 0.24 }, "<")
-          .to(p.puppet, { y: 0, scaleX: 1.012, scaleY: 0.988, duration: 0.32, ease: "bounce.out" });
+        this.setExpression("surprised");
+        timeline.to(value, { bodyY: -8, leg: 1, shoulder: 1, duration: 0.18 })
+          .to(value, { bodyY: 12, angleY: -10, duration: 0.2, ease: "back.out(2)" })
+          .to(value, { bodyY: 0, angleY: 0, duration: 0.3, ease: "bounce.out" });
       } else if (type === "dance") {
         this.setExpression("star");
-        timeline
-          .to(p.body, { rotation: -4, x: -7, duration: 0.22 })
-          .to(p.head, { rotation: 4, x: -3, duration: 0.22 }, 0)
-          .to(p.armLeft, { rotation: 34, duration: 0.22 }, 0)
-          .to(p.forearmLeft, { rotation: 24, duration: 0.22 }, 0)
-          .to(p.armRight, { rotation: -10, duration: 0.22 }, 0)
-          .to(p.body, { rotation: 4, x: 7, duration: 0.24 })
-          .to(p.head, { rotation: -4, x: 3, duration: 0.24 }, "<")
-          .to(p.armLeft, { rotation: 10, duration: 0.24 }, "<")
-          .to(p.armRight, { rotation: -34, duration: 0.24 }, "<")
-          .to(p.forearmRight, { rotation: -24, duration: 0.24 }, "<")
-          .to(p.body, { rotation: -3, x: -5, duration: 0.21 });
+        timeline.to(value, { bodyX: -8, bodyZ: -8, angleZ: 8, armR: 1, duration: 0.24 })
+          .to(value, { bodyX: 8, bodyZ: 8, angleZ: -8, armR: -1, armL: 1, duration: 0.28 })
+          .to(value, { bodyX: -6, bodyZ: -6, angleZ: 6, armL: -1, duration: 0.24 });
       } else if (type === "sleep") {
         this.setExpression("sleep");
-        timeline
-          .to(p.head, { rotation: 6, y: 7, duration: 0.36, ease: "sine.inOut" })
-          .to(p.body, { y: 4, scaleY: 0.992, duration: 0.42 }, 0)
-          .to(p.armRight, { rotation: -7, duration: 0.36 }, 0)
-          .to(p.head, { y: 10, duration: 0.7, repeat: 1, yoyo: true, ease: "sine.inOut" });
+        timeline.to(value, { angleZ: 12, bodyZ: 6, angleY: 8, duration: 0.42 })
+          .to(value, { breath: 1, duration: 0.75, repeat: 1, yoyo: true, ease: "sine.inOut" });
       } else if (type === "wave") {
         this.setExpression("happy");
-        timeline
-          .to(p.armRight, { rotation: -112, duration: 0.28, ease: "back.out(1.5)" })
-          .to(p.forearmRight, { rotation: -48, duration: 0.25 }, 0.06)
-          .to(p.handRight, { rotation: -18, duration: 0.13, repeat: 4, yoyo: true, ease: "sine.inOut" }, 0.28)
-          .to(p.head, { rotation: -3, duration: 0.24 }, 0.1);
+        timeline.to(value, { armR: 1, angleZ: -6, duration: 0.25 })
+          .to(value, { armR: -1, duration: 0.16, repeat: 4, yoyo: true });
       } else if (type === "nod") {
         this.setExpression("happy");
-        timeline
-          .to(p.head, { y: 6, rotation: 0.8, duration: 0.16 })
-          .to(p.head, { y: -2, rotation: -0.6, duration: 0.19 })
-          .to(p.head, { y: 4, rotation: 0.5, duration: 0.16 });
+        timeline.to(value, { angleY: -18, duration: 0.17 })
+          .to(value, { angleY: 8, duration: 0.19 })
+          .to(value, { angleY: -12, duration: 0.16 });
       } else if (type === "talk") {
-        this.setExpression("talk");
-        timeline
-          .to(p.head, { rotation: -1.6, duration: 0.2 })
-          .add(() => this.setExpression("happy"), 0.18)
-          .to(p.head, { rotation: 1.6, duration: 0.2 })
-          .add(() => this.setExpression("talk"), 0.38)
-          .to(p.head, { rotation: -1, duration: 0.18 })
-          .add(() => this.setExpression("happy"), 0.55);
+        timeline.to(value, { mouthOpen: 0.65, mouthForm: 0.45, angleZ: -4, duration: 0.16 })
+          .to(value, { mouthOpen: 0.1, angleZ: 4, duration: 0.14, repeat: 3, yoyo: true });
       }
 
-      timeline.to({}, { duration: 0.16 });
+      timeline.to({}, { duration: 0.14 });
       return timeline;
     }
   }

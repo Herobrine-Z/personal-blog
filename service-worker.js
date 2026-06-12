@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-blog-v20";
+const CACHE_NAME = "hutao-blog-v24";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -20,6 +20,14 @@ const APP_SHELL = [
   "./kurumi.js",
   "./pet-rig.js",
   "./pet.js",
+  "./assets/vendor/live2dcubismcore.min.js",
+  "./assets/vendor/pixi.min.js",
+  "./assets/vendor/pixi-live2d-display.min.js",
+  "./assets/models/Hutao/Hutao.model3.json",
+  "./assets/models/Hutao/Hutao.moc3",
+  "./assets/models/Hutao/Hutao.physics3.json",
+  "./assets/models/Hutao/Hutao.cdi3.json",
+  "./assets/models/Hutao/Hutao.1024/texture_00.png",
   "./assets/icon.png",
   "./assets/ink-hero.png",
   "./assets/ink-scroll.png",

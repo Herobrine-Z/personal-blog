@@ -1,0 +1,11 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "Hutao.moc3",
+		"Textures": [
+			"Hutao.1024/texture_00.png"
+		],
+		"Physics": "Hutao.physics3.json",
+		"DisplayInfo": "Hutao.cdi3.json"
+	}
+}
