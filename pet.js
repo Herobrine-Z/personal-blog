@@ -463,7 +463,9 @@
   character.addEventListener("pointercancel", finishDrag);
   character.addEventListener("click", (event) => event.preventDefault());
   actionButtons.forEach((button) => button.addEventListener("click", () => runAction(button.dataset.action)));
-  room.addEventListener("pointermove", (event) => rig?.trackPointer(event.clientX, event.clientY), { passive: true });
+  document.addEventListener("pointermove", (event) => rig?.trackPointer(event.clientX, event.clientY), { passive: true });
+  document.documentElement.addEventListener("pointerleave", () => rig?.resetGaze(), { passive: true });
+  window.addEventListener("blur", () => rig?.resetGaze());
 
   soundToggle.addEventListener("click", () => {
     state.sound = !state.sound;

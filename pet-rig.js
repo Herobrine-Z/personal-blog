@@ -17,6 +17,7 @@
       this.blinkTimer = null;
       this.expressionTimer = null;
       this.gaze = { x: 0, y: 0 };
+      this.applyParameters = () => this.updateParameters();
       this.values = this.defaults();
     }
 
@@ -76,7 +77,7 @@
         this.fitModel();
         this.resizeObserver = new ResizeObserver(() => this.fitModel());
         this.resizeObserver.observe(this.host);
-        this.app.ticker.add(() => this.updateParameters());
+        this.model.internalModel.on("beforeModelUpdate", this.applyParameters);
         this.ready = true;
         this.host.closest(".pet-rig")?.classList.add("rig-ready", "live2d-ready");
         this.scheduleBlink();
@@ -112,11 +113,11 @@
         : 0;
       value.breath = this.motion ? (idle + 1) / 2 : 0;
 
-      this.setParameter("ParamAngleX", value.angleX + this.gaze.x * 22);
-      this.setParameter("ParamAngleY", value.angleY + this.gaze.y * 16);
-      this.setParameter("ParamAngleZ", value.angleZ + this.gaze.x * 5);
-      this.setParameter("ParamBodyAngleX", value.bodyX + this.gaze.x * 5);
-      this.setParameter("ParamBodyAngleY", value.bodyY + this.gaze.y * 3);
+      this.setParameter("ParamAngleX", value.angleX + this.gaze.x * 25);
+      this.setParameter("ParamAngleY", value.angleY - this.gaze.y * 19);
+      this.setParameter("ParamAngleZ", value.angleZ - this.gaze.x * this.gaze.y * 7);
+      this.setParameter("ParamBodyAngleX", value.bodyX + this.gaze.x * 4);
+      this.setParameter("ParamBodyAngleY", value.bodyY - this.gaze.y * 2);
       this.setParameter("ParamBodyAngleZ", value.bodyZ + idle * 1.4);
       this.setParameter("ParamEyeBallX", value.eyeX + this.gaze.x);
       this.setParameter("ParamEyeBallY", value.eyeY - this.gaze.y);
@@ -186,12 +187,31 @@
     trackPointer(clientX, clientY) {
       if (!this.motion || this.dragging || this.actionTimeline || !window.gsap) return;
       const rect = this.host.getBoundingClientRect();
-      const x = clamp(((clientX - rect.left) / rect.width) * 2 - 1);
-      const y = clamp(((clientY - rect.top) / rect.height) * 2 - 1);
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height * 0.34;
+      const rangeX = Math.max(window.innerWidth * 0.42, rect.width);
+      const rangeY = Math.max(window.innerHeight * 0.42, rect.height);
+      const x = clamp((clientX - centerX) / rangeX);
+      const y = clamp((clientY - centerY) / rangeY);
       gsap.to(this.gaze, {
         x,
         y,
-        duration: 0.42,
+        duration: 0.28,
+        overwrite: "auto",
+        ease: "power3.out",
+      });
+    }
+
+    resetGaze() {
+      if (!window.gsap) {
+        this.gaze.x = 0;
+        this.gaze.y = 0;
+        return;
+      }
+      gsap.to(this.gaze, {
+        x: 0,
+        y: 0,
+        duration: 0.5,
         overwrite: "auto",
         ease: "power2.out",
       });
