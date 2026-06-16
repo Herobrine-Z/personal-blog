@@ -1,0 +1,11 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "Zhang.moc3",
+		"Textures": [
+			"Zhang.2048/texture_00.png"
+		],
+		"Physics": "Zhang.physics3.json",
+		"DisplayInfo": "Zhang.cdi3.json"
+	}
+}

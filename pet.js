@@ -84,6 +84,7 @@
   let stageOffset = { x: 0, y: 0 };
   let characterKey = "hutao";
   let modelLoadToken = 0;
+  const characterOrder = ["hutao", "fireman", "zhang"];
 
   const characters = {
     hutao: {
@@ -116,6 +117,22 @@
         dance: ["烈火随心，步子自然也要豪迈。", "今日兴起，便舞上一回。"],
         sleep: ["养足精神，再战不迟。", "我先歇片刻，酒可别收走。"],
         wave: ["季沧海，前来拜访。", "有朋在此，岂能不来？"],
+      },
+    },
+    zhang: {
+      name: "张起灵",
+      relation: "沉默访客",
+      modelUrl: "./assets/models/Zhang/Zhang.model3.json",
+      scale: 0.8,
+      y: 0.52,
+      welcome: "我来了。这里，很安静。",
+      actions: {
+        pet: ["……别闹。", "嗯。"],
+        feed: ["谢谢。", "够了。"],
+        play: ["跟上。", "动作要快。"],
+        dance: ["不太擅长。", "只一次。"],
+        sleep: ["我守着。", "休息吧。"],
+        wave: ["张起灵。", "我在。"],
       },
     },
   };
@@ -303,17 +320,20 @@
 
   function updateCharacterUI() {
     const character = characters[characterKey];
-    const visiting = characterKey === "fireman";
+    const visiting = characterKey !== "hutao";
+    const nextKey = characterOrder[(characterOrder.indexOf(characterKey) + 1) % characterOrder.length];
+    const nextCharacter = characters[nextKey];
     $("#profileName").textContent = character.name;
     $("#profileRelation").textContent = character.relation;
     $("#speakerName").textContent = character.name;
     $("#petCharacter").setAttribute("aria-label", `与${character.name}互动，按住可以拖动`);
     $("#petRoom").classList.toggle("is-visitor", visiting);
+    $("#profileAvatarText").textContent = character.name.slice(0, 1);
     const visitToggle = $("#visitToggle");
     visitToggle.classList.toggle("is-active", visiting);
     visitToggle.setAttribute("aria-pressed", String(visiting));
-    visitToggle.querySelector("span").textContent = visiting ? "送客" : "串门";
-    visitToggle.querySelector("strong").textContent = visiting ? "请季沧海下次再来" : "邀请季沧海来坐坐";
+    visitToggle.querySelector("span").textContent = nextKey === "hutao" ? "送客" : "串门";
+    visitToggle.querySelector("strong").textContent = nextKey === "hutao" ? `请${character.name}下次再来` : `邀请${nextCharacter.name}来坐坐`;
   }
 
   async function loadCharacter(nextKey, initial = false) {
@@ -392,10 +412,11 @@
     $("#visitToggle").addEventListener("click", async (event) => {
       if (busy || event.currentTarget.disabled) return;
       const button = event.currentTarget;
-      const nextKey = characterKey === "hutao" ? "fireman" : "hutao";
+      const nextKey = characterOrder[(characterOrder.indexOf(characterKey) + 1) % characterOrder.length];
+      const nextCharacter = characters[nextKey];
       button.disabled = true;
-      playSound(nextKey === "fireman" ? 460 : 620);
-      showToast(nextKey === "fireman" ? "季沧海正在登门" : "季沧海告辞离开");
+      playSound(nextKey === "fireman" ? 460 : nextKey === "zhang" ? 390 : 620);
+      showToast(nextKey === "hutao" ? `${characters[characterKey].name}告辞离开` : `${nextCharacter.name}正在登门`);
       await loadCharacter(nextKey);
       button.disabled = false;
     });
