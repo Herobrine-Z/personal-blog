@@ -563,20 +563,31 @@ window.addEventListener(
 windToggle.addEventListener("click", () => setWind(!windActive));
 summonButton.addEventListener("click", summonPetals);
 
-menuToggle.addEventListener("click", () => {
-  const open = !nav.classList.contains("open");
+function setMobileMenu(open) {
   nav.classList.toggle("open", open);
   menuToggle.classList.toggle("open", open);
   menuToggle.setAttribute("aria-expanded", String(open));
+  document.documentElement.classList.toggle("mobile-nav-open", open);
+  document.body.classList.toggle("mobile-nav-open", open);
+}
+
+menuToggle.addEventListener("click", () => {
+  setMobileMenu(!nav.classList.contains("open"));
 });
 
 nav.addEventListener("click", (event) => {
   if (event.target.matches("a")) {
-    nav.classList.remove("open");
-    menuToggle.classList.remove("open");
-    menuToggle.setAttribute("aria-expanded", "false");
+    setMobileMenu(false);
   }
 });
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && nav.classList.contains("open")) setMobileMenu(false);
+});
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 840 && nav.classList.contains("open")) setMobileMenu(false);
+}, { passive: true });
 
 function renderGuestbook(messages) {
   const list = document.querySelector("#guestbookList");
