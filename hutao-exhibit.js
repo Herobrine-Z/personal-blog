@@ -85,11 +85,105 @@
     window.addEventListener("scroll", update, { passive: true });
   }
 
+  function ensurePageVeil() {
+    let veil = document.querySelector(".hutao-page-veil");
+    if (veil) return veil;
+    veil = document.createElement("div");
+    veil.className = "hutao-page-veil";
+    veil.setAttribute("aria-hidden", "true");
+    document.body.prepend(veil);
+    return veil;
+  }
+
+  function scrollToSection(target) {
+    const header = document.querySelector(".site-header, .kurumi-header");
+    const offset = (header?.getBoundingClientRect().height || 74) + 14;
+    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top, behavior: reducedMotion ? "auto" : "smooth" });
+  }
+
+  function setupPageMotion() {
+    ensurePageVeil();
+    document.body.classList.add("hutao-page-entering");
+    window.requestAnimationFrame(() => {
+      window.setTimeout(() => document.body.classList.remove("hutao-page-entering"), reducedMotion ? 80 : 520);
+    });
+
+    document.addEventListener("click", (event) => {
+      const anchor = event.target.closest("a[href]");
+      if (!anchor || event.defaultPrevented) return;
+      if (anchor.target || anchor.hasAttribute("download")) return;
+
+      let url;
+      try {
+        url = new URL(anchor.href, window.location.href);
+      } catch (error) {
+        return;
+      }
+      if (url.origin !== window.location.origin) return;
+
+      const samePath = url.pathname === window.location.pathname && url.search === window.location.search;
+      if (samePath && url.hash) {
+        const target = document.querySelector(decodeURIComponent(url.hash));
+        if (!target) return;
+        event.preventDefault();
+        scrollToSection(target);
+        history.pushState(null, "", url.hash);
+        document.querySelector(".site-nav.open")?.classList.remove("open");
+        document.querySelector(".menu-toggle.open")?.classList.remove("open");
+        return;
+      }
+
+      if (samePath) return;
+      event.preventDefault();
+      document.body.classList.add("hutao-page-leaving");
+      window.setTimeout(() => {
+        window.location.href = url.href;
+      }, reducedMotion ? 20 : 280);
+    });
+  }
+
+  function setupSectionFocus() {
+    const sections = Array.from(document.querySelectorAll("main > section[id]"));
+    if (!sections.length || !("IntersectionObserver" in window)) return;
+    const navLinks = Array.from(document.querySelectorAll(".site-nav a[href^='#']"));
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const section = entry.target;
+        const progress = entry.isIntersecting ? Math.min(1, Math.max(0, entry.intersectionRatio * 1.6)) : 0;
+        section.style.setProperty("--section-progress", progress.toFixed(2));
+        section.classList.toggle("is-current", entry.isIntersecting && entry.intersectionRatio > 0.42);
+        if (!entry.isIntersecting || entry.intersectionRatio < 0.42) return;
+        navLinks.forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${section.id}`));
+      });
+    }, { threshold: [0, 0.18, 0.42, 0.62, 0.82], rootMargin: "-18% 0px -46% 0px" });
+    sections.forEach((section) => observer.observe(section));
+  }
+
+  function revealExistingElements() {
+    const candidates = document.querySelectorAll(".phase2-reveal, .art-scroll-reveal, .reveal");
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+      candidates.forEach((element) => element.classList.add("is-visible", "visible"));
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible", "visible");
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    candidates.forEach((element) => observer.observe(element));
+  }
+
   function init() {
     enhanceHero();
     setupHeroParallax();
     setupCardTilt();
     setupStickyHeaderState();
+    setupPageMotion();
+    setupSectionFocus();
+    revealExistingElements();
   }
 
   if (document.readyState === "loading") {

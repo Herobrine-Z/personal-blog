@@ -18,11 +18,20 @@
   --hutao-bg-y: 0px;
   --hutao-fog-x: 0px;
   --hutao-fog-y: 0px;
+  --glass-blur: 6px;
+  --glass-opacity: 0.56;
+  --section-progress: 0;
 }
 
 body {
   font-family: var(--hutao-body);
   color: var(--hutao-ink);
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 html body,
@@ -58,11 +67,40 @@ body.art-scroll-transitioning main {
   opacity: 1 !important;
 }
 
+.hutao-page-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 250, 238, 0.72), rgba(245, 235, 216, 0.38) 34%, rgba(31, 28, 23, 0.08) 72%),
+    url("./assets/hutao-ink/InkFog_03.png") center / cover no-repeat,
+    url("./assets/hutao-ink/PaperTexture.png") center / 720px auto repeat;
+  mix-blend-mode: normal;
+  transition: opacity 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.hutao-page-entering .hutao-page-veil,
+body.hutao-page-leaving .hutao-page-veil {
+  opacity: 1;
+}
+
+body.hutao-page-entering main {
+  animation: hutaoPageRise 0.72s 0.06s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+body.hutao-page-leaving main {
+  transform: translateY(10px) scale(0.99);
+  opacity: 0.88;
+  transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.42s ease;
+}
+
 .site-header {
   background: rgba(248, 242, 229, 0.76) !important;
   border: 1px solid rgba(84, 66, 42, 0.1);
   box-shadow: 0 10px 36px rgba(37, 31, 23, 0.08);
-  backdrop-filter: blur(8px) saturate(1.04) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.02) !important;
 }
 
 .site-header.scrolled,
@@ -94,6 +132,29 @@ body.is-scrolled .site-header {
 .site-nav a:hover,
 .site-nav a.active {
   color: var(--hutao-seal) !important;
+}
+
+.site-nav a {
+  min-height: 44px;
+}
+
+.site-search-trigger,
+.pet-entry-skip,
+.wind-toggle,
+#tagFilters button,
+.text-control,
+.visit-control,
+.mini-toggle,
+.action-grid button,
+.daily-gift,
+.seal-button,
+.ink-button,
+.text-button {
+  min-height: 44px;
+}
+
+.text-control {
+  padding-inline: 10px;
 }
 
 .hero.phase2-gif-hero {
@@ -188,6 +249,15 @@ body.is-scrolled .site-header {
   transform: translate3d(0, 0, 0);
 }
 
+.hero-copy > *,
+.section-heading > *,
+.about-copy > *,
+.message-inner > *,
+.portrait-panel > * {
+  position: relative;
+  z-index: 2;
+}
+
 .hero h1 {
   font-family: var(--hutao-brush) !important;
   color: var(--hutao-ink) !important;
@@ -220,6 +290,8 @@ body.is-scrolled .site-header {
 
 .article-card,
 .home-video-card,
+.article-list-card,
+.video-card,
 .achievement-cards article,
 .friend-card,
 .guestbook-list article,
@@ -245,6 +317,8 @@ body.is-scrolled .site-header {
 
 .article-card::before,
 .home-video-card::before,
+.article-list-card::before,
+.video-card::before,
 .achievement-cards article::before,
 .friend-card::before {
   content: "";
@@ -261,6 +335,8 @@ body.is-scrolled .site-header {
 
 .article-card > *,
 .home-video-card > *,
+.article-list-card > *,
+.video-card > *,
 .achievement-cards article > *,
 .friend-card > * {
   position: relative;
@@ -269,6 +345,8 @@ body.is-scrolled .site-header {
 
 .article-card:hover,
 .home-video-card:hover,
+.article-list-card:hover,
+.video-card:hover,
 .achievement-cards article:hover,
 .friend-card:hover,
 .portal-card:hover {
@@ -279,12 +357,16 @@ body.is-scrolled .site-header {
 
 .article-card:hover::before,
 .home-video-card:hover::before,
+.article-list-card:hover::before,
+.video-card:hover::before,
 .friend-card:hover::before {
   opacity: 0.13 !important;
 }
 
 .article-card h3,
 .home-video-card h3,
+.article-list-card h2,
+.video-card h2,
 .friend-card strong,
 .achievement-cards strong {
   color: #211c16 !important;
@@ -294,8 +376,38 @@ body.is-scrolled .site-header {
 }
 
 .article-card p,
-.home-video-card p {
+.home-video-card p,
+.article-list-card p,
+.video-card p {
   color: rgba(53, 47, 39, 0.78) !important;
+}
+
+.article-state,
+.hutao-state {
+  display: grid;
+  gap: 8px;
+  width: min(720px, 100%);
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 42px);
+  color: rgba(47, 40, 32, 0.82) !important;
+  text-align: center;
+  background:
+    linear-gradient(135deg, rgba(252, 248, 238, 0.94), rgba(239, 228, 207, 0.86)),
+    url("./assets/hutao-ink/PaperTexture.png") center / 560px auto repeat;
+  border: 1px solid rgba(49, 42, 30, 0.14);
+  border-radius: 20px;
+  box-shadow: 0 18px 48px rgba(31, 28, 21, 0.12);
+}
+
+.hutao-state strong {
+  color: var(--hutao-ink);
+  font-family: var(--hutao-serif);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+}
+
+.hutao-state span {
+  color: var(--hutao-muted);
+  line-height: 1.75;
 }
 
 .home-video-grid {
@@ -348,6 +460,24 @@ body.is-scrolled .site-header {
   border: 1px solid rgba(214, 172, 86, 0.72) !important;
   box-shadow: 0 12px 30px rgba(24, 30, 27, 0.32), inset 0 0 18px rgba(255, 245, 218, 0.06) !important;
   transform: translate(-50%, -50%) !important;
+}
+
+.video-play-mark {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #f6ecdc !important;
+  font-size: 0 !important;
+}
+
+.video-play-mark::before {
+  content: "";
+  width: 0;
+  height: 0;
+  margin-left: 3px;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-left: 14px solid currentColor;
 }
 
 .home-video-visual span::before {
@@ -411,14 +541,90 @@ blockquote {
 .phase2-reveal,
 .art-scroll-reveal,
 .reveal {
-  filter: blur(7px);
+  opacity: 0;
+  filter: none !important;
+  transform: translateY(32px) scale(0.98);
+  transition:
+    opacity 0.82s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.82s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .phase2-reveal.is-visible,
 .art-scroll-reveal.is-visible,
 .reveal.is-visible,
 .reveal.visible {
-  filter: blur(0);
+  opacity: 1;
+  filter: none !important;
+  transform: translateY(0) scale(1);
+}
+
+main > section:not(.hero):not(.kurumi-page-hero) {
+  position: relative;
+  isolation: isolate;
+}
+
+main > section:not(.hero):not(.kurumi-page-hero)::after {
+  content: "";
+  position: absolute;
+  inset: clamp(22px, 4vw, 48px) -2%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: calc(0.34 - (var(--section-progress, 0) * 0.26));
+  background:
+    url("./assets/hutao-ink/InkFog_03.png") center / cover no-repeat,
+    radial-gradient(circle at 50% 22%, rgba(255, 251, 241, 0.34), transparent 36%);
+  mix-blend-mode: multiply;
+  transition: opacity 0.7s ease;
+}
+
+main > section:not(.hero):not(.kurumi-page-hero).is-current::after {
+  opacity: 0.07;
+}
+
+main > section:not(.hero):not(.kurumi-page-hero) > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cover-view-count,
+.live-status,
+.speech-bubble,
+.status-card,
+.control-card {
+  backdrop-filter: blur(6px) !important;
+}
+
+.status-card > *,
+.control-card > *,
+.speech-bubble > *,
+.live-status > * {
+  position: relative;
+  z-index: 2;
+}
+
+.status-card::before,
+.control-card::before,
+.speech-bubble::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background: rgba(255, 246, 228, 0.04);
+  pointer-events: none;
+}
+
+.article-image-gallery,
+.kurumi-art-grid,
+.gallery-grid {
+  max-width: 100%;
+}
+
+.article-image-gallery img,
+.kurumi-art-card img,
+.gallery-image-button img {
+  max-width: 100%;
+  height: auto;
 }
 
 @keyframes hutaoFogDrift {
@@ -431,7 +637,62 @@ blockquote {
   to { transform: translate3d(18px, -12px, 0) scale(1.06); }
 }
 
+@keyframes hutaoPageRise {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @media (max-width: 760px) {
+  :root {
+    --glass-blur: 4px;
+  }
+
+  .site-header {
+    z-index: 100;
+  }
+
+  .site-nav {
+    inset: 0 !important;
+    padding: 88px 22px 32px !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    overflow-y: auto;
+    background:
+      linear-gradient(180deg, rgba(250, 246, 236, 0.97), rgba(241, 232, 214, 0.94)),
+      url("./assets/hutao-ink/PaperTexture.png") center / 560px auto repeat !important;
+    clip-path: inset(0 0 100% 0);
+    opacity: 1 !important;
+    transform: none !important;
+    transition: clip-path 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .site-nav::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.2;
+    background: url("./assets/hutao-ink/InkFog_03.png") center / cover no-repeat;
+    pointer-events: none;
+  }
+
+  .site-nav.open {
+    clip-path: inset(0 0 0 0);
+  }
+
+  .site-nav a {
+    width: min(100%, 360px);
+    min-height: 48px;
+    justify-content: center;
+    border-bottom: 1px solid rgba(49, 42, 30, 0.1);
+  }
+
   .hero-copy {
     background: rgba(250, 246, 236, 0.9) !important;
   }
@@ -471,6 +732,63 @@ blockquote {
   .art-scroll-reveal,
   .reveal {
     filter: none !important;
+    transform: translateY(18px) scale(0.99);
+  }
+
+  .section,
+  .kurumi-profile-section,
+  .kurumi-gallery-section,
+  .pet-shell {
+    width: min(100% - 28px, 1180px) !important;
+  }
+
+  .article-card,
+  .article-card.featured,
+  .home-video-card,
+  .article-list-card,
+  .video-card,
+  .friend-card {
+    width: 100%;
+    grid-template-columns: 1fr !important;
+  }
+
+  .article-grid,
+  .home-video-grid,
+  .friend-grid,
+  .gallery-grid,
+  .kurumi-art-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .kurumi-art-card,
+  .kurumi-art-card.wide {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+
+  .action-grid {
+    grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)) !important;
+  }
+
+  .action-grid button,
+  .visit-control,
+  .ink-button,
+  .seal-button,
+  .text-button,
+  button,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+  .status-card,
+  .control-card {
+    backdrop-filter: blur(4px) !important;
+  }
+
+  .speech-bubble {
+    max-width: calc(100vw - 36px);
   }
 }
 
