@@ -184,7 +184,6 @@
     setupHeroParallax();
     setupCardTilt();
     setupStickyHeaderState();
-    setupPageMotion();
     setupSectionFocus();
     revealExistingElements();
   }
