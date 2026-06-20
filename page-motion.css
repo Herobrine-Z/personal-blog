@@ -1,0 +1,76 @@
+.ink-page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 10020;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    linear-gradient(105deg, rgba(247, 239, 222, 0.98), rgba(235, 224, 203, 0.96)),
+    url("./assets/hutao-ink/PaperTexture.png") center / 720px auto repeat;
+  opacity: 0;
+  transform: translate3d(-102%, 0, 0);
+  will-change: transform, opacity;
+}
+
+.ink-page-transition::after {
+  content: "";
+  position: absolute;
+  top: -12%;
+  right: -8vw;
+  width: 18vw;
+  min-width: 90px;
+  height: 124%;
+  opacity: 0.28;
+  background: url("./assets/hutao-ink/InkFog_02.png") center / cover no-repeat;
+  mix-blend-mode: multiply;
+}
+
+body.page-motion-leaving .ink-page-transition {
+  animation: inkPageCover 0.34s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+body.page-motion-entering .ink-page-transition {
+  animation: inkPageReveal 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+body.page-motion-leaving main {
+  opacity: 0.88;
+  transform: translate3d(0, 6px, 0);
+  transition: opacity 0.24s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Only one transition system should paint during navigation. */
+.minimal-ink-transition,
+.art-brush-transition,
+.phase2-water-ink {
+  display: none !important;
+}
+
+body.phase2-transitioning main,
+body.art-scroll-transitioning main {
+  filter: none !important;
+}
+
+@keyframes inkPageCover {
+  from { opacity: 0; transform: translate3d(-102%, 0, 0); }
+  12% { opacity: 1; }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes inkPageReveal {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  82% { opacity: 1; }
+  to { opacity: 0; transform: translate3d(102%, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.page-motion-leaving .ink-page-transition,
+  body.page-motion-entering .ink-page-transition {
+    animation-duration: 0.01ms !important;
+  }
+
+  body.page-motion-leaving main {
+    transform: none;
+    transition: none;
+  }
+}
