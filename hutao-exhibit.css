@@ -297,7 +297,7 @@ body.is-scrolled .site-header {
   border: 1px solid rgba(75, 60, 38, 0.14) !important;
   box-shadow: 0 24px 76px rgba(23, 18, 14, 0.22) !important;
   backdrop-filter: none !important;
-  transform: translate3d(0, 0, 0);
+  transform: translate3d(0, calc(-50% + var(--minimal-title-y, 0px)), 0);
 }
 
 .hero-copy > *,
@@ -609,12 +609,12 @@ blockquote {
   transform: translateY(0) scale(1);
 }
 
-main > section:not(.hero):not(.kurumi-page-hero) {
+main > section:not(.hero):not(.kurumi-page-hero):not(.hutao-house) {
   position: relative;
   isolation: isolate;
 }
 
-main > section:not(.hero):not(.kurumi-page-hero)::after {
+main > section:not(.hero):not(.kurumi-page-hero):not(.hutao-house)::after {
   content: "";
   position: absolute;
   inset: clamp(22px, 4vw, 48px) -2%;
@@ -628,11 +628,11 @@ main > section:not(.hero):not(.kurumi-page-hero)::after {
   transition: opacity 0.7s ease;
 }
 
-main > section:not(.hero):not(.kurumi-page-hero).is-current::after {
+main > section:not(.hero):not(.kurumi-page-hero):not(.hutao-house).is-current::after {
   opacity: 0.07;
 }
 
-main > section:not(.hero):not(.kurumi-page-hero) > * {
+main > section:not(.hero):not(.kurumi-page-hero):not(.hutao-house) > * {
   position: relative;
   z-index: 1;
 }
@@ -811,25 +811,14 @@ main > section:not(.hero):not(.kurumi-page-hero) > * {
     border-bottom: 1px solid rgba(49, 42, 30, 0.1);
     font-size: clamp(17px, 4.8vw, 20px);
     letter-spacing: 0.18em;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition:
-      color 0.25s,
-      opacity 0.24s ease,
-      transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .site-header .site-nav.open a {
     opacity: 1;
     transform: translateY(0);
+    transition: color 0.25s;
   }
 
-  .site-header .site-nav.open a:nth-child(2) { transition-delay: 0.035s; }
-  .site-header .site-nav.open a:nth-child(3) { transition-delay: 0.07s; }
-  .site-header .site-nav.open a:nth-child(4) { transition-delay: 0.105s; }
-  .site-header .site-nav.open a:nth-child(5) { transition-delay: 0.14s; }
-  .site-header .site-nav.open a:nth-child(6) { transition-delay: 0.175s; }
-  .site-header .site-nav.open a:nth-child(7) { transition-delay: 0.21s; }
+  .hero-copy {
+    transform: none;
+  }
 }
 
 @media (max-width: 760px) {
