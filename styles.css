@@ -1194,6 +1194,12 @@ footer {
 }
 
 @media (max-width: 840px) {
+  html.mobile-nav-open,
+  body.mobile-nav-open {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
   html.cursor-ready,
   html.cursor-ready body,
   html.cursor-ready a,
@@ -1215,7 +1221,7 @@ footer {
 
   .menu-toggle {
     position: relative;
-    z-index: 2;
+    z-index: 10002;
     display: grid;
     gap: 7px;
     width: 42px;
@@ -1242,26 +1248,48 @@ footer {
   .site-nav {
     position: fixed;
     inset: 0;
+    z-index: 10001;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0 !important;
+    padding: max(88px, calc(env(safe-area-inset-top) + 76px)) 24px max(28px, env(safe-area-inset-bottom)) !important;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 35px;
+    justify-content: flex-start;
+    gap: 0 !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     background: color-mix(in srgb, var(--paper) 97%, transparent);
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-    transform: translateY(-12px);
-    transition: opacity 0.25s, transform 0.25s;
+    transform: translate3d(0, -12px, 0);
+    transition: opacity 0.24s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.3s;
   }
 
   .site-nav.open {
     opacity: 1;
+    visibility: visible;
     pointer-events: auto;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
+    transition-delay: 0s;
   }
 
   .site-nav a {
-    font-size: 18px;
+    display: flex !important;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 360px);
+    min-height: 52px;
+    padding: 11px 8px !important;
+    border-bottom: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+    font-size: clamp(17px, 4.8vw, 20px) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
   }
 
   .hero-art {
