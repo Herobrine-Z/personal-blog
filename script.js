@@ -5,8 +5,6 @@ const header = document.querySelector(".site-header");
 const windToggle = document.querySelector("#windToggle");
 const windLabel = windToggle.querySelector(".wind-label");
 const summonButton = document.querySelector("#summonPetals");
-const menuToggle = document.querySelector(".menu-toggle");
-const nav = document.querySelector(".site-nav");
 const cursor = document.querySelector(".ink-cursor");
 const cursorRing = document.querySelector(".ink-cursor-ring");
 const cursorDot = document.querySelector(".ink-cursor-dot");
@@ -562,32 +560,6 @@ window.addEventListener(
 
 windToggle.addEventListener("click", () => setWind(!windActive));
 summonButton.addEventListener("click", summonPetals);
-
-function setMobileMenu(open) {
-  nav.classList.toggle("open", open);
-  menuToggle.classList.toggle("open", open);
-  menuToggle.setAttribute("aria-expanded", String(open));
-  document.documentElement.classList.toggle("mobile-nav-open", open);
-  document.body.classList.toggle("mobile-nav-open", open);
-}
-
-menuToggle.addEventListener("click", () => {
-  setMobileMenu(!nav.classList.contains("open"));
-});
-
-nav.addEventListener("click", (event) => {
-  if (event.target.matches("a")) {
-    setMobileMenu(false);
-  }
-});
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && nav.classList.contains("open")) setMobileMenu(false);
-});
-
-window.addEventListener("resize", () => {
-  if (window.innerWidth > 840 && nav.classList.contains("open")) setMobileMenu(false);
-}, { passive: true });
 
 function renderGuestbook(messages) {
   const list = document.querySelector("#guestbookList");
