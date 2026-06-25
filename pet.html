@@ -15,10 +15,6 @@
     <link rel="stylesheet" href="./styles.css?v=14" />
     <link rel="preload" as="image" href="./assets/hutao-entry-shanshui.png" fetchpriority="high" />
     <link rel="stylesheet" href="./pet.css?v=20260615-shanshui" />
-    <link rel="stylesheet" href="./phase2-effects.css?v=1" />
-    <link rel="stylesheet" href="./next-effects.css?v=1" />
-    <link rel="stylesheet" href="./minimal-ink.css?v=1" />
-    <link rel="stylesheet" href="./art-scroll.css?v=1" />
     <link rel="stylesheet" href="./page-motion.css?v=1" />
   </head>
   <body class="pet-page pet-entry-active">
@@ -41,10 +37,13 @@
     </div>
     <header class="site-header scrolled pet-header">
       <a class="brand" href="./index.html" aria-label="返回首页">
-        <img class="brand-icon" src="./assets/icon.png" alt="" />
+        <img class="brand-icon" src="./assets/icon-96.webp" alt="" width="48" height="48" />
         <span class="brand-name">不会振刀</span>
       </a>
-      <nav class="inner-nav" aria-label="网站导航">
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="siteNav">
+        <span></span><span></span><span class="sr-only">打开导航</span>
+      </button>
+      <nav class="site-nav inner-nav" id="siteNav" aria-label="网站导航">
         <a href="./index.html">首页</a>
         <a href="./articles.html">文章</a>
         <a href="./videos.html">视频</a>
@@ -168,10 +167,6 @@
     <script src="./theme.js?v=14"></script>
     <script src="./pet-rig.js?v=20260615-fullbody"></script>
     <script src="./pet.js?v=20260616-zhang"></script>
-    <script src="./phase2-effects.js?v=1"></script>
-    <script src="./next-effects.js?v=1"></script>
-    <script src="./minimal-ink.js?v=1"></script>
-    <script src="./art-scroll.js?v=1"></script>
     <script src="./page-motion.js?v=1"></script>
   </body>
 </html>

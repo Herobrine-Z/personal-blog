@@ -9,6 +9,7 @@ const cursor = document.querySelector(".ink-cursor");
 const cursorRing = document.querySelector(".ink-cursor-ring");
 const cursorDot = document.querySelector(".ink-cursor-dot");
 const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+const compactMotion = window.matchMedia("(max-width: 840px), (pointer: coarse)").matches;
 
 let windActive = false;
 let windStrength = 0;
@@ -19,6 +20,30 @@ let lastCursorTrailAt = 0;
 let lastTrailPoint = null;
 
 const random = (min, max) => Math.random() * (max - min) + min;
+if (hasGsap && !reducedMotion) document.documentElement.classList.add("motion-ready");
+
+function withTimeout(promise, ms = 7000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => window.setTimeout(() => reject(new Error("请求超时")), ms)),
+  ]);
+}
+
+function readCachedWorks(key) {
+  try {
+    const cached = JSON.parse(localStorage.getItem(key) || "null");
+    if (Array.isArray(cached?.items)) return cached.items;
+  } catch {
+    localStorage.removeItem(key);
+  }
+  return [];
+}
+
+function writeCachedWorks(key, items) {
+  try {
+    localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), items }));
+  } catch {}
+}
 
 function createHomepageArticleCard(article, index) {
   const card = document.createElement("article");
@@ -96,21 +121,32 @@ async function loadHomepageArticles() {
   if (!container || !window.articleService) return;
 
   if (!articleService.configured) {
-    container.innerHTML = '<p class="article-state">文章功能尚待站长完成配置。</p>';
+    container.dataset.fallbackReason = "not-configured";
     return;
   }
 
   try {
-    const articles = await articleService.listPublished(2);
+    const articles = await withTimeout(articleService.listPublished(2));
     container.replaceChildren();
     if (!articles.length) {
       container.innerHTML = '<p class="article-state">还没有发布文章，第一卷正在酝酿中。</p>';
       return;
     }
+    writeCachedWorks("hutao-homepage-articles", articles);
     articles.forEach((article, index) => container.appendChild(createHomepageArticleCard(article, index)));
     setupInkHoverEffects();
   } catch (error) {
-    container.innerHTML = `<p class="article-state">文章读取失败：${error.message}</p>`;
+    const cached = readCachedWorks("hutao-homepage-articles");
+    if (cached.length) {
+      container.replaceChildren();
+      cached.slice(0, 2).forEach((article, index) => container.appendChild(createHomepageArticleCard(article, index)));
+      setupInkHoverEffects();
+      return;
+    }
+    const note = document.createElement("p");
+    note.className = "article-state";
+    note.textContent = "文章暂时读取失败，已保留备用入口。";
+    container.appendChild(note);
   }
 }
 
@@ -148,16 +184,27 @@ async function loadHomepageVideos() {
   const container = document.querySelector("#latestVideos");
   if (!container || !articleService.configured) return;
   try {
-    const videos = await articleService.listPublished(2, { contentType: "video" });
+    const videos = await withTimeout(articleService.listPublished(2, { contentType: "video" }));
     container.replaceChildren();
     if (!videos.length) {
       container.innerHTML = '<p class="article-state">还没有发布视频，第一段影像正在路上。</p>';
       return;
     }
+    writeCachedWorks("hutao-homepage-videos", videos);
     videos.forEach((video) => container.appendChild(createHomepageVideoCard(video)));
     setupInkHoverEffects();
   } catch (error) {
-    container.innerHTML = `<p class="article-state">视频读取失败：${error.message}</p>`;
+    const cached = readCachedWorks("hutao-homepage-videos");
+    if (cached.length) {
+      container.replaceChildren();
+      cached.slice(0, 2).forEach((video) => container.appendChild(createHomepageVideoCard(video)));
+      setupInkHoverEffects();
+      return;
+    }
+    const note = document.createElement("p");
+    note.className = "article-state";
+    note.textContent = "视频暂时读取失败，已保留备用入口。";
+    container.appendChild(note);
   }
 }
 
@@ -366,7 +413,7 @@ function createCursorTrail(x, y) {
 }
 
 function setupFlowingLandscape() {
-  if (!hasGsap || reducedMotion) return;
+  if (!hasGsap || reducedMotion || compactMotion) return;
   const hero = document.querySelector(".hero");
   const far = document.querySelector(".landscape-far");
   const near = document.querySelector(".landscape-near");
@@ -391,7 +438,7 @@ function setupFlowingLandscape() {
 }
 
 function setupAmbientInk() {
-  if (!hasGsap || reducedMotion) return;
+  if (!hasGsap || reducedMotion || compactMotion) return;
   const drifts = gsap.utils.toArray(".ink-drift");
   if (!drifts.length) return;
 
@@ -411,7 +458,7 @@ function setupAmbientInk() {
 }
 
 function createPiece(options = {}) {
-  if (reducedMotion || !hasGsap || pieces.size > 42) return;
+  if (reducedMotion || compactMotion || !hasGsap || pieces.size > 42) return;
 
   const piece = document.createElement("span");
   const isPetal = options.type ? options.type === "petal" : Math.random() > 0.28;
@@ -712,6 +759,18 @@ function setupInkHoverEffects() {
   });
 }
 
+function setupLinksToggle() {
+  const section = document.querySelector(".links-section");
+  const button = document.querySelector("#linksToggle");
+  if (!section || !button) return;
+  button.addEventListener("click", () => {
+    const open = !section.classList.contains("is-expanded");
+    section.classList.toggle("is-expanded", open);
+    button.setAttribute("aria-expanded", String(open));
+    button.textContent = open ? "收起入口" : "展开全部入口";
+  });
+}
+
 if (hasGsap && !reducedMotion) {
   if (finePointer) {
     document.documentElement.classList.add("cursor-ready");
@@ -800,3 +859,4 @@ setupAchievements();
 setupInkHoverEffects();
 setupFlowingLandscape();
 setupAmbientInk();
+setupLinksToggle();

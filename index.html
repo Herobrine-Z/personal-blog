@@ -9,20 +9,16 @@
     <link rel="apple-touch-icon" href="/personal-blog/assets/next/favicon_hutao_tigerhat_ink_180.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="虎桃不会振刀 RSS" href="./rss.xml" />
+    <link rel="preload" as="image" href="./assets/ink-hero-desktop.webp" imagesrcset="./assets/ink-hero-mobile.webp 720w, ./assets/ink-hero-tablet.webp 1080w, ./assets/ink-hero-desktop.webp 1600w" imagesizes="100vw" fetchpriority="high" />
     <title>虎桃不会振刀 | 一卷桃花江湖</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Long+Cang&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css?v=14" />
-    <link rel="stylesheet" href="./phase1-effects.css?v=1" />
-    <link rel="stylesheet" href="./phase2-effects.css?v=1" />
-    <link rel="stylesheet" href="./next-effects.css?v=1" />
-    <link rel="stylesheet" href="./minimal-ink.css?v=1" />
-    <link rel="stylesheet" href="./art-scroll.css?v=1" />
     <link rel="stylesheet" href="./hutao-exhibit.css?v=4" />
     <link rel="stylesheet" href="./page-motion.css?v=1" />
   </head>
-  <body>
+  <body class="home-page">
     <div class="paper-noise" aria-hidden="true"></div>
     <div class="ink-atmosphere" aria-hidden="true">
       <span class="ink-drift ink-drift-one"></span>
@@ -37,7 +33,7 @@
 
     <header class="site-header">
       <a class="brand" href="#home" aria-label="返回首页">
-        <img class="brand-icon" src="./assets/icon.png" alt="" />
+        <img class="brand-icon" src="./assets/icon-96.webp" alt="" width="48" height="48" />
         <span class="brand-name">不会振刀</span>
       </a>
       <button class="menu-toggle" aria-expanded="false" aria-controls="siteNav">
@@ -57,7 +53,12 @@
 
     <main>
       <section class="hero" id="home">
-        <img class="hero-art" src="./assets/ink-hero.png" alt="水墨浪潮与红衣胡桃" />
+        <picture>
+          <source media="(max-width: 600px)" srcset="./assets/ink-hero-mobile.webp" type="image/webp" />
+          <source media="(max-width: 1080px)" srcset="./assets/ink-hero-tablet.webp" type="image/webp" />
+          <source srcset="./assets/ink-hero-desktop.webp" type="image/webp" />
+          <img class="hero-art" src="./assets/ink-hero.png" alt="水墨浪潮与红衣胡桃" width="1600" height="900" fetchpriority="high" />
+        </picture>
         <div class="flowing-landscape" aria-hidden="true">
           <svg class="landscape-layer landscape-far" viewBox="0 0 1600 520" preserveAspectRatio="none">
             <path d="M0 420C130 350 210 370 330 280C425 208 500 320 610 250C730 170 810 250 905 195C1020 125 1115 250 1230 205C1360 155 1450 245 1600 150V520H0Z" />
@@ -88,7 +89,24 @@
           <p>新写下的两卷文字，<br /><a class="section-heading-link" href="./articles.html">查看全部文章 →</a></p>
         </div>
         <div class="article-grid" id="latestArticles" aria-live="polite">
-          <p class="article-state">正在翻阅最新文章……</p>
+          <article class="article-card featured reveal static-fallback">
+            <div class="card-visual peach-mountain" aria-hidden="true"><span class="card-index">新</span><div class="ink-mountain"></div></div>
+            <div class="card-content">
+              <div class="article-meta"><span>最新文章</span><time>静态兜底</time></div>
+              <h3>文章正在路上</h3>
+              <p>若网络或 Supabase 暂时不可用，仍可先进入文章页翻阅已发布内容。</p>
+              <a href="./articles.html">查看全部文章 <span>→</span></a>
+            </div>
+          </article>
+          <article class="article-card reveal static-fallback">
+            <div class="card-visual moon-lake" aria-hidden="true"><span class="card-index">卷</span><div class="moon"></div></div>
+            <div class="card-content">
+              <div class="article-meta"><span>随笔</span><time>备用入口</time></div>
+              <h3>去文章页继续阅读</h3>
+              <p>动态数据加载成功后，这里会自动替换为最新两篇文章。</p>
+              <a href="./articles.html">展开文章列表 <span>→</span></a>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -98,7 +116,22 @@
           <p>新上传的对局与片刻，<br /><a class="section-heading-link" href="./videos.html">查看全部视频 →</a></p>
         </div>
         <div class="home-video-grid" id="latestVideos" aria-live="polite">
-          <p class="article-state">正在读取最新视频……</p>
+          <a class="home-video-card reveal static-fallback" href="./videos.html">
+            <div class="home-video-visual"><span aria-hidden="true">▶</span></div>
+            <div>
+              <small>最新视频 · 静态兜底</small>
+              <h3>视频正在整理中</h3>
+              <p>动态读取失败时，可以从这里进入视频页查看已发布内容。</p>
+            </div>
+          </a>
+          <a class="home-video-card reveal static-fallback" href="./videos.html">
+            <div class="home-video-visual"><span aria-hidden="true">▶</span></div>
+            <div>
+              <small>备用入口</small>
+              <h3>前往视频列表</h3>
+              <p>Supabase 成功返回后，这里会替换为最新两个视频。</p>
+            </div>
+          </a>
         </div>
       </section>
 
@@ -128,9 +161,10 @@
 
       <section class="section links-section" id="links">
         <div class="section-heading reveal">
-          <div><p class="eyebrow">Useful Links</p><h2>友情链接</h2></div>
-          <p>常用视频平台与 AI 工具，<br />一处抵达更大的数字江湖。</p>
+          <div><p class="eyebrow">Useful Links</p><h2>江湖驿站</h2></div>
+          <p>常用入口默认收起，<br />需要时再展开全部。</p>
         </div>
+        <div class="links-collapsible" id="linksCollapsible">
         <div class="friend-group reveal">
           <div class="friend-group-heading">
             <div><span>01</span><h3>视频平台</h3></div>
@@ -233,6 +267,8 @@
             </a>
           </div>
         </div>
+        </div>
+        <button class="links-toggle reveal" id="linksToggle" type="button" aria-expanded="false" aria-controls="linksCollapsible">展开全部入口</button>
       </section>
 
       <section class="about-section" id="about">
@@ -307,11 +343,6 @@
     <script src="./article-service.js?v=8"></script>
     <script src="./theme.js?v=14"></script>
     <script src="./script.js?v=12"></script>
-    <script src="./phase1-effects.js?v=2"></script>
-    <script src="./phase2-effects.js?v=1"></script>
-    <script src="./next-effects.js?v=1"></script>
-    <script src="./minimal-ink.js?v=1"></script>
-    <script src="./art-scroll.js?v=1"></script>
     <script src="./hutao-exhibit.js?v=4"></script>
     <script src="./page-motion.js?v=1"></script>
   </body>

@@ -61,7 +61,7 @@
       if (event.key === "Escape" && navigation.classList.contains("open")) setMenuOpen(false);
     });
     window.addEventListener("resize", () => {
-      if (window.innerWidth > 840 && navigation.classList.contains("open")) setMenuOpen(false);
+      if (window.innerWidth > 1080 && navigation.classList.contains("open")) setMenuOpen(false);
     }, { passive: true });
   }
 

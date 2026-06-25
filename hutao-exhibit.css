@@ -592,12 +592,19 @@ blockquote {
 .phase2-reveal,
 .art-scroll-reveal,
 .reveal {
-  opacity: 0;
+  opacity: 1;
   filter: none !important;
-  transform: translateY(32px) scale(0.98);
+  transform: none;
   transition:
     opacity 0.82s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.82s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.motion-ready .phase2-reveal,
+.motion-ready .art-scroll-reveal,
+.motion-ready .reveal {
+  opacity: 0;
+  transform: translateY(28px) scale(0.99);
 }
 
 .phase2-reveal.is-visible,
