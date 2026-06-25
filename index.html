@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="./hutao-exhibit.css?v=4" />
     <link rel="stylesheet" href="./page-motion.css?v=1" />
   </head>
-  <body class="home-page">
+  <body class="home-page" data-page="home">
     <div class="paper-noise" aria-hidden="true"></div>
     <div class="ink-atmosphere" aria-hidden="true">
       <span class="ink-drift ink-drift-one"></span>
@@ -31,23 +31,23 @@
       <span class="ink-cursor-dot"></span>
     </div>
 
-    <header class="site-header">
+    <header class="site-header" data-site-header>
       <a class="brand" href="#home" aria-label="返回首页">
-        <img class="brand-icon" src="./assets/icon-96.webp" alt="" width="48" height="48" />
+        <img class="brand-icon" src="./assets/icon-96.webp" alt="" width="44" height="44" />
         <span class="brand-name">不会振刀</span>
       </a>
-      <button class="menu-toggle" aria-expanded="false" aria-controls="siteNav">
-        <span></span><span></span><span class="sr-only">打开导航</span>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="打开导航">
+        <span></span><span></span>
       </button>
       <nav class="site-nav" id="siteNav" aria-label="主导航">
-        <a class="active" href="#home">卷首</a>
-        <a href="./articles.html">文章</a>
-        <a href="./videos.html">视频</a>
-        <a href="./kurumi.html">胡桃绘卷</a>
-        <a href="./pet.html">桌宠小屋</a>
-        <a href="#links">江湖去处</a>
-        <a href="#about">侠客志</a>
-        <a href="#message">留墨</a>
+        <a class="active" href="#home" data-nav-page="home">卷首</a>
+        <a href="./articles.html" data-nav-page="articles">文章</a>
+        <a href="./videos.html" data-nav-page="videos">视频</a>
+        <a href="./kurumi.html" data-nav-page="kurumi">胡桃绘卷</a>
+        <a href="./pet.html" data-nav-page="pet">桌宠小屋</a>
+        <a href="#links" data-nav-page="links">江湖去处</a>
+        <a href="#about" data-nav-page="about">侠客志</a>
+        <a href="#message" data-nav-page="message">留墨</a>
       </nav>
     </header>
 

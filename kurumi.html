@@ -20,20 +20,25 @@
     <link rel="stylesheet" href="./hutao-exhibit.css?v=4" />
     <link rel="stylesheet" href="./page-motion.css?v=1" />
   </head>
-  <body class="kurumi-page">
+  <body class="kurumi-page" data-page="kurumi">
     <div class="paper-noise" aria-hidden="true"></div>
-    <header class="site-header kurumi-header">
+    <header class="site-header kurumi-header" data-site-header>
       <a class="brand" href="./index.html" aria-label="返回首页">
-        <img class="brand-icon" src="./assets/icon.png" alt="" />
+        <img class="brand-icon" src="./assets/icon-96.webp" width="44" height="44" alt="" />
         <span class="brand-name">不会振刀</span>
       </a>
-      <nav class="inner-nav" aria-label="胡桃绘卷导航">
-        <a href="./index.html">卷首</a>
-        <a href="./articles.html">文章</a>
-        <a class="active" href="./kurumi.html">胡桃绘卷</a>
-        <a href="./pet.html">桌宠小屋</a>
-        <a href="./index.html#about">侠客志</a>
-        <a href="./index.html#message">留墨亭</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="打开导航">
+        <span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav" aria-label="主导航">
+        <a href="./index.html" data-nav-page="home">卷首</a>
+        <a href="./articles.html" data-nav-page="articles">文章</a>
+        <a href="./videos.html" data-nav-page="videos">视频</a>
+        <a class="active" href="./kurumi.html" data-nav-page="kurumi">胡桃绘卷</a>
+        <a href="./pet.html" data-nav-page="pet">桌宠小屋</a>
+        <a href="./index.html#links" data-nav-page="links">江湖去处</a>
+        <a href="./index.html#about" data-nav-page="about">侠客志</a>
+        <a href="./index.html#message" data-nav-page="message">留墨</a>
       </nav>
     </header>
 
@@ -51,7 +56,7 @@
         <article class="kurumi-profile-card reveal">
           <div class="kurumi-profile-copy">
             <p class="eyebrow">Character Profile</p>
-            <h2>继承古老传承的大小姐</h2>
+            <h2>继承古老<br />传承的大小姐</h2>
             <p>为了探寻天地秘密、掌握阴阳术的终极，胡桃离开日轮国鲸息岛，踏上了属于她的新旅程。她以灵伞庇护同伴，也以纯粹的热忱面对聚窟洲的每一次相逢。</p>
             <dl class="kurumi-facts">
               <div><dt>身份</dt><dd>阴阳师</dd></div>

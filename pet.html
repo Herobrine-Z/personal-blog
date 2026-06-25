@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="./pet.css?v=20260615-shanshui" />
     <link rel="stylesheet" href="./page-motion.css?v=1" />
   </head>
-  <body class="pet-page pet-entry-active">
+  <body class="pet-page pet-entry-active" data-page="pet">
     <div class="pet-entry" id="petEntry" aria-label="正在进入胡桃小屋" aria-live="polite">
       <div class="pet-entry-landscape" aria-hidden="true"></div>
       <div class="pet-entry-mist pet-entry-mist-back" aria-hidden="true"></div>
@@ -35,22 +35,23 @@
       </div>
       <button class="pet-entry-skip" id="petEntrySkip" type="button">跳过入境</button>
     </div>
-    <header class="site-header scrolled pet-header">
+    <header class="site-header scrolled pet-header" data-site-header>
       <a class="brand" href="./index.html" aria-label="返回首页">
-        <img class="brand-icon" src="./assets/icon-96.webp" alt="" width="48" height="48" />
+        <img class="brand-icon" src="./assets/icon-96.webp" alt="" width="44" height="44" />
         <span class="brand-name">不会振刀</span>
       </a>
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="siteNav">
-        <span></span><span></span><span class="sr-only">打开导航</span>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="打开导航">
+        <span></span><span></span>
       </button>
-      <nav class="site-nav inner-nav" id="siteNav" aria-label="网站导航">
-        <a href="./index.html">首页</a>
-        <a href="./articles.html">文章</a>
-        <a href="./videos.html">视频</a>
-        <a href="./kurumi.html">胡桃绘卷</a>
-        <a class="active" href="./pet.html">胡桃小屋</a>
-        <a href="./index.html#about">侠客志</a>
-        <a href="./index.html#message">留墨亭</a>
+      <nav class="site-nav" id="siteNav" aria-label="主导航">
+        <a href="./index.html" data-nav-page="home">卷首</a>
+        <a href="./articles.html" data-nav-page="articles">文章</a>
+        <a href="./videos.html" data-nav-page="videos">视频</a>
+        <a href="./kurumi.html" data-nav-page="kurumi">胡桃绘卷</a>
+        <a class="active" href="./pet.html" data-nav-page="pet">桌宠小屋</a>
+        <a href="./index.html#links" data-nav-page="links">江湖去处</a>
+        <a href="./index.html#about" data-nav-page="about">侠客志</a>
+        <a href="./index.html#message" data-nav-page="message">留墨</a>
       </nav>
     </header>
 

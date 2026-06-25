@@ -44,6 +44,16 @@
 
     menuToggle.setAttribute("aria-controls", navigation.id);
     menuToggle.setAttribute("aria-expanded", "false");
+    if (!menuToggle.hasAttribute("aria-label")) {
+      menuToggle.setAttribute("aria-label", "打开导航");
+    }
+
+    const currentPage = document.body.dataset.page;
+    if (currentPage) {
+      navigation.querySelectorAll("[data-nav-page]").forEach((link) => {
+        link.classList.toggle("active", link.dataset.navPage === currentPage);
+      });
+    }
 
     const setMenuOpen = (open) => {
       navigation.classList.toggle("open", open);

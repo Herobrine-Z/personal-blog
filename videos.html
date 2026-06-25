@@ -19,18 +19,25 @@
     <link rel="stylesheet" href="./hutao-exhibit.css?v=4" />
     <link rel="stylesheet" href="./page-motion.css?v=1" />
   </head>
-  <body class="inner-page">
+  <body class="inner-page" data-page="videos">
     <div class="paper-noise" aria-hidden="true"></div>
-    <header class="site-header scrolled">
-      <a class="brand" href="./index.html"><img class="brand-icon" src="./assets/icon.png" alt="" /><span class="brand-name">不会振刀</span></a>
-      <nav class="inner-nav" aria-label="视频导航">
-        <a href="./index.html">首页</a>
-        <a href="./articles.html">文章</a>
-        <a class="active" href="./videos.html">视频</a>
-        <a href="./kurumi.html">胡桃绘卷</a>
-        <a href="./pet.html">桌宠小屋</a>
-        <a href="./index.html#about">侠客志</a>
-        <a href="./index.html#message">留墨亭</a>
+    <header class="site-header scrolled" data-site-header>
+      <a class="brand" href="./index.html" aria-label="返回首页">
+        <img class="brand-icon" src="./assets/icon-96.webp" width="44" height="44" alt="" />
+        <span class="brand-name">不会振刀</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="打开导航">
+        <span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav" aria-label="主导航">
+        <a href="./index.html" data-nav-page="home">卷首</a>
+        <a href="./articles.html" data-nav-page="articles">文章</a>
+        <a class="active" href="./videos.html" data-nav-page="videos">视频</a>
+        <a href="./kurumi.html" data-nav-page="kurumi">胡桃绘卷</a>
+        <a href="./pet.html" data-nav-page="pet">桌宠小屋</a>
+        <a href="./index.html#links" data-nav-page="links">江湖去处</a>
+        <a href="./index.html#about" data-nav-page="about">侠客志</a>
+        <a href="./index.html#message" data-nav-page="message">留墨</a>
       </nav>
     </header>
     <main class="article-page-shell">

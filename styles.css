@@ -343,21 +343,20 @@ button {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 30;
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px clamp(24px, 5vw, 80px);
-  transition: background-color 0.4s, box-shadow 0.4s, padding 0.4s;
+  z-index: 100;
+  width: 100%;
+  min-height: 72px;
+  padding: 10px clamp(28px, 4vw, 72px);
+  transition: background-color 0.4s, box-shadow 0.4s, backdrop-filter 0.4s;
 }
 
 .site-header.scrolled {
-  padding-top: 12px;
-  padding-bottom: 12px;
   background: color-mix(in srgb, var(--paper) 88%, transparent);
   box-shadow: 0 1px 0 var(--line), 0 10px 34px color-mix(in srgb, var(--ink) 6%, transparent);
-  backdrop-filter: blur(18px) saturate(0.8);
+  backdrop-filter: blur(6px) saturate(0.9);
 }
 
 .brand {
@@ -367,8 +366,8 @@ button {
 }
 
 .brand-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border: 1px solid rgba(117, 36, 31, 0.45);
   border-radius: 50%;
   object-fit: cover;
@@ -394,21 +393,23 @@ button {
 
 .brand-name {
   font-family: var(--brush);
-  font-size: 24px;
-  letter-spacing: 0.08em;
+  font-size: 22px;
+  letter-spacing: 0.04em;
 }
 
 .site-nav {
   display: flex;
-  gap: clamp(24px, 4vw, 56px);
+  align-items: center;
+  gap: clamp(18px, 2.2vw, 38px);
 }
 
 .site-nav a {
   position: relative;
-  padding: 7px 2px;
+  padding: 8px 1px;
   color: var(--ink-soft);
-  font-size: 15px;
-  letter-spacing: 0.22em;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
   transition: color 0.25s;
 }
 
@@ -1402,14 +1403,14 @@ footer {
   gap: 8px;
   order: 2;
   margin-left: auto;
-  padding: 8px 11px;
+  padding: 7px 10px;
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--ink-soft);
   background: color-mix(in srgb, var(--paper) 76%, transparent);
   font-size: 12px;
   cursor: pointer;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(6px);
   transition: border-color 0.2s, color 0.2s, transform 0.2s;
 }
 
@@ -1432,7 +1433,7 @@ footer {
 
 .site-header > nav {
   order: 3;
-  margin-left: clamp(18px, 2.8vw, 42px);
+  margin-left: clamp(16px, 2vw, 32px);
 }
 
 .site-header > .menu-toggle {
@@ -2778,26 +2779,13 @@ body:has(.fortune-dialog[open]) {
   text-shadow: none;
 }
 
-.kurumi-header .inner-nav {
-  display: flex;
-  gap: 30px;
-}
-
-.kurumi-header .inner-nav a {
-  padding: 6px 0;
-  border-bottom: 1px solid transparent;
-  font-size: 13px;
-  letter-spacing: 0.16em;
-}
-
-.kurumi-header .inner-nav a:hover,
-.kurumi-header .inner-nav a.active {
-  border-color: var(--cinnabar);
+.kurumi-header .site-nav a:hover,
+.kurumi-header .site-nav a.active {
   color: #ef9b90;
 }
 
-.kurumi-header.scrolled .inner-nav a:hover,
-.kurumi-header.scrolled .inner-nav a.active {
+.kurumi-header.scrolled .site-nav a:hover,
+.kurumi-header.scrolled .site-nav a.active {
   color: var(--cinnabar);
 }
 
