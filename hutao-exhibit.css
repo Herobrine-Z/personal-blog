@@ -589,6 +589,31 @@ blockquote {
   text-shadow: none !important;
 }
 
+@media (min-width: 901px) {
+  .home-page .about-copy {
+    background:
+      linear-gradient(135deg, rgba(250, 247, 238, 0.88), rgba(244, 236, 220, 0.82)),
+      url("./assets/hutao-ink/PaperTexture.png") center / 520px auto repeat !important;
+    border: 1px solid rgba(70, 55, 40, 0.14) !important;
+    box-shadow:
+      0 20px 55px rgba(65, 49, 37, 0.11),
+      inset 0 1px 0 rgba(255, 255, 255, 0.52) !important;
+    backdrop-filter: none !important;
+  }
+
+  .home-page .portrait-panel {
+    background: rgba(250, 247, 238, 0.28) !important;
+    border-color: rgba(70, 55, 40, 0.12) !important;
+    box-shadow: 0 16px 38px rgba(65, 49, 37, 0.08) !important;
+  }
+
+  .home-page .about-copy blockquote {
+    color: rgba(67, 40, 32, 0.78) !important;
+    background: transparent !important;
+    border-left: 3px solid rgba(159, 48, 41, 0.72) !important;
+  }
+}
+
 .phase2-reveal,
 .art-scroll-reveal,
 .reveal {
@@ -614,6 +639,13 @@ blockquote {
   opacity: 1;
   filter: none !important;
   transform: translateY(0) scale(1);
+}
+
+.home-page .about-section .reveal,
+.motion-ready .home-page .about-section .reveal {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
 }
 
 main > section:not(.hero):not(.kurumi-page-hero):not(.hutao-house) {

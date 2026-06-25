@@ -18,6 +18,7 @@ const pieces = new Set();
 const pointer = { x: -1000, y: -1000 };
 let lastCursorTrailAt = 0;
 let lastTrailPoint = null;
+let cursorIdleTimer = 0;
 
 const random = (min, max) => Math.random() * (max - min) + min;
 if (hasGsap && !reducedMotion) document.documentElement.classList.add("motion-ready");
@@ -781,7 +782,13 @@ if (hasGsap && !reducedMotion) {
       cursorX(event.clientX);
       cursorY(event.clientY);
       createCursorTrail(event.clientX, event.clientY);
+      cursor.classList.remove("is-idle");
       gsap.to(cursor, { autoAlpha: 1, duration: 0.15, overwrite: "auto" });
+      window.clearTimeout(cursorIdleTimer);
+      cursorIdleTimer = window.setTimeout(() => {
+        cursor.classList.add("is-idle");
+        gsap.to(cursor, { autoAlpha: 0, duration: 0.45, overwrite: "auto" });
+      }, 1200);
     });
 
     document.addEventListener("pointerover", (event) => {
