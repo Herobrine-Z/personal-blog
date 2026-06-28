@@ -14,6 +14,17 @@
   function applyScene(scene) {
     room.dataset.timeScene = scene;
     document.body.dataset.petScene = scene;
+    const label = {
+      dawn: "场景：清晨",
+      day: "场景：白天",
+      dusk: "场景：黄昏",
+      night: "场景：夜晚",
+    }[scene] || "场景：自动";
+    const button = document.querySelector("#sceneToggle");
+    if (button) {
+      button.textContent = label;
+      button.setAttribute("aria-pressed", scene !== currentScene());
+    }
   }
 
   applyScene(currentScene());

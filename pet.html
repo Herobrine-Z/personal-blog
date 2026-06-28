@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="胡桃小屋：会呼吸、眨眼、跟随光标并回应互动的 Live2D 桌面宠物。" />
     <meta name="theme-color" content="#6f1826" />
-    <link rel="icon" href="/personal-blog/assets/next/favicon.ico" />
-    <link rel="apple-touch-icon" href="/personal-blog/assets/next/favicon_hutao_tigerhat_ink_180.png" />
+    <link rel="icon" href="./assets/next/favicon.ico" />
+    <link rel="apple-touch-icon" href="./assets/next/favicon_hutao_tigerhat_ink_180.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <title>胡桃小屋 | 虎桃不会振刀</title>
     <link rel="stylesheet" href="./styles.css?v=15" />
     <link rel="preload" as="image" href="./assets/hutao-entry-shanshui.png" fetchpriority="high" />
-    <link rel="stylesheet" href="./pet.css?v=20260628-repair" />
+    <link rel="stylesheet" href="./pet.css?v=20260628-repair2" />
     <link rel="stylesheet" href="./motion-core.css?v=2" />
   </head>
   <body class="pet-page pet-entry-active" data-page="pet">
@@ -157,6 +157,41 @@
           <span>03</span><div><h2>互动回应</h2><p>六种动作都直接控制 Live2D 骨骼参数，并同步保存养成进度。</p></div>
         </article>
       </section>
+
+      <section class="pet-archive" aria-labelledby="petArchiveTitle">
+        <div class="pet-archive-heading">
+          <p class="pet-kicker">HOUSE RECORDS</p>
+          <h2 id="petArchiveTitle">小屋卷册</h2>
+          <p>这里先收纳已经接入的角色、台词和小屋记录，后续可以继续扩展家具与事件。</p>
+        </div>
+        <div class="pet-archive-grid">
+          <article>
+            <span>角色图鉴</span>
+            <strong>胡桃、季沧海、张起灵</strong>
+            <p>当前小屋支持三位角色串门，切换时会保留养成状态和互动入口。</p>
+          </article>
+          <article>
+            <span>已解锁台词</span>
+            <strong>六类互动回应</strong>
+            <p>摸摸、投喂、玩耍、跳舞、休息和招手均有角色专属回复。</p>
+          </article>
+          <article>
+            <span>好感等级</span>
+            <strong>经验、等级与桃花币</strong>
+            <p>互动会积累经验；升级奖励桃花币，每日小礼会记录在本地。</p>
+          </article>
+          <article>
+            <span>小屋事件</span>
+            <strong>今日礼物与角色来访</strong>
+            <p>当前记录保存在浏览器本地，后续可以扩展为更完整的事件日志。</p>
+          </article>
+          <article>
+            <span>装饰入口</span>
+            <strong>家具功能预留</strong>
+            <p>暂不伪造家具数据，先保留清晰入口，等待真实素材后接入。</p>
+          </article>
+        </div>
+      </section>
     </main>
 
     <div class="pet-toast" id="petToast" role="status" aria-live="polite"></div>
@@ -166,8 +201,8 @@
     <script src="./assets/vendor/pixi-live2d-display.min.js"></script>
     <script src="./theme.js?v=14"></script>
     <script src="./pet-rig.js?v=20260615-fullbody"></script>
-    <script src="./pet.js?v=20260628-repair"></script>
-    <script src="./motion-core.js?v=2"></script>
-    <script src="./motion-pet.js?v=2"></script>
+    <script src="./pet.js?v=20260628-repair2"></script>
+    <script src="./motion-core.js?v=3"></script>
+    <script src="./motion-pet.js?v=3"></script>
   </body>
 </html>

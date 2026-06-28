@@ -201,13 +201,12 @@
 
   function createClickEffect(x, y, source) {
     if (typeof x !== "number" || typeof y !== "number") return;
-    if (!state.fine || state.reduced) return;
     const target = source instanceof Element ? source : null;
     if (target?.closest(".click-petal, .falling-piece, input, textarea, select, option, video, audio, iframe, canvas, [contenteditable='true']")) return;
 
     const interactive = Boolean(target?.closest("button, a, summary, [role='button'], .ink-button, .text-button, .seal-button"));
-    const duration = interactive ? 340 : 430;
-    const size = interactive ? 46 : 96;
+    const duration = state.reduced ? 180 : interactive ? 340 : state.coarse ? 360 : 430;
+    const size = state.reduced ? 34 : interactive ? 46 : state.coarse ? 68 : 96;
     const root = document.createDocumentFragment();
 
     const ripple = document.createElement("i");
@@ -218,14 +217,16 @@
     ripple.style.setProperty("--click-duration", `${duration}ms`);
     root.appendChild(ripple);
 
-    const core = document.createElement("i");
-    core.className = "ink-click-core";
-    core.style.setProperty("--click-x", `${x}px`);
-    core.style.setProperty("--click-y", `${y}px`);
-    core.style.setProperty("--click-duration", `${duration - 30}ms`);
-    root.appendChild(core);
+    if (!state.reduced) {
+      const core = document.createElement("i");
+      core.className = "ink-click-core";
+      core.style.setProperty("--click-x", `${x}px`);
+      core.style.setProperty("--click-y", `${y}px`);
+      core.style.setProperty("--click-duration", `${duration - 30}ms`);
+      root.appendChild(core);
+    }
 
-    const count = interactive ? 1 : 3;
+    const count = state.reduced ? 0 : interactive ? 1 : state.coarse ? 1 : 3;
     for (let index = 0; index < count; index += 1) {
       const petal = document.createElement("i");
       petal.className = "click-petal";

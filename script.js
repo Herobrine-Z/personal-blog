@@ -381,11 +381,11 @@ async function setupAchievements() {
 }
 
 function createClickEffect(x, y, source) {
-  if (!finePointer || reducedMotion || compactMotion) return;
   if (window.MotionCore?.createClickEffect) {
     window.MotionCore.createClickEffect(x, y, source);
     return;
   }
+  if (!finePointer || reducedMotion || compactMotion) return;
   const ripple = document.createElement("i");
   ripple.className = "ink-click-ripple";
   ripple.style.setProperty("--click-x", `${x}px`);
@@ -824,15 +824,6 @@ if (hasGsap && !reducedMotion) {
     });
   }
 
-  const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
-  intro
-    .from(".brand", { y: -20, autoAlpha: 0, duration: 0.7 })
-    .from(".site-nav a", { y: -14, autoAlpha: 0, stagger: 0.08, duration: 0.45 }, "<0.12")
-    .from(".hero .eyebrow", { x: -25, autoAlpha: 0, duration: 0.55 }, "<0.1")
-    .from(".hero h1 > span", { y: 45, autoAlpha: 0, stagger: 0.13, duration: 0.85 }, "<0.08")
-    .from(".hero-verse", { y: 22, autoAlpha: 0, duration: 0.65 }, "-=0.35")
-    .from(".hero-actions", { y: 18, autoAlpha: 0, duration: 0.55 }, "-=0.35");
-
   gsap.to(".scroll-cue i", {
     scaleY: 0.45,
     transformOrigin: "top",
@@ -841,23 +832,6 @@ if (hasGsap && !reducedMotion) {
     duration: 1.25,
     ease: "sine.inOut",
   });
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        gsap.fromTo(
-          entry.target,
-          { y: 38, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, duration: 0.85, ease: "power3.out" },
-        );
-        observer.unobserve(entry.target);
-      });
-    },
-    { threshold: 0.14 },
-  );
-
-  document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
 
   window.setInterval(() => {
     if (!document.hidden) createPiece();

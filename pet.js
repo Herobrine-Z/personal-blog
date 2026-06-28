@@ -188,7 +188,6 @@
     gift.querySelector("strong").textContent = claimed ? "今日已领取" : "领取 10 枚桃花币";
     setToggle($("#motionToggle"), state.motion, `动态：${state.motion ? "开" : "关"}`);
     setToggle($("#soundToggle"), state.sound, `音效：${state.sound ? "开" : "关"}`);
-    setToggle($("#sceneToggle"), state.deepNight, `夜色：${state.deepNight ? "深" : "浅"}`);
     $("#petRoom").classList.toggle("is-deep-night", state.deepNight);
   }
 
@@ -352,8 +351,10 @@
     const status = $("#modelStatus");
     const token = ++modelLoadToken;
     const character = characters[nextKey];
+    const previousKey = characterKey;
     characterKey = nextKey;
     updateCharacterUI();
+    $("#petRoom").classList.add("is-switching-character");
     status.classList.remove("is-ready", "is-error");
     status.querySelector("span").textContent = `正在迎接${character.name}…`;
     $("#petRig").classList.remove("is-live2d-ready");
@@ -376,10 +377,13 @@
     } catch (error) {
       if (token !== modelLoadToken) return;
       console.error(`${character.name} Live2D init failed:`, error);
+      characterKey = previousKey;
+      updateCharacterUI();
       status.classList.add("is-error");
-      status.querySelector("span").textContent = `${character.name}暂时未能到访`;
-      speak(`${character.name}似乎在路上耽搁了，请稍后再试。`);
+      status.querySelector("span").textContent = `${character.name}暂时未能到访，已留在当前角色`;
+      speak(`${character.name}似乎在路上耽搁了，先继续陪你的是${characters[previousKey].name}。`);
     } finally {
+      $("#petRoom").classList.remove("is-switching-character");
       if (initial) markEntryReady();
     }
   }
@@ -416,21 +420,21 @@
       updateUI();
       if (state.sound) playSound(700);
     });
-    $("#sceneToggle").addEventListener("click", () => {
-      state.deepNight = !state.deepNight;
-      saveState();
-      updateUI();
-    });
     $("#visitToggle").addEventListener("click", async (event) => {
       if (busy || event.currentTarget.disabled) return;
       const button = event.currentTarget;
       const nextKey = characterOrder[(characterOrder.indexOf(characterKey) + 1) % characterOrder.length];
       const nextCharacter = characters[nextKey];
+      busy = true;
       button.disabled = true;
-      playSound(nextKey === "fireman" ? 460 : nextKey === "zhang" ? 390 : 620);
-      showToast(nextKey === "hutao" ? `${characters[characterKey].name}告辞离开` : `${nextCharacter.name}正在登门`);
-      await loadCharacter(nextKey);
-      button.disabled = false;
+      try {
+        playSound(nextKey === "fireman" ? 460 : nextKey === "zhang" ? 390 : 620);
+        showToast(nextKey === "hutao" ? `${characters[characterKey].name}告辞离开` : `${nextCharacter.name}正在登门`);
+        await loadCharacter(nextKey);
+      } finally {
+        busy = false;
+        button.disabled = false;
+      }
     });
     $("#resetPosition").addEventListener("click", () => {
       stageOffset = { x: 0, y: 0 };
