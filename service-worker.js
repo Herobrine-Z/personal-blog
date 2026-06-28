@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-blog-v52";
+﻿const CACHE_NAME = "hutao-blog-v53-responsive-readability";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -13,6 +13,7 @@ const APP_SHELL = [
   "./hutao-exhibit.css",
   "./motion-core.css",
   "./motion-home.css",
+  "./responsive-fixes.css",
   "./works.css",
   "./pet.css",
   "./article-pages.css",
@@ -137,3 +138,4 @@ self.addEventListener("fetch", (event) => {
       .catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html"))),
   );
 });
+
