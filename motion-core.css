@@ -9,7 +9,7 @@
 .ink-page-transition {
   position: fixed;
   inset: 0;
-  z-index: 10020;
+  z-index: var(--z-transition, 10020);
   overflow: hidden;
   pointer-events: none;
   background:
@@ -18,6 +18,11 @@
   opacity: 0;
   transform: translate3d(-102%, 0, 0);
   will-change: transform, opacity;
+}
+
+body:not(.page-motion-leaving):not(.page-motion-entering) .ink-page-transition {
+  visibility: hidden;
+  transform: none;
 }
 
 .ink-page-transition::after {
@@ -49,7 +54,7 @@ body.page-motion-leaving main {
 
 .motion-scroll-progress {
   position: fixed;
-  z-index: 24;
+  z-index: var(--z-floating, 40);
   top: 18vh;
   right: clamp(16px, 2.2vw, 34px);
   width: 1px;

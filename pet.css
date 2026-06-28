@@ -29,7 +29,7 @@
 
 .pet-entry-landscape {
   position: absolute;
-  inset: -3%;
+  inset: 0;
   background: url("./assets/hutao-entry-shanshui.png") center / cover no-repeat;
   filter: saturate(0.86) contrast(1.04);
   animation: shanshui-breathe 7s ease-out both;
@@ -38,8 +38,8 @@
 
 .pet-entry-mist {
   position: absolute;
-  left: -12%;
-  width: 124%;
+  left: 0;
+  width: 100%;
   border-radius: 50%;
   background: linear-gradient(90deg, transparent, rgba(245, 239, 222, 0.52), rgba(230, 227, 214, 0.28), transparent);
   filter: blur(28px);
@@ -274,7 +274,7 @@
     repeating-linear-gradient(90deg, transparent 0 120px, rgba(22, 8, 12, 0.2) 121px 124px);
 }
 .moon { position: absolute; top: 75px; left: 50%; width: 125px; height: 125px; translate: -50%; border-radius: 50%; background: #ffe6ad; box-shadow: 0 0 70px rgba(255, 218, 149, 0.45); }
-.mountain { position: absolute; left: -5%; bottom: 170px; width: 110%; height: 250px; clip-path: polygon(0 85%, 14% 44%, 25% 71%, 41% 27%, 53% 69%, 68% 20%, 82% 70%, 100% 38%, 100% 100%, 0 100%); }
+.mountain { position: absolute; left: 0; bottom: 170px; width: 100%; height: 250px; clip-path: polygon(0 85%, 14% 44%, 25% 71%, 41% 27%, 53% 69%, 68% 20%, 82% 70%, 100% 38%, 100% 100%, 0 100%); }
 .mountain-back { background: rgba(29, 24, 34, 0.55); }
 .mountain-front { bottom: 120px; background: rgba(18, 15, 20, 0.8); transform: scaleX(-1); }
 .window-frame { position: absolute; inset: 28px 26% 165px; border: 16px solid rgba(47, 18, 23, 0.92); border-radius: 180px 180px 12px 12px; box-shadow: inset 0 0 0 2px rgba(223, 164, 92, 0.18); }
@@ -469,7 +469,7 @@
 }
 
 @media (max-width: 760px) {
-  .pet-entry-landscape { inset: -2% -46%; background-position: center; }
+  .pet-entry-landscape { inset: 0; background-position: center; }
   .pet-entry-title { top: 16%; }
   .pet-entry-loader {
     right: 20px;

@@ -13,6 +13,14 @@
   --serif: "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
   --brush: "Ma Shan Zheng", "STKaiti", "KaiTi", cursive;
   --hand: "Long Cang", "STKaiti", "KaiTi", cursive;
+  --z-content: 1;
+  --z-floating: 40;
+  --z-header: 1000;
+  --z-mobile-nav: 2000;
+  --z-cursor-trail: 8990;
+  --z-cursor: 9000;
+  --z-dialog: 9500;
+  --z-transition: 10020;
 }
 
 * {
@@ -90,8 +98,8 @@ select {
 
 .theme-toggle {
   position: fixed;
-  z-index: 25;
-  bottom: 24px;
+  z-index: var(--z-floating);
+  bottom: max(24px, env(safe-area-inset-bottom));
   left: 24px;
   width: 44px;
   height: 44px;
@@ -121,7 +129,7 @@ button {
 .paper-noise {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: var(--z-content);
   pointer-events: none;
   opacity: 0.12;
   mix-blend-mode: multiply;
@@ -176,7 +184,7 @@ button {
 .petal-field {
   position: fixed;
   inset: 0;
-  z-index: 15;
+  z-index: var(--z-content);
   pointer-events: none;
   overflow: hidden;
 }
@@ -208,11 +216,12 @@ button {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 100;
+  z-index: var(--z-cursor);
   display: none;
   width: 0;
   height: 0;
   pointer-events: none;
+  mix-blend-mode: normal;
 }
 
 .ink-cursor-ring,
@@ -268,7 +277,7 @@ button {
 
 .ink-cursor-trail {
   position: fixed;
-  z-index: 98;
+  z-index: var(--z-cursor-trail);
   top: 0;
   left: 0;
   width: var(--trail-length, 20px);
@@ -346,7 +355,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  z-index: 100;
+  z-index: var(--z-header);
   width: 100%;
   min-height: 72px;
   padding: 10px clamp(28px, 4vw, 72px);
@@ -1160,7 +1169,7 @@ footer {
   position: fixed;
   right: 24px;
   bottom: 24px;
-  z-index: 31;
+  z-index: var(--z-floating);
   display: flex;
   align-items: center;
   gap: 7px;
@@ -1189,6 +1198,7 @@ footer {
   html.cursor-ready button,
   html.cursor-ready input,
   html.cursor-ready textarea,
+  html.cursor-ready select,
   html.cursor-ready .falling-piece {
     cursor: none;
   }
@@ -1196,9 +1206,28 @@ footer {
   html.cursor-ready .ink-cursor {
     display: block;
   }
+
+  html.cursor-ready.search-dialog-open,
+  html.cursor-ready.search-dialog-open body,
+  html.cursor-ready.search-dialog-open a,
+  html.cursor-ready.search-dialog-open button,
+  html.cursor-ready.search-dialog-open input,
+  html.cursor-ready.search-dialog-open textarea,
+  html.cursor-ready.search-dialog-open select {
+    cursor: auto;
+  }
+
+  html.cursor-ready.search-dialog-open .ink-cursor,
+  html.cursor-ready.search-dialog-open .ink-cursor-trail {
+    display: none !important;
+  }
 }
 
 @media (max-width: 840px) {
+  .ink-drift {
+    display: none;
+  }
+
   html.mobile-nav-open,
   body.mobile-nav-open {
     overflow: hidden;
@@ -1211,6 +1240,7 @@ footer {
   html.cursor-ready button,
   html.cursor-ready input,
   html.cursor-ready textarea,
+  html.cursor-ready select,
   html.cursor-ready .falling-piece {
     cursor: auto;
   }
@@ -1224,9 +1254,9 @@ footer {
     padding: 15px 20px;
   }
 
-  .menu-toggle {
+.menu-toggle {
     position: relative;
-    z-index: 10002;
+    z-index: calc(var(--z-mobile-nav) + 1);
     display: grid;
     gap: 7px;
     width: 42px;
@@ -1250,10 +1280,10 @@ footer {
     transform: translateY(-4px) rotate(-45deg);
   }
 
-  .site-nav {
+.site-nav {
     position: fixed;
     inset: 0;
-    z-index: 10001;
+    z-index: var(--z-mobile-nav);
     width: 100vw;
     height: 100vh;
     height: 100dvh;
@@ -1300,6 +1330,7 @@ footer {
   .hero-art {
     object-position: 67% center;
     opacity: 0.85;
+    transform: none;
   }
 
   .hero-wash {
@@ -1441,6 +1472,7 @@ footer {
 }
 
 .site-search-dialog {
+  z-index: var(--z-dialog);
   width: min(680px, calc(100% - 28px));
   max-width: none;
   padding: 0;
@@ -1579,9 +1611,9 @@ footer {
 
 .back-to-top {
   position: fixed;
-  z-index: 24;
+  z-index: var(--z-floating);
   right: 24px;
-  bottom: 86px;
+  bottom: max(86px, calc(env(safe-area-inset-bottom) + 86px));
   width: 44px;
   height: 44px;
   border: 1px solid var(--line);
@@ -1656,9 +1688,9 @@ footer {
     padding: 14px clamp(18px, 4vw, 34px);
   }
 
-  .menu-toggle {
+.menu-toggle {
     position: relative;
-    z-index: 10002;
+    z-index: calc(var(--z-mobile-nav) + 1);
     display: grid;
     gap: 7px;
     width: 44px;
@@ -1684,10 +1716,10 @@ footer {
     transform: translateY(-4px) rotate(-45deg);
   }
 
-  .site-nav {
+.site-nav {
     position: fixed;
     inset: 0;
-    z-index: 10001;
+    z-index: var(--z-mobile-nav);
     width: 100vw;
     height: 100vh;
     height: 100dvh;
@@ -1751,9 +1783,20 @@ footer {
     min-height: max(760px, 100svh);
   }
 
+  .ink-mountain {
+    right: 0;
+    width: 84%;
+  }
+
   .flowing-landscape {
+    inset-inline: 0;
     height: 38%;
     opacity: 0.42;
+  }
+
+  .landscape-layer {
+    left: 0;
+    width: 100%;
   }
 
   .hero-copy {
@@ -1787,7 +1830,7 @@ footer {
   }
 
   .flowing-landscape {
-    inset-inline: -32%;
+    inset-inline: 0;
     height: 34%;
   }
 
@@ -1821,8 +1864,15 @@ footer {
 
   .petal-field,
   .scroll-cue,
-  .ink-cursor {
+  .ink-cursor,
+  .ink-cursor-trail {
     display: none;
+  }
+
+  .kurumi-hero-gif,
+  .kurumi-hero-depth {
+    animation: none !important;
+    transform: none !important;
   }
 }
 
@@ -2296,17 +2346,42 @@ footer {
   object-fit: cover;
 }
 
-.home-video-visual span {
+.media-play-button {
   position: absolute;
-  inset: 50% auto auto 50%;
+  top: 50%;
+  left: 50%;
   display: grid;
-  width: 3.5rem;
+  width: clamp(46px, 4vw, 58px);
   aspect-ratio: 1;
   place-items: center;
-  color: white;
-  background: rgba(166, 52, 45, 0.88);
+  border: 1px solid rgba(255, 245, 235, 0.42);
   border-radius: 50%;
+  background: rgba(159, 48, 41, 0.9);
+  box-shadow:
+    0 10px 30px rgba(30, 18, 15, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
   transform: translate(-50%, -50%);
+  transition: transform 220ms ease, background-color 220ms ease, box-shadow 220ms ease;
+  pointer-events: none;
+  font-size: 0;
+}
+
+.media-play-button__icon {
+  width: 0;
+  height: 0;
+  margin-left: 4px;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 13px solid #fff8ed;
+}
+
+.video-card:hover .media-play-button,
+.home-video-card:hover .media-play-button {
+  background: rgba(177, 53, 45, 0.96);
+  box-shadow:
+    0 14px 36px rgba(30, 18, 15, 0.3),
+    0 0 0 6px rgba(159, 48, 41, 0.12);
+  transform: translate(-50%, -50%) scale(1.06);
 }
 
 .home-video-card > div:last-child {
@@ -2798,16 +2873,84 @@ body:has(.fortune-dialog[open]) {
   overflow: hidden;
   padding: 112px max(28px, calc((100vw - 1180px) / 2)) 72px;
   color: #f8efe4;
+  background: #121210;
+}
+
+.kurumi-hero-media,
+.kurumi-hero-media picture,
+.kurumi-hero-gif {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.kurumi-hero-gif {
+  object-fit: cover;
+  object-position: 58% center;
+  transform: scale(1.02);
+}
+
+.kurumi-hero-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(11, 12, 11, 0.9) 0%, rgba(11, 12, 11, 0.56) 37%, transparent 65%),
-    linear-gradient(0deg, rgba(14, 15, 14, 0.7), transparent 30%),
-    url("./assets/ink-hero.png") 58% center / cover no-repeat;
+    linear-gradient(90deg, rgba(8, 9, 8, 0.94) 0%, rgba(12, 13, 12, 0.66) 38%, rgba(12, 13, 12, 0.1) 68%),
+    linear-gradient(0deg, rgba(13, 14, 13, 0.82), transparent 32%),
+    radial-gradient(circle at 78% 25%, rgba(255, 210, 190, 0.12), transparent 30%);
+}
+
+.kurumi-hero-depth {
+  position: absolute;
+  pointer-events: none;
+}
+
+.kurumi-hero-depth--far {
+  z-index: 2;
+  inset: auto 0 11%;
+  height: 28%;
+  opacity: 0.28;
+  background: url("./assets/next/parallax_mountain_mid.png") center bottom / cover no-repeat;
+  transform: translate3d(0, 0, 0);
+}
+
+.kurumi-hero-depth--mist {
+  z-index: 2;
+  inset: 12% 0 auto;
+  height: 44%;
+  opacity: 0.22;
+  background: url("./assets/next/parallax_mist_foreground.png") center / cover no-repeat;
+  animation: kurumiMistDrift 12s ease-in-out infinite alternate;
+}
+
+.kurumi-hero-depth--near {
+  z-index: 3;
+  right: -2vw;
+  bottom: -2%;
+  width: min(38vw, 520px);
+  height: min(34vw, 430px);
+  opacity: 0.56;
+  background: url("./assets/next/parallax_peach_branch_foreground.png") right bottom / contain no-repeat;
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes kurumiMistDrift {
+  from {
+    transform: translate3d(-16px, 0, 0);
+  }
+  to {
+    transform: translate3d(22px, -4px, 0);
+  }
 }
 
 .kurumi-page-hero::after {
   content: "桃";
   position: absolute;
-  z-index: 0;
+  z-index: 3;
   right: 4vw;
   bottom: -7vw;
   color: rgba(255, 245, 232, 0.08);
@@ -2819,7 +2962,7 @@ body:has(.fortune-dialog[open]) {
 
 .kurumi-page-hero-copy {
   position: relative;
-  z-index: 2;
+  z-index: 5;
   width: min(500px, 46vw);
 }
 
@@ -3520,6 +3663,7 @@ body:has(.fortune-dialog[open]) {
 }
 
 .image-lightbox {
+  z-index: var(--z-dialog);
   width: min(1100px, calc(100% - 32px));
   max-width: none;
   padding: 0;
@@ -3608,9 +3752,18 @@ body:has(.fortune-dialog[open]) {
   }
 
   .kurumi-page-hero {
-    min-height: 760px;
+    min-height: max(700px, 100svh);
     padding: 108px 32px 70px;
-    background-position: 64% center;
+  }
+
+  .kurumi-hero-gif {
+    object-position: 64% center;
+    transform: none;
+  }
+
+  .kurumi-hero-depth--near {
+    right: 0;
+    width: min(36vw, 292px);
   }
 
   .kurumi-page-hero-copy {
@@ -3705,10 +3858,35 @@ body:has(.fortune-dialog[open]) {
   }
 
   .kurumi-page-hero {
-    min-height: 720px;
+    min-height: max(640px, 100svh);
     align-items: end;
     padding: 104px 24px 88px;
-    background-position: 66% center;
+  }
+
+  .kurumi-hero-gif {
+    object-position: 66% center;
+  }
+
+  .kurumi-hero-shade {
+    background:
+      linear-gradient(180deg, rgba(8, 9, 8, 0.18), rgba(8, 9, 8, 0.42) 40%, rgba(8, 9, 8, 0.92)),
+      linear-gradient(90deg, rgba(8, 9, 8, 0.78), rgba(8, 9, 8, 0.16) 72%);
+  }
+
+  .kurumi-hero-depth--far {
+    height: 22%;
+    opacity: 0.2;
+  }
+
+  .kurumi-hero-depth--mist {
+    display: none;
+  }
+
+  .kurumi-hero-depth--near {
+    right: 0;
+    width: 74vw;
+    height: 58vw;
+    opacity: 0.36;
   }
 
   .kurumi-page-hero-copy {
@@ -3720,7 +3898,7 @@ body:has(.fortune-dialog[open]) {
   }
 
   .kurumi-given-name {
-    font-size: 74px;
+    font-size: clamp(58px, 19vw, 74px);
   }
 
   .kurumi-page-hero-copy > p:last-of-type {

@@ -9,8 +9,8 @@
     <link rel="apple-touch-icon" href="./assets/next/favicon_hutao_tigerhat_ink_180.png" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <title>胡桃绘卷 | 虎桃不会振刀</title>
-    <link rel="stylesheet" href="./styles.css?v=15" />
-    <link rel="stylesheet" href="./motion-core.css?v=2" />
+    <link rel="stylesheet" href="./styles.css?v=16" />
+    <link rel="stylesheet" href="./motion-core.css?v=3" />
   </head>
   <body class="kurumi-page" data-page="kurumi">
     <div class="paper-noise" aria-hidden="true"></div>
@@ -37,6 +37,16 @@
 
     <main>
       <section class="kurumi-page-hero">
+        <div class="kurumi-hero-media" aria-hidden="true">
+          <picture>
+            <source media="(prefers-reduced-motion: reduce)" srcset="./assets/ink-hero.png" />
+            <img class="kurumi-hero-gif" src="./assets/next/hero_bg_from_mp4_optimized.gif" alt="" fetchpriority="high" />
+          </picture>
+        </div>
+        <div class="kurumi-hero-shade" aria-hidden="true"></div>
+        <div class="kurumi-hero-depth kurumi-hero-depth--far" aria-hidden="true"></div>
+        <div class="kurumi-hero-depth kurumi-hero-depth--mist" aria-hidden="true"></div>
+        <div class="kurumi-hero-depth kurumi-hero-depth--near" aria-hidden="true"></div>
         <div class="kurumi-page-hero-copy">
           <p class="eyebrow">TSUCHIMIKADO KURUMI</p>
           <h1><span class="kurumi-family-name">土御门</span><span class="kurumi-given-name">胡桃</span></h1>
@@ -114,7 +124,7 @@
       <img src="" alt="" />
     </dialog>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-    <script src="./theme.js?v=14"></script>
+    <script src="./theme.js?v=15"></script>
     <script src="./kurumi.js?v=5"></script>
     <script src="./motion-core.js?v=3"></script>
     <script src="./motion-gallery.js?v=2"></script>

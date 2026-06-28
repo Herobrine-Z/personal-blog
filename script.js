@@ -174,8 +174,12 @@ function createHomepageVideoCard(video) {
     visual.appendChild(image);
   }
   const play = document.createElement("span");
+  play.className = "media-play-button";
   play.textContent = "▶";
   play.setAttribute("aria-hidden", "true");
+  const playIcon = document.createElement("span");
+  playIcon.className = "media-play-button__icon";
+  play.appendChild(playIcon);
   visual.appendChild(play);
   const copy = document.createElement("div");
   const meta = document.createElement("small");

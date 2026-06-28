@@ -77,12 +77,18 @@
 .work-card {
   position: relative;
   display: grid;
+  min-width: 0;
   min-height: 100%;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: color-mix(in srgb, var(--surface) 82%, var(--paper));
   box-shadow: 0 18px 42px rgba(24, 32, 29, 0.08);
+}
+
+.work-card > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .work-cover {

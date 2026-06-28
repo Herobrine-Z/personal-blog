@@ -164,6 +164,8 @@
 
   async function openSearch() {
     if (!searchDialog.open) searchDialog.showModal();
+    document.documentElement.classList.add("search-dialog-open");
+    document.body.classList.add("search-dialog-open");
     searchInput.value = "";
     renderSearchResults("");
     searchInput.focus();
@@ -180,6 +182,10 @@
 
   searchButton.addEventListener("click", openSearch);
   searchDialog.querySelector("[data-search-close]").addEventListener("click", () => searchDialog.close());
+  searchDialog.addEventListener("close", () => {
+    document.documentElement.classList.remove("search-dialog-open");
+    document.body.classList.remove("search-dialog-open");
+  });
   searchDialog.addEventListener("click", (event) => {
     if (event.target === searchDialog) searchDialog.close();
   });
@@ -249,6 +255,9 @@
 
     document.documentElement.addEventListener("mouseleave", () => {
       cursor.style.opacity = "0";
+    });
+    document.documentElement.addEventListener("mouseenter", () => {
+      cursor.style.opacity = "1";
     });
 
   }
