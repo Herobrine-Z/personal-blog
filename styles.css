@@ -4044,3 +4044,118 @@ body:has(.fortune-dialog[open]) {
     z-index: 2;
   }
 }
+/* ===== Remaining pages responsive repair v3: Kurumi and shared detail UI ===== */
+@media (max-width: 840px) {
+  .kurumi-page-hero-copy,
+  .kurumi-profile-copy,
+  .kurumi-facts div,
+  .kurumi-art-card,
+  .kurumi-art-card figcaption {
+    min-width: 0;
+  }
+
+  .kurumi-page-hero-copy .eyebrow {
+    max-width: 100%;
+    font-size: 11px;
+    letter-spacing: 0.18em !important;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+
+  .kurumi-page-hero-copy > p:last-of-type {
+    font-size: clamp(17px, 4.8vw, 21px) !important;
+    line-height: 1.7;
+  }
+
+  .kurumi-profile-copy h2 {
+    font-size: clamp(40px, 10vw, 58px) !important;
+    line-height: 1.16 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .kurumi-profile-copy > p:not(.eyebrow) {
+    font-size: 15px !important;
+    line-height: 1.9 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .kurumi-facts dd,
+  .source-link,
+  .asset-credit {
+    overflow-wrap: anywhere;
+  }
+
+  .source-link {
+    flex-wrap: wrap;
+    line-height: 1.7;
+  }
+
+  .kurumi-art-card figcaption {
+    right: 10px !important;
+    bottom: 10px !important;
+    max-width: calc(100% - 20px);
+    white-space: normal;
+    line-height: 1.45;
+  }
+}
+
+@media (max-width: 620px) {
+  .kurumi-page-hero {
+    min-height: max(600px, 92svh) !important;
+    padding: calc(94px + env(safe-area-inset-top)) 20px 72px !important;
+  }
+
+  .kurumi-page-hero-copy {
+    width: 100% !important;
+  }
+
+  .kurumi-family-name {
+    font-size: clamp(42px, 13vw, 54px) !important;
+  }
+
+  .kurumi-given-name {
+    font-size: clamp(56px, 18vw, 72px) !important;
+  }
+
+  .kurumi-profile-section,
+  .kurumi-gallery-section {
+    width: min(100% - 22px, 1180px) !important;
+    padding: 64px 0 !important;
+  }
+
+  .kurumi-profile-card {
+    min-height: 0 !important;
+    border-radius: 14px;
+  }
+
+  .kurumi-profile-copy {
+    padding: 28px 20px !important;
+  }
+
+  .kurumi-facts {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    margin: 26px 0 !important;
+  }
+
+  .kurumi-profile-art {
+    min-height: 360px !important;
+  }
+
+  .kurumi-art-grid {
+    gap: 12px !important;
+  }
+
+  .kurumi-art-card {
+    height: 220px !important;
+  }
+
+  .kurumi-art-card:nth-child(1) {
+    height: 240px !important;
+  }
+
+  .kurumi-art-card:nth-child(2),
+  .kurumi-art-card:nth-child(5) {
+    height: 420px !important;
+  }
+}

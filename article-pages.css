@@ -1584,3 +1584,149 @@ button:disabled {
     padding: 9px !important;
   }
 }
+/* ===== Remaining pages responsive repair v3: article detail and admin ===== */
+.article-body :where(img, video, iframe, canvas, svg) {
+  max-width: 100%;
+}
+
+.article-body :where(p, li, a, td, th, figcaption) {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 840px) {
+  .article-detail-header {
+    margin-bottom: 40px !important;
+    padding-bottom: 28px !important;
+  }
+
+  .article-detail-excerpt {
+    margin-top: 20px !important;
+    font-size: 17px !important;
+    line-height: 1.85 !important;
+  }
+
+  .article-body h2 {
+    font-size: clamp(25px, 7vw, 31px) !important;
+  }
+
+  .article-body h3 {
+    font-size: clamp(21px, 6vw, 25px) !important;
+  }
+
+  .article-actions button,
+  .reading-tools button {
+    min-height: 42px;
+  }
+
+  .article-neighbors a,
+  .related-articles a {
+    padding: 16px;
+    overflow-wrap: anywhere;
+  }
+
+  .comment-form,
+  .comment-item,
+  .article-attachments {
+    padding: 20px 16px !important;
+  }
+
+  .comment-item header,
+  .guestbook-list article > div {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .admin-tabs,
+  .admin-filter-bar {
+    flex-wrap: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .admin-tabs::-webkit-scrollbar,
+  .admin-filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-tabs button,
+  .admin-filter-bar button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .admin-list-heading,
+  .admin-row-actions {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .admin-article-row {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    align-items: start;
+    gap: 12px;
+  }
+
+  .admin-article-row .admin-row-actions {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .admin-moderation-row {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .top-works-list p {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .analytics-panel {
+    padding: 16px 12px;
+  }
+
+  .analytics-chart {
+    min-width: 520px;
+  }
+
+  .analytics-panel:has(.analytics-chart) {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .article-actions button {
+    flex: 1 1 calc(50% - 8px);
+  }
+
+  .article-actions > span {
+    flex-basis: 100%;
+  }
+
+  .comment-replies {
+    margin-left: 8px;
+  }
+
+  .admin-shell {
+    width: min(100% - 18px, 760px) !important;
+  }
+
+  .auth-panel,
+  .editor-panel {
+    padding: 22px 16px !important;
+  }
+
+  .admin-dashboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-list-heading h2 {
+    font-size: 30px;
+  }
+
+  .work-type-picker {
+    grid-template-columns: 1fr !important;
+  }
+}

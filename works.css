@@ -238,3 +238,102 @@
     gap: 6px;
   }
 }
+/* ===== Remaining pages responsive repair v3: works ===== */
+.works-page :where(.work-card, .work-copy, .work-actions, .work-tech, .works-log-item > div) {
+  min-width: 0;
+}
+
+.works-page :where(.work-copy h2, .work-copy p, .work-actions a, .work-tech span, .works-log-item h3, .works-log-item p) {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 920px) {
+  .works-hero {
+    align-items: start;
+    padding-top: 24px;
+  }
+
+  .works-hero h1 {
+    font-size: clamp(3rem, 12vw, 5.4rem);
+    line-height: 1;
+  }
+
+  .works-hero-mark {
+    min-height: 160px;
+  }
+}
+
+@media (max-width: 620px) {
+  .works-page main {
+    margin-top: calc(104px + env(safe-area-inset-top));
+    margin-bottom: 52px;
+  }
+
+  .works-hero {
+    gap: 14px;
+    padding: 18px 0 24px;
+  }
+
+  .works-hero h1 {
+    font-size: clamp(46px, 15vw, 68px);
+  }
+
+  .works-hero p {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .works-hero-mark {
+    display: none;
+  }
+
+  .works-toolbar {
+    flex-wrap: nowrap;
+    max-width: 100%;
+    margin: 20px 0 18px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .works-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .works-toolbar button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .works-grid {
+    gap: 14px;
+  }
+
+  .work-copy {
+    padding: 16px;
+  }
+
+  .work-copy h2 {
+    font-size: 1.16rem;
+    line-height: 1.45;
+  }
+
+  .work-copy p {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .work-actions {
+    gap: 8px 12px;
+  }
+
+  .works-log {
+    margin-top: 38px;
+    padding-top: 22px;
+  }
+
+  .works-log-item {
+    padding: 14px;
+  }
+}
