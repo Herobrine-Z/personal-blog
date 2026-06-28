@@ -4,6 +4,14 @@
 
 .home-page .hero {
   isolation: isolate;
+  --home-parallax-x: 0px;
+  --home-parallax-y: 0px;
+}
+
+.home-page .hero-art {
+  transform: translate3d(var(--home-parallax-x), var(--home-parallax-y), 0) scale(1.025);
+  transition: transform 900ms var(--ease-ink);
+  will-change: transform;
 }
 
 .home-page .hero::before {
@@ -119,6 +127,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .home-page .hero-art {
+    transform: none;
+    transition: none;
+  }
+
   .home-page.motion-home-opening .hero::before {
     animation: none;
   }

@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500;600;700&family=ZCOOL+QingKe+HuangYou&family=ZCOOL+XiaoWei&display=swap");
-
 :root {
   --hutao-brush: "Ma Shan Zheng", "ZCOOL QingKe HuangYou", "Long Cang", cursive;
   --hutao-serif: "ZCOOL XiaoWei", "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
@@ -31,7 +29,7 @@ body {
 html,
 body {
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 html body,
@@ -43,108 +41,6 @@ html.cursor-ready body {
   background-position: center, center;
   background-size: auto, 760px auto;
   background-repeat: no-repeat, repeat;
-}
-
-.phase2-water-ink,
-.phase2-click-ripple,
-.art-brush-transition,
-.minimal-ink-transition,
-.ink-click-ripple {
-  display: none !important;
-  animation: none !important;
-  pointer-events: none !important;
-}
-
-body.phase2-transitioning,
-body.art-scroll-transitioning {
-  cursor: auto !important;
-}
-
-body.phase2-transitioning main,
-body.art-scroll-transitioning main {
-  transform: none !important;
-  filter: none !important;
-  opacity: 1 !important;
-}
-
-.hutao-page-veil {
-  --hutao-transition-x: 50%;
-  --hutao-transition-y: 50%;
-  position: fixed;
-  inset: 0;
-  z-index: 9998;
-  pointer-events: none;
-  opacity: 0;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at var(--hutao-transition-x) var(--hutao-transition-y), rgba(255, 250, 238, 0.8), rgba(245, 235, 216, 0.5) 34%, rgba(31, 28, 23, 0.12) 72%),
-    url("./assets/hutao-ink/InkFog_03.png") center / cover no-repeat,
-    url("./assets/hutao-ink/PaperTexture.png") center / 720px auto repeat;
-  mix-blend-mode: normal;
-  clip-path: circle(0 at var(--hutao-transition-x) var(--hutao-transition-y));
-  will-change: clip-path, opacity;
-}
-
-.hutao-page-veil::before,
-.hutao-page-veil::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-
-.hutao-page-veil::before {
-  inset: -18%;
-  opacity: 0.28;
-  background:
-    url("./assets/hutao-ink/InkFog_02.png") center / cover no-repeat,
-    linear-gradient(112deg, transparent 17%, rgba(25, 23, 20, 0.72) 46%, transparent 72%);
-  mix-blend-mode: multiply;
-  transform: translate3d(-22%, 8%, 0) rotate(-5deg) scale(1.15);
-}
-
-.hutao-page-veil::after {
-  right: clamp(24px, 7vw, 88px);
-  bottom: clamp(24px, 7vw, 72px);
-  width: 28px;
-  aspect-ratio: 1;
-  border: 2px solid rgba(142, 44, 40, 0.72);
-  box-shadow: inset 0 0 0 3px rgba(142, 44, 40, 0.08);
-  opacity: 0;
-  transform: rotate(-8deg) scale(0.72);
-}
-
-body.hutao-page-leaving .hutao-page-veil {
-  animation: hutaoInkCover 0.52s cubic-bezier(0.7, 0, 0.22, 1) both;
-}
-
-body.hutao-page-leaving .hutao-page-veil::before {
-  animation: hutaoBrushCross 0.58s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-body.hutao-page-leaving .hutao-page-veil::after {
-  animation: hutaoSealLand 0.3s 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-body.hutao-page-entering .hutao-page-veil {
-  animation: hutaoInkReveal 0.68s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-body.hutao-page-entering .hutao-page-veil::before {
-  animation: hutaoBrushSettle 0.68s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-body.hutao-page-entering main {
-  animation: hutaoPageRise 0.72s 0.06s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-body.hutao-page-leaving main {
-  transform: translateY(14px) scale(0.992);
-  opacity: 0.72;
-  filter: saturate(0.72) contrast(0.94);
-  transition:
-    transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.42s ease,
-    filter 0.42s ease;
 }
 
 .site-header {
@@ -664,8 +560,6 @@ blockquote {
   }
 }
 
-.phase2-reveal,
-.art-scroll-reveal,
 .reveal {
   opacity: 1;
   filter: none !important;
@@ -675,15 +569,11 @@ blockquote {
     transform 0.82s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.motion-ready .phase2-reveal,
-.motion-ready .art-scroll-reveal,
 .motion-ready .reveal {
   opacity: 0;
   transform: translateY(28px) scale(0.99);
 }
 
-.phase2-reveal.is-visible,
-.art-scroll-reveal.is-visible,
 .reveal.is-visible,
 .reveal.visible {
   opacity: 1;
@@ -1140,6 +1030,11 @@ main > section:not(.hero):not(.kurumi-page-hero):not(.hutao-house) > * {
 
   .site-header {
     z-index: 100;
+    background:
+      linear-gradient(180deg, rgba(250, 246, 236, 0.98), rgba(245, 237, 221, 0.97)),
+      url("./assets/hutao-ink/PaperTexture.png") center / 520px auto repeat !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   .site-header .brand,
@@ -1162,7 +1057,7 @@ main > section:not(.hero):not(.kurumi-page-hero):not(.hutao-house) > * {
     align-items: center;
     justify-content: flex-start !important;
     gap: 0 !important;
-    overflow-x: hidden;
+    overflow-x: clip;
     overflow-y: auto;
     overscroll-behavior: contain;
     background:
@@ -1260,8 +1155,6 @@ main > section:not(.hero):not(.kurumi-page-hero):not(.hutao-house) > * {
     transform: translateY(-5px) !important;
   }
 
-  .phase2-reveal,
-  .art-scroll-reveal,
   .reveal {
     filter: none !important;
     transform: translateY(18px) scale(0.99);
@@ -1329,12 +1222,6 @@ main > section:not(.hero):not(.kurumi-page-hero):not(.hutao-house) > * {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hutao-page-veil,
-  .hutao-page-veil::before,
-  .hutao-page-veil::after {
-    animation-duration: 0.01ms !important;
-  }
-
   .hutao-fog-layer,
   .hutao-bamboo-leaves {
     animation: none !important;

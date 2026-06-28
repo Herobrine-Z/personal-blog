@@ -85,8 +85,38 @@
     window.addEventListener("resize", requestUpdate, { passive: true });
   }
 
+  function setupHeroParallax() {
+    if (reduced || compact) return;
+    const hero = document.querySelector(".home-page .hero");
+    if (!hero) return;
+
+    let frame = 0;
+    let targetX = 0;
+    let targetY = 0;
+
+    function render() {
+      frame = 0;
+      hero.style.setProperty("--home-parallax-x", `${targetX.toFixed(2)}px`);
+      hero.style.setProperty("--home-parallax-y", `${targetY.toFixed(2)}px`);
+    }
+
+    hero.addEventListener("pointermove", (event) => {
+      const rect = hero.getBoundingClientRect();
+      targetX = ((event.clientX - rect.left) / rect.width - 0.5) * 12;
+      targetY = ((event.clientY - rect.top) / rect.height - 0.5) * 8;
+      if (!frame) frame = window.requestAnimationFrame(render);
+    }, { passive: true });
+
+    hero.addEventListener("pointerleave", () => {
+      targetX = 0;
+      targetY = 0;
+      if (!frame) frame = window.requestAnimationFrame(render);
+    });
+  }
+
   onReady(() => {
     setupOpening();
     setupRouteProgress();
+    setupHeroParallax();
   });
 }());

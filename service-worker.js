@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-blog-v48";
+const CACHE_NAME = "hutao-blog-v49";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -85,18 +85,6 @@ const APP_SHELL = [
   "./assets/next/ui_input_brush_frame.png",
   "./assets/next/ui_speech_bubble_jianghu.png",
   "./assets/next/ui_toast_ink_banner.png",
-  "./assets/minimal-ink/article_card_minimal.png",
-  "./assets/minimal-ink/comment_input_minimal.png",
-  "./assets/minimal-ink/petals_minimal_sprite.png",
-  "./assets/minimal-ink/toast_seal_banner_minimal.png",
-  "./assets/art-scroll/floating_mist_layer.png",
-  "./assets/art-scroll/parallax_mountain_layer_1.png",
-  "./assets/art-scroll/parallax_mountain_layer_2.png",
-  "./assets/art-scroll/parallax_mountain_layer_3.png",
-  "./assets/art-scroll/section_divider_scroll.png",
-  "./assets/art-scroll/transition_brush_wave.png",
-  "./assets/art-scroll/transition_ink_ribbon.png",
-  "./assets/art-scroll/transition_scroll_reveal.png",
   "./assets/hutao-ink/BambooLeaf_01.png",
   "./assets/hutao-ink/InkCardFrame.png",
   "./assets/hutao-ink/InkFog_01.png",

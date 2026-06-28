@@ -201,12 +201,13 @@
 
   function createClickEffect(x, y, source) {
     if (typeof x !== "number" || typeof y !== "number") return;
+    if (!state.fine || state.reduced) return;
     const target = source instanceof Element ? source : null;
     if (target?.closest(".click-petal, .falling-piece, input, textarea, select, option, video, audio, iframe, canvas, [contenteditable='true']")) return;
 
     const interactive = Boolean(target?.closest("button, a, summary, [role='button'], .ink-button, .text-button, .seal-button"));
-    const duration = state.reduced ? 160 : interactive ? 340 : 430;
-    const size = state.reduced ? 42 : interactive ? 46 : state.coarse ? 72 : 96;
+    const duration = interactive ? 340 : 430;
+    const size = interactive ? 46 : 96;
     const root = document.createDocumentFragment();
 
     const ripple = document.createElement("i");
@@ -217,26 +218,24 @@
     ripple.style.setProperty("--click-duration", `${duration}ms`);
     root.appendChild(ripple);
 
-    if (!state.reduced) {
-      const core = document.createElement("i");
-      core.className = "ink-click-core";
-      core.style.setProperty("--click-x", `${x}px`);
-      core.style.setProperty("--click-y", `${y}px`);
-      core.style.setProperty("--click-duration", `${duration - 30}ms`);
-      root.appendChild(core);
+    const core = document.createElement("i");
+    core.className = "ink-click-core";
+    core.style.setProperty("--click-x", `${x}px`);
+    core.style.setProperty("--click-y", `${y}px`);
+    core.style.setProperty("--click-duration", `${duration - 30}ms`);
+    root.appendChild(core);
 
-      const count = interactive ? 2 : state.coarse ? 3 : 5;
-      for (let index = 0; index < count; index += 1) {
-        const petal = document.createElement("i");
-        petal.className = "click-petal";
-        petal.style.setProperty("--click-x", `${x}px`);
-        petal.style.setProperty("--click-y", `${y}px`);
-        petal.style.setProperty("--click-duration", `${duration + 20}ms`);
-        petal.style.setProperty("--petal-x", `${(Math.random() - 0.5) * (interactive ? 30 : 58)}px`);
-        petal.style.setProperty("--petal-y", `${-8 - Math.random() * (interactive ? 18 : 34)}px`);
-        petal.style.setProperty("--petal-r", `${Math.random() * 160 - 80}deg`);
-        root.appendChild(petal);
-      }
+    const count = interactive ? 1 : 3;
+    for (let index = 0; index < count; index += 1) {
+      const petal = document.createElement("i");
+      petal.className = "click-petal";
+      petal.style.setProperty("--click-x", `${x}px`);
+      petal.style.setProperty("--click-y", `${y}px`);
+      petal.style.setProperty("--click-duration", `${duration + 20}ms`);
+      petal.style.setProperty("--petal-x", `${(Math.random() - 0.5) * (interactive ? 24 : 48)}px`);
+      petal.style.setProperty("--petal-y", `${-8 - Math.random() * (interactive ? 14 : 28)}px`);
+      petal.style.setProperty("--petal-r", `${Math.random() * 140 - 70}deg`);
+      root.appendChild(petal);
     }
 
     const nodes = Array.from(root.children);

@@ -189,20 +189,6 @@ body.page-motion-leaving main {
   animation: inkClickPetal var(--click-duration, 440ms) var(--ease-ink) forwards;
 }
 
-.minimal-ink-transition,
-.art-brush-transition,
-.phase2-water-ink,
-.hutao-page-veil {
-  display: none !important;
-}
-
-body.phase2-transitioning main,
-body.art-scroll-transitioning main,
-body.hutao-page-leaving main,
-body.hutao-page-entering main {
-  filter: none !important;
-}
-
 @keyframes inkPageCover {
   from { opacity: 0; transform: translate3d(-102%, 0, 0); }
   12% { opacity: 1; }

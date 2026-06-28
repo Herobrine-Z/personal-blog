@@ -32,7 +32,7 @@ body {
   line-height: 1.75;
   letter-spacing: 0.015em;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body::before {
@@ -3556,8 +3556,14 @@ body:has(.fortune-dialog[open]) {
 }
 
 @media (max-width: 840px) {
-  .site-header.scrolled {
-    backdrop-filter: none;
+  .site-header,
+  .site-header.scrolled,
+  body.is-scrolled .site-header {
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--paper) 98%, transparent), color-mix(in srgb, var(--paper) 94%, transparent)),
+      url("./assets/hutao-ink/PaperTexture.png") center / 520px auto repeat;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   .kurumi-feature {

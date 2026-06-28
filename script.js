@@ -381,6 +381,7 @@ async function setupAchievements() {
 }
 
 function createClickEffect(x, y, source) {
+  if (!finePointer || reducedMotion || compactMotion) return;
   if (window.MotionCore?.createClickEffect) {
     window.MotionCore.createClickEffect(x, y, source);
     return;
@@ -389,10 +390,10 @@ function createClickEffect(x, y, source) {
   ripple.className = "ink-click-ripple";
   ripple.style.setProperty("--click-x", `${x}px`);
   ripple.style.setProperty("--click-y", `${y}px`);
-  ripple.style.setProperty("--click-size", compactMotion ? "64px" : "88px");
-  ripple.style.setProperty("--click-duration", reducedMotion ? "160ms" : "380ms");
+  ripple.style.setProperty("--click-size", "88px");
+  ripple.style.setProperty("--click-duration", "380ms");
   document.body.appendChild(ripple);
-  window.setTimeout(() => ripple.remove(), reducedMotion ? 220 : 460);
+  window.setTimeout(() => ripple.remove(), 460);
 }
 
 function createCursorTrail(x, y) {
@@ -767,20 +768,6 @@ function setupInkHoverEffects() {
     });
   });
 
-  const hero = document.querySelector(".hero");
-  const heroArt = document.querySelector(".hero-art");
-  hero.addEventListener("pointermove", (event) => {
-    const x = (event.clientX / window.innerWidth - 0.5) * 12;
-    const y = (event.clientY / window.innerHeight - 0.5) * 8;
-    if (hasGsap) {
-      gsap.to(heroArt, { x, y, scale: 1.04, duration: 1.1, ease: "power2.out", overwrite: "auto" });
-    }
-  });
-  hero.addEventListener("pointerleave", () => {
-    if (hasGsap) {
-      gsap.to(heroArt, { x: 0, y: 0, scale: 1.025, duration: 1.2, ease: "power2.out" });
-    }
-  });
 }
 
 function setupLinksToggle() {
