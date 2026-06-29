@@ -3041,6 +3041,43 @@ body:has(.fortune-dialog[open]) {
   display: block;
 }
 
+@media (min-width: 901px) {
+  .kurumi-page-hero-copy {
+    width: min(58vw, 760px);
+    max-width: calc(100vw - 56px);
+  }
+
+  .kurumi-page-hero-copy h1 {
+    display: inline-flex;
+    flex-flow: row nowrap;
+    align-items: baseline;
+    gap: clamp(12px, 1.2vw, 22px);
+    width: max-content;
+    max-width: 100%;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow-wrap: normal;
+    line-height: 0.96;
+  }
+
+  .kurumi-page-hero-copy h1 > span {
+    display: inline-block;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow-wrap: normal;
+  }
+
+  .kurumi-family-name {
+    font-size: clamp(58px, 5.4vw, 94px);
+  }
+
+  .kurumi-given-name {
+    margin-left: 0;
+    font-size: clamp(76px, 7.6vw, 126px);
+  }
+}
+
 .kurumi-family-name {
   font-size: clamp(54px, 5.8vw, 82px);
   letter-spacing: 0.08em;
@@ -4189,12 +4226,21 @@ body:has(.fortune-dialog[open]) {
     width: 100% !important;
   }
 
+  .kurumi-page-hero-copy h1 {
+    word-break: keep-all;
+    overflow-wrap: normal;
+  }
+
   .kurumi-family-name {
     font-size: clamp(42px, 13vw, 54px) !important;
+    word-break: keep-all;
+    overflow-wrap: normal;
   }
 
   .kurumi-given-name {
     font-size: clamp(56px, 18vw, 72px) !important;
+    word-break: keep-all;
+    overflow-wrap: normal;
   }
 
   .kurumi-profile-section,

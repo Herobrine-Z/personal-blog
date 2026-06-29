@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "hutao-blog-v54";
+﻿const CACHE_NAME = "hutao-blog-v55";
 
 const APP_SHELL = [
   "./",
@@ -37,6 +37,7 @@ const APP_SHELL = [
   "./theme.js",
   "./kurumi.js",
   "./pet-rig.js",
+  "./pet-voices.js",
   "./pet.js",
   "./assets/vendor/gsap/gsap-3.13.0.min.js",
   "./assets/vendor/supabase/supabase-2.108.2.js",

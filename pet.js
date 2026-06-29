@@ -158,6 +158,125 @@
     wave: { mood: 4, xp: 5, sound: 710 },
   };
 
+  const voiceLibrary = window.PET_VOICE_LIBRARY || {};
+  let voiceUnlocked = false;
+
+  function getVoiceEntry(role, action) {
+    return voiceLibrary?.[role]?.actions?.[action] || characters[role]?.actions?.[action];
+  }
+
+  function getSystemVoice(key) {
+    return voiceLibrary?.hutao?.system?.[key];
+  }
+
+  function getWelcomeVoice(role) {
+    return voiceLibrary?.[role]?.welcome || characters[role]?.welcome;
+  }
+
+  function chooseRandomLine(lines) {
+    if (!Array.isArray(lines)) return lines;
+    if (!lines.length) return "";
+    return lines[Math.floor(Math.random() * lines.length)];
+  }
+
+  function normalizeSpeechEntry(value) {
+    const picked = chooseRandomLine(value);
+    if (picked && typeof picked === "object") {
+      return {
+        text: String(picked.text || ""),
+        audio: typeof picked.audio === "string" && picked.audio ? picked.audio : "",
+      };
+    }
+    return { text: String(picked || ""), audio: "" };
+  }
+
+  function fallbackSpeechDuration(text) {
+    return Math.min(5.2, Math.max(1.4, [...String(text)].length * 0.16));
+  }
+
+  function safeRigSpeak(duration) {
+    const safeDuration = Math.min(12, Math.max(0.3, Number(duration) || 0));
+    if (safeDuration > 0) rig?.speak(safeDuration);
+  }
+
+  class VoiceController {
+    constructor() {
+      this.audio = new Audio();
+      this.audio.preload = "metadata";
+      this.playToken = 0;
+      this.currentSource = "";
+      this.warnedSources = new Set();
+    }
+
+    stop() {
+      this.playToken += 1;
+      this.audio.pause();
+      this.audio.removeAttribute("src");
+      this.audio.load();
+      this.currentSource = "";
+      safeRigSpeak(0.3);
+    }
+
+    waitForMetadata(token) {
+      return new Promise((resolve, reject) => {
+        const cleanup = () => {
+          this.audio.removeEventListener("loadedmetadata", onLoaded);
+          this.audio.removeEventListener("error", onError);
+        };
+        const onLoaded = () => {
+          cleanup();
+          resolve();
+        };
+        const onError = () => {
+          cleanup();
+          reject(new Error("Audio metadata failed"));
+        };
+        if (Number.isFinite(this.audio.duration) && this.audio.duration > 0) {
+          resolve();
+          return;
+        }
+        this.audio.addEventListener("loadedmetadata", onLoaded, { once: true });
+        this.audio.addEventListener("error", onError, { once: true });
+        window.setTimeout(() => {
+          if (token !== this.playToken) return;
+          cleanup();
+          resolve();
+        }, 1200);
+      });
+    }
+
+    warnOnce(source, error) {
+      if (this.warnedSources.has(source)) return;
+      this.warnedSources.add(source);
+      console.warn("Character voice could not be played:", source, error);
+    }
+
+    async play(source) {
+      if (!source) return { ok: false, duration: 0 };
+      this.stop();
+      const token = this.playToken;
+      this.currentSource = source;
+      this.audio.src = source;
+      try {
+        const playPromise = this.audio.play().catch((error) => ({ voicePlayError: error }));
+        await this.waitForMetadata(token);
+        if (token !== this.playToken) return { ok: false, duration: 0 };
+        const duration = Number.isFinite(this.audio.duration) && this.audio.duration > 0
+          ? Math.min(12, Math.max(0.3, this.audio.duration))
+          : 0;
+        const playResult = await playPromise;
+        if (playResult?.voicePlayError) throw playResult.voicePlayError;
+        if (token !== this.playToken) return { ok: false, duration: 0 };
+        return { ok: true, duration };
+      } catch (error) {
+        if (token === this.playToken) this.warnOnce(source, error);
+        return { ok: false, duration: 0 };
+      }
+    }
+  }
+
+  const voiceController = new VoiceController();
+
   function loadState() {
     try {
       return { ...defaults, ...JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") };
@@ -211,13 +330,22 @@
     } else state[key] = clamp(state[key] + amount);
   }
 
-  function speak(lines) {
-    const line = Array.isArray(lines) ? lines[Math.floor(Math.random() * lines.length)] : lines;
+  async function speak(value, options = {}) {
+    const entry = normalizeSpeechEntry(value);
+    const line = entry.text;
     const speech = $("#petSpeech");
     speech.animate([{ opacity: 0.2, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { duration: 260 });
     speech.textContent = line;
-    const speakingDuration = Math.min(5.2, Math.max(1.4, [...String(line)].length * 0.16));
-    rig?.speak(speakingDuration);
+    if (options.speaker) $("#speakerName").textContent = options.speaker;
+    const fallbackDuration = fallbackSpeechDuration(line);
+    const canPlayVoice = state.sound && entry.audio && (voiceUnlocked || options.allowAutoplay);
+    if (!canPlayVoice) {
+      safeRigSpeak(fallbackDuration);
+      return entry;
+    }
+    const result = await voiceController.play(entry.audio);
+    safeRigSpeak(result.duration || fallbackDuration);
+    return entry;
   }
 
   function showToast(message) {
@@ -264,16 +392,17 @@
 
   function runAction(name, source) {
     if (busy || !actionData[name]) return;
+    voiceUnlocked = true;
     const data = actionData[name];
     if (data.coins && state.coins + data.coins < 0) {
-      speak("桃花币不够啦，先领取今日小礼吧。");
+      speak(characterKey === "hutao" ? getSystemVoice("coinsEmpty") : "桃花币不够啦，先领取今日小礼吧。");
       showToast("桃花币不足");
       return;
     }
 
     busy = true;
     $$("[data-action]").forEach((button) => { button.disabled = true; });
-    speak(characters[characterKey].actions[name]);
+    speak(getVoiceEntry(characterKey, name));
     playSound(data.sound);
     const rect = (source || $("#petCharacter")).getBoundingClientRect();
     makeSparks(rect.left + rect.width / 2, rect.top + rect.height * 0.42, name === "dance" ? 14 : 8);
@@ -358,6 +487,7 @@
     status.classList.remove("is-ready", "is-error");
     status.querySelector("span").textContent = `正在迎接${character.name}…`;
     $("#petRig").classList.remove("is-live2d-ready");
+    voiceController.stop();
     rig?.destroy();
     rig = null;
     try {
@@ -373,7 +503,7 @@
       rig.setMotion(state.motion);
       status.classList.add("is-ready");
       status.querySelector("span").textContent = `${character.name}已到 · Live2D 运行中`;
-      speak(character.welcome);
+      speak(getWelcomeVoice(nextKey));
     } catch (error) {
       if (token !== modelLoadToken) return;
       console.error(`${character.name} Live2D init failed:`, error);
@@ -395,6 +525,7 @@
   function bindControls() {
     $$("[data-action]").forEach((button) => button.addEventListener("click", () => runAction(button.dataset.action, button)));
     $("#dailyGift").addEventListener("click", (event) => {
+      voiceUnlocked = true;
       if (state.lastGift === today()) return;
       state.lastGift = today();
       state.coins += 10;
@@ -404,18 +535,21 @@
       playSound(880);
       const rect = event.currentTarget.getBoundingClientRect();
       makeSparks(rect.left + rect.width / 2, rect.top, 14);
-      speak("今日份的桃花币，收好啦！");
+      speak(characterKey === "hutao" ? getSystemVoice("gift") : "今日份的桃花币，收好啦！");
       showToast("获得 10 枚桃花币");
     });
     $("#motionToggle").addEventListener("click", () => {
+      voiceUnlocked = true;
       state.motion = !state.motion;
       rig?.setMotion(state.motion);
       saveState();
       updateUI();
-      speak(state.motion ? "好啦，我继续活动活动。" : "那我先安静地待一会儿。");
+      speak(characterKey === "hutao" ? getSystemVoice(state.motion ? "motionOn" : "motionOff") : state.motion ? "好啦，我继续活动活动。" : "那我先安静地待一会儿。");
     });
     $("#soundToggle").addEventListener("click", () => {
+      voiceUnlocked = true;
       state.sound = !state.sound;
+      if (!state.sound) voiceController.stop();
       saveState();
       updateUI();
       if (state.sound) playSound(700);
@@ -425,6 +559,7 @@
       const button = event.currentTarget;
       const nextKey = characterOrder[(characterOrder.indexOf(characterKey) + 1) % characterOrder.length];
       const nextCharacter = characters[nextKey];
+      voiceUnlocked = true;
       busy = true;
       button.disabled = true;
       try {
@@ -437,9 +572,10 @@
       }
     });
     $("#resetPosition").addEventListener("click", () => {
+      voiceUnlocked = true;
       stageOffset = { x: 0, y: 0 };
       $("#petStage").style.transform = "translate3d(0, 0, 0)";
-      speak("又回到最舒服的位置啦。");
+      speak(characterKey === "hutao" ? getSystemVoice("reset") : "又回到最舒服的位置啦。");
     });
   }
 
@@ -454,8 +590,12 @@
     }, { passive: true });
     document.documentElement.addEventListener("mouseleave", () => rig?.resetGaze());
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) rig?.resetGaze();
+      if (document.hidden) {
+        rig?.resetGaze();
+        voiceController.stop();
+      }
     });
+    window.addEventListener("beforeunload", () => voiceController.stop());
     initRig();
   }
 
