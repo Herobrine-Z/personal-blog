@@ -3041,6 +3041,18 @@ body:has(.fortune-dialog[open]) {
   display: block;
 }
 
+.kurumi-family-name {
+  font-size: clamp(54px, 5.8vw, 82px);
+  letter-spacing: 0.08em;
+}
+
+.kurumi-given-name {
+  margin-left: 0.56em;
+  color: #f3e8d8;
+  font-size: clamp(76px, 8vw, 112px);
+  letter-spacing: 0.14em;
+}
+
 @media (min-width: 901px) {
   .kurumi-page-hero-copy {
     width: min(58vw, 760px);
@@ -3051,6 +3063,7 @@ body:has(.fortune-dialog[open]) {
     display: inline-flex;
     flex-flow: row nowrap;
     align-items: baseline;
+    flex-wrap: nowrap;
     gap: clamp(12px, 1.2vw, 22px);
     width: max-content;
     max-width: 100%;
@@ -3078,18 +3091,6 @@ body:has(.fortune-dialog[open]) {
   }
 }
 
-.kurumi-family-name {
-  font-size: clamp(54px, 5.8vw, 82px);
-  letter-spacing: 0.08em;
-}
-
-.kurumi-given-name {
-  margin-left: 0.56em;
-  color: #f3e8d8;
-  font-size: clamp(76px, 8vw, 112px);
-  letter-spacing: 0.14em;
-}
-
 .kurumi-page-hero-copy > p:last-of-type {
   margin: 28px 0 26px;
   color: rgba(248, 239, 228, 0.78);
@@ -3101,6 +3102,39 @@ body:has(.fortune-dialog[open]) {
 .kurumi-page-hero .ink-button {
   z-index: 3;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.video-upload-panel {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(111, 49, 35, 0.22);
+  background: rgba(255, 248, 238, 0.72);
+}
+
+.video-upload-panel > div:first-child,
+.video-upload-meta,
+.video-upload-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+}
+
+.video-upload-panel p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.video-upload-panel progress {
+  width: 100%;
+  height: 12px;
+  accent-color: #8f3829;
+}
+
+.video-upload-meta {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .kurumi-profile-section,

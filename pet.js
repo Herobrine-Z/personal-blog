@@ -160,6 +160,7 @@
 
   const voiceLibrary = window.PET_VOICE_LIBRARY || {};
   let voiceUnlocked = false;
+  let pendingWelcomeVoice = null;
 
   function getVoiceEntry(role, action) {
     return voiceLibrary?.[role]?.actions?.[action] || characters[role]?.actions?.[action];
@@ -206,6 +207,10 @@
       this.playToken = 0;
       this.currentSource = "";
       this.warnedSources = new Set();
+      this.audio.addEventListener("ended", () => { this.currentSource = ""; });
+      this.audio.addEventListener("error", () => { this.currentSource = ""; });
+      this.audio.addEventListener("abort", () => { this.currentSource = ""; });
+      this.audio.addEventListener("emptied", () => { this.currentSource = ""; });
     }
 
     stop() {
@@ -219,28 +224,40 @@
 
     waitForMetadata(token) {
       return new Promise((resolve, reject) => {
+        let settled = false;
+        let timeoutId = 0;
+        const settle = (callback, value) => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          callback(value);
+        };
         const cleanup = () => {
+          if (timeoutId) window.clearTimeout(timeoutId);
           this.audio.removeEventListener("loadedmetadata", onLoaded);
           this.audio.removeEventListener("error", onError);
+          this.audio.removeEventListener("abort", onAbort);
+          this.audio.removeEventListener("emptied", onAbort);
         };
         const onLoaded = () => {
-          cleanup();
-          resolve();
+          settle(resolve, { cancelled: token !== this.playToken });
         };
         const onError = () => {
-          cleanup();
-          reject(new Error("Audio metadata failed"));
+          settle(reject, new Error("Audio metadata failed"));
+        };
+        const onAbort = () => {
+          settle(resolve, { cancelled: true });
         };
         if (Number.isFinite(this.audio.duration) && this.audio.duration > 0) {
-          resolve();
+          resolve({ cancelled: token !== this.playToken });
           return;
         }
         this.audio.addEventListener("loadedmetadata", onLoaded, { once: true });
         this.audio.addEventListener("error", onError, { once: true });
-        window.setTimeout(() => {
-          if (token !== this.playToken) return;
-          cleanup();
-          resolve();
+        this.audio.addEventListener("abort", onAbort, { once: true });
+        this.audio.addEventListener("emptied", onAbort, { once: true });
+        timeoutId = window.setTimeout(() => {
+          settle(resolve, { cancelled: token !== this.playToken });
         }, 1200);
       });
     }
@@ -259,7 +276,8 @@
       this.audio.src = source;
       try {
         const playPromise = this.audio.play().catch((error) => ({ voicePlayError: error }));
-        await this.waitForMetadata(token);
+        const metadata = await this.waitForMetadata(token);
+        if (metadata?.cancelled) return { ok: false, duration: 0 };
         if (token !== this.playToken) return { ok: false, duration: 0 };
         const duration = Number.isFinite(this.audio.duration) && this.audio.duration > 0
           ? Math.min(12, Math.max(0.3, this.audio.duration))
@@ -336,8 +354,13 @@
     const speech = $("#petSpeech");
     speech.animate([{ opacity: 0.2, transform: "translateY(3px)" }, { opacity: 1, transform: "none" }], { duration: 260 });
     speech.textContent = line;
-    if (options.speaker) $("#speakerName").textContent = options.speaker;
+    $("#speakerName").textContent = options.speaker || characters[characterKey]?.name || "小桃";
     const fallbackDuration = fallbackSpeechDuration(line);
+    if (options.deferAudio) {
+      pendingWelcomeVoice = { role: characterKey, entry };
+      safeRigSpeak(fallbackDuration);
+      return entry;
+    }
     const canPlayVoice = state.sound && entry.audio && (voiceUnlocked || options.allowAutoplay);
     if (!canPlayVoice) {
       safeRigSpeak(fallbackDuration);
@@ -346,6 +369,30 @@
     const result = await voiceController.play(entry.audio);
     safeRigSpeak(result.duration || fallbackDuration);
     return entry;
+  }
+
+  function speakCharacter(value, options = {}) {
+    return speak(value, { ...options, speaker: characters[characterKey]?.name });
+  }
+
+  function speakSystemMessage(value, options = {}) {
+    if (characterKey === "hutao" && options.hutaoVoice !== false) {
+      return speak(value, { ...options, speaker: characters.hutao.name });
+    }
+    return speak(value?.text || value, { ...options, speaker: "小屋提示" });
+  }
+
+  function unlockVoice(options = {}) {
+    voiceUnlocked = true;
+    if (options.discardWelcome) pendingWelcomeVoice = null;
+  }
+
+  function playPendingWelcome() {
+    if (!pendingWelcomeVoice || pendingWelcomeVoice.role !== characterKey || !state.sound) return false;
+    const entry = pendingWelcomeVoice.entry;
+    pendingWelcomeVoice = null;
+    speak(entry, { speaker: characters[characterKey]?.name });
+    return true;
   }
 
   function showToast(message) {
@@ -392,17 +439,17 @@
 
   function runAction(name, source) {
     if (busy || !actionData[name]) return;
-    voiceUnlocked = true;
+    unlockVoice({ discardWelcome: true });
     const data = actionData[name];
     if (data.coins && state.coins + data.coins < 0) {
-      speak(characterKey === "hutao" ? getSystemVoice("coinsEmpty") : "桃花币不够啦，先领取今日小礼吧。");
+      speakSystemMessage(characterKey === "hutao" ? getSystemVoice("coinsEmpty") : "桃花币不够啦，先领取今日小礼吧。");
       showToast("桃花币不足");
       return;
     }
 
     busy = true;
     $$("[data-action]").forEach((button) => { button.disabled = true; });
-    speak(getVoiceEntry(characterKey, name));
+    speakCharacter(getVoiceEntry(characterKey, name));
     playSound(data.sound);
     const rect = (source || $("#petCharacter")).getBoundingClientRect();
     makeSparks(rect.left + rect.width / 2, rect.top + rect.height * 0.42, name === "dance" ? 14 : 8);
@@ -503,7 +550,8 @@
       rig.setMotion(state.motion);
       status.classList.add("is-ready");
       status.querySelector("span").textContent = `${character.name}已到 · Live2D 运行中`;
-      speak(getWelcomeVoice(nextKey));
+      pendingWelcomeVoice = null;
+      speak(getWelcomeVoice(nextKey), { speaker: character.name, deferAudio: initial && !voiceUnlocked });
     } catch (error) {
       if (token !== modelLoadToken) return;
       console.error(`${character.name} Live2D init failed:`, error);
@@ -511,7 +559,7 @@
       updateCharacterUI();
       status.classList.add("is-error");
       status.querySelector("span").textContent = `${character.name}暂时未能到访，已留在当前角色`;
-      speak(`${character.name}似乎在路上耽搁了，先继续陪你的是${characters[previousKey].name}。`);
+      speakSystemMessage(`${character.name}似乎在路上耽搁了，先继续陪你的是${characters[previousKey].name}。`, { hutaoVoice: false });
     } finally {
       $("#petRoom").classList.remove("is-switching-character");
       if (initial) markEntryReady();
@@ -525,7 +573,7 @@
   function bindControls() {
     $$("[data-action]").forEach((button) => button.addEventListener("click", () => runAction(button.dataset.action, button)));
     $("#dailyGift").addEventListener("click", (event) => {
-      voiceUnlocked = true;
+      unlockVoice({ discardWelcome: true });
       if (state.lastGift === today()) return;
       state.lastGift = today();
       state.coins += 10;
@@ -535,19 +583,19 @@
       playSound(880);
       const rect = event.currentTarget.getBoundingClientRect();
       makeSparks(rect.left + rect.width / 2, rect.top, 14);
-      speak(characterKey === "hutao" ? getSystemVoice("gift") : "今日份的桃花币，收好啦！");
+      speakSystemMessage(characterKey === "hutao" ? getSystemVoice("gift") : "今日份的桃花币，收好啦！");
       showToast("获得 10 枚桃花币");
     });
     $("#motionToggle").addEventListener("click", () => {
-      voiceUnlocked = true;
+      unlockVoice({ discardWelcome: true });
       state.motion = !state.motion;
       rig?.setMotion(state.motion);
       saveState();
       updateUI();
-      speak(characterKey === "hutao" ? getSystemVoice(state.motion ? "motionOn" : "motionOff") : state.motion ? "好啦，我继续活动活动。" : "那我先安静地待一会儿。");
+      speakSystemMessage(characterKey === "hutao" ? getSystemVoice(state.motion ? "motionOn" : "motionOff") : state.motion ? "好啦，我继续活动活动。" : "那我先安静地待一会儿。");
     });
     $("#soundToggle").addEventListener("click", () => {
-      voiceUnlocked = true;
+      unlockVoice();
       state.sound = !state.sound;
       if (!state.sound) voiceController.stop();
       saveState();
@@ -559,7 +607,7 @@
       const button = event.currentTarget;
       const nextKey = characterOrder[(characterOrder.indexOf(characterKey) + 1) % characterOrder.length];
       const nextCharacter = characters[nextKey];
-      voiceUnlocked = true;
+      unlockVoice({ discardWelcome: true });
       busy = true;
       button.disabled = true;
       try {
@@ -572,10 +620,15 @@
       }
     });
     $("#resetPosition").addEventListener("click", () => {
-      voiceUnlocked = true;
+      unlockVoice({ discardWelcome: true });
       stageOffset = { x: 0, y: 0 };
       $("#petStage").style.transform = "translate3d(0, 0, 0)";
-      speak(characterKey === "hutao" ? getSystemVoice("reset") : "又回到最舒服的位置啦。");
+      speakSystemMessage(characterKey === "hutao" ? getSystemVoice("reset") : "又回到最舒服的位置啦。");
+    });
+    $("#petRoom").addEventListener("click", (event) => {
+      if (event.target.closest("button, a, input, select, textarea, [data-action], #petCharacter")) return;
+      unlockVoice();
+      playPendingWelcome();
     });
   }
 

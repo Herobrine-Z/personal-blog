@@ -15,6 +15,19 @@ const markdownPreview = document.querySelector("#markdownPreview");
 const videoEditorFields = document.querySelector("#videoEditorFields");
 const currentVideo = document.querySelector("#currentVideo");
 const contentFieldLabel = document.querySelector("#contentFieldLabel");
+const videoUploadHint = document.querySelector("#videoUploadHint");
+const videoUploadPanel = document.querySelector("#videoUploadPanel");
+const videoUploadName = document.querySelector("#videoUploadName");
+const videoUploadSize = document.querySelector("#videoUploadSize");
+const videoUploadStatus = document.querySelector("#videoUploadStatus");
+const videoUploadProgress = document.querySelector("#videoUploadProgress");
+const videoUploadPercent = document.querySelector("#videoUploadPercent");
+const videoUploadBytes = document.querySelector("#videoUploadBytes");
+const videoUploadPart = document.querySelector("#videoUploadPart");
+const videoUploadSpeed = document.querySelector("#videoUploadSpeed");
+const videoUploadEta = document.querySelector("#videoUploadEta");
+const cancelVideoUpload = document.querySelector("#cancelVideoUpload");
+const retryVideoUpload = document.querySelector("#retryVideoUpload");
 
 let articles = [];
 let comments = [];
@@ -23,6 +36,115 @@ let editingArticle = null;
 let workFilter = "all";
 const selectedWorks = new Set();
 let autosaveTimer = null;
+let currentVideoUpload = null;
+let lastVideoFile = null;
+
+function getVideoUploadMode() {
+  return window.BLOG_CONFIG?.videoUploadApi ? "r2" : "supabase";
+}
+
+function getMaxVideoSizeBytes() {
+  return getVideoUploadMode() === "r2"
+    ? Number(window.BLOG_CONFIG?.maxVideoSizeMb || 500) * 1024 * 1024
+    : 50 * 1024 * 1024;
+}
+
+function formatBytes(bytes) {
+  if (!Number.isFinite(bytes)) return "0 MB";
+  return `${(bytes / 1024 / 1024).toFixed(bytes >= 100 * 1024 * 1024 ? 0 : 1)} MB`;
+}
+
+function validateVideoFile(file) {
+  if (!file) return null;
+  if (!["video/mp4", "video/webm", "video/ogg"].includes(file.type)) return "Video must be MP4, WebM, or OGG.";
+  const maxBytes = getMaxVideoSizeBytes();
+  if (file.size > maxBytes) return `Video must not exceed ${formatBytes(maxBytes)}.`;
+  return null;
+}
+
+function updateVideoUploadHint() {
+  if (!videoUploadHint) return;
+  videoUploadHint.textContent = getVideoUploadMode() === "r2"
+    ? "MP4/WebM/OGG, up to 500MB with multipart R2 upload."
+    : "Supabase compatibility upload is active: up to 50MB. Configure Cloudflare R2 for 500MB.";
+}
+
+function renderUploadProgress(detail = {}) {
+  if (!videoUploadPanel) return;
+  videoUploadPanel.hidden = !detail.file;
+  if (!detail.file) return;
+  videoUploadName.textContent = detail.file.name;
+  videoUploadSize.textContent = formatBytes(detail.file.size);
+  const label = {
+    creating: "Creating upload",
+    uploading: "Uploading",
+    retrying: "Retrying",
+    completing: "Completing upload",
+    done: "Upload complete",
+    failed: "Upload failed",
+    canceled: "Canceled",
+    waiting: "Waiting",
+  }[detail.status] || "Waiting";
+  videoUploadStatus.textContent = label;
+  videoUploadProgress.value = Math.round(detail.percent || 0);
+  videoUploadPercent.textContent = `${Math.round(detail.percent || 0)}%`;
+  videoUploadBytes.textContent = `${formatBytes(detail.uploadedBytes || 0)} / ${formatBytes(detail.totalBytes || detail.file.size)}`;
+  videoUploadPart.textContent = `Part ${detail.partNumber || 0} / ${detail.totalParts || 0}`;
+  videoUploadSpeed.textContent = `${formatBytes(detail.speedBytesPerSecond || 0)}/s`;
+  videoUploadEta.textContent = detail.remainingSeconds ? `ETA ${Math.ceil(detail.remainingSeconds)}s` : "ETA --";
+}
+
+async function uploadSelectedVideo(file, session) {
+  if (getVideoUploadMode() !== "r2") return articleService.uploadVideo(file, session.user.id);
+  const controller = new AbortController();
+  const uploader = new window.MultipartVideoUploader({
+    endpoint: window.BLOG_CONFIG.videoUploadApi,
+    accessToken: session.access_token,
+    chunkSize: 10 * 1024 * 1024,
+    concurrency: 3,
+    maxRetries: 3,
+    signal: controller.signal,
+    onProgress: (detail) => {
+      sessionStorage.setItem("hutao-video-upload-state", JSON.stringify({
+        name: detail.file.name,
+        size: detail.file.size,
+        percent: detail.percent,
+        status: detail.status,
+      }));
+      renderUploadProgress(detail);
+    },
+  });
+  currentVideoUpload = { controller, uploader, file };
+  cancelVideoUpload.hidden = false;
+  retryVideoUpload.hidden = true;
+  articleForm.elements.videoFile.disabled = true;
+  try {
+    const result = await uploader.uploadFile(file);
+    renderUploadProgress({ file, status: "done", percent: 100, uploadedBytes: file.size, totalBytes: file.size });
+    sessionStorage.removeItem("hutao-video-upload-state");
+    return {
+      name: file.name,
+      path: `r2:${result.key}`,
+      url: result.url,
+      type: file.type,
+      size: file.size,
+      provider: "cloudflare-r2",
+    };
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      await uploader.abort();
+      renderUploadProgress({ file, status: "canceled", percent: 0, uploadedBytes: 0, totalBytes: file.size });
+    } else {
+      renderUploadProgress({ file, status: "failed", percent: videoUploadProgress.value, totalBytes: file.size });
+      retryVideoUpload.hidden = false;
+    }
+    throw error;
+  } finally {
+    cancelVideoUpload.hidden = true;
+    articleForm.elements.videoFile.disabled = false;
+    currentVideoUpload = null;
+  }
+}
 
 function setStatus(message, isError = false) {
   statusElement.textContent = message;
@@ -62,6 +184,7 @@ function updateEditorMode() {
   articleForm.querySelector(".publish-button").textContent = editingArticle
     ? "保存修改"
     : isVideo ? "发布视频" : "发布文章";
+  updateVideoUploadHint();
 }
 
 function resetEditor(type = "article") {
@@ -75,6 +198,7 @@ function resetEditor(type = "article") {
   existingAttachments.replaceChildren();
   currentVideo.hidden = true;
   currentVideo.textContent = "";
+  renderUploadProgress();
   document.querySelector("#restoreDraftButton").hidden = !localStorage.getItem(`hutao-editor-draft-${type}`);
   updateEditorMode();
   renderMarkdownPreview();
@@ -464,8 +588,9 @@ articleForm.addEventListener("submit", async (event) => {
     return;
   }
   const selectedVideo = articleForm.elements.videoFile.files[0];
-  if (selectedVideo && (selectedVideo.size > 50 * 1024 * 1024 || !["video/mp4", "video/webm", "video/ogg"].includes(selectedVideo.type))) {
-    setStatus("视频须为 MP4、WebM 或 OGG，且不超过 50 MB。", true);
+  const videoError = validateVideoFile(selectedVideo);
+  if (videoError) {
+    setStatus(videoError, true);
     return;
   }
   if (contentType === "video" && !selectedVideo && !form.get("videoUrl").trim() && !editingArticle?.video_url) {
@@ -482,7 +607,7 @@ articleForm.addEventListener("submit", async (event) => {
     if (!session) throw new Error("登录已过期，请重新登录。");
     const files = [...articleForm.elements.attachments.files];
     newAttachments = files.length ? await articleService.uploadFiles(files, session.user.id) : [];
-    if (selectedVideo) uploadedVideo = await articleService.uploadVideo(selectedVideo, session.user.id);
+    if (selectedVideo) uploadedVideo = await uploadSelectedVideo(selectedVideo, session);
 
     const removedIndexes = new Set(form.getAll("removeAttachment").map(Number));
     const oldAttachments = editingArticle?.attachments || [];
@@ -564,7 +689,17 @@ document.querySelector("#bulkTrashButton").addEventListener("click", async () =>
 articleForm.elements.contentType.forEach((radio) => radio.addEventListener("change", updateEditorMode));
 articleForm.elements.videoFile.addEventListener("change", () => {
   const file = articleForm.elements.videoFile.files[0];
-  if (!file) return;
+  lastVideoFile = file || null;
+  if (!file) {
+    renderUploadProgress();
+    return;
+  }
+  renderUploadProgress({ file, status: "waiting", percent: 0, uploadedBytes: 0, totalBytes: file.size });
+  const videoError = validateVideoFile(file);
+  if (videoError) {
+    setStatus(videoError, true);
+    return;
+  }
   const probe = document.createElement("video");
   probe.preload = "metadata";
   probe.onloadedmetadata = () => {
@@ -572,6 +707,20 @@ articleForm.elements.videoFile.addEventListener("change", () => {
     URL.revokeObjectURL(probe.src);
   };
   probe.src = URL.createObjectURL(file);
+});
+cancelVideoUpload?.addEventListener("click", async () => {
+  currentVideoUpload?.controller.abort();
+  await currentVideoUpload?.uploader.abort();
+});
+retryVideoUpload?.addEventListener("click", () => {
+  if (!lastVideoFile) return;
+  retryVideoUpload.hidden = true;
+  renderUploadProgress({ file: lastVideoFile, status: "waiting", percent: 0, uploadedBytes: 0, totalBytes: lastVideoFile.size });
+});
+window.addEventListener("beforeunload", (event) => {
+  if (!currentVideoUpload) return;
+  event.preventDefault();
+  event.returnValue = "";
 });
 articleForm.elements.content.addEventListener("input", renderMarkdownPreview);
 

@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "hutao-blog-v55";
+﻿const CACHE_NAME = "hutao-blog-v56";
 
 const APP_SHELL = [
   "./",
@@ -33,6 +33,7 @@ const APP_SHELL = [
   "./article-detail.js",
   "./videos.js",
   "./article-service.js",
+  "./video-uploader.js",
   "./markdown.js",
   "./theme.js",
   "./kurumi.js",
@@ -84,6 +85,8 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  const requestUrl = new URL(event.request.url);
+  if (event.request.destination === "video" || /\.(mp4|webm|ogg)(?:$|\?)/i.test(requestUrl.pathname)) return;
 
   event.respondWith(
     fetch(event.request)

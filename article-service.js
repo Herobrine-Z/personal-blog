@@ -283,6 +283,10 @@
 
   async function removeVideo(video) {
     if (!video?.path) return;
+    if (String(video.path).startsWith("r2:")) {
+      console.info("R2 video deletion is skipped locally. Remove it from Cloudflare R2 if it is no longer needed:", video.path);
+      return;
+    }
     const { error } = await requireClient().storage.from("video-assets").remove([video.path]);
     if (error) throw error;
   }

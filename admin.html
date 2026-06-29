@@ -126,7 +126,23 @@
               <label><span>定时发布</span><input type="datetime-local" name="scheduledAt" /></label>
             </div>
             <div class="video-editor-fields" id="videoEditorFields" hidden>
-              <label><span>上传视频</span><input type="file" name="videoFile" accept="video/mp4,video/webm,video/ogg" /><small>支持 MP4、WebM、OGG，单个文件不超过 50 MB。</small></label>
+              <label><span>上传视频</span><input type="file" name="videoFile" accept="video/mp4,video/webm,video/ogg" /><small id="videoUploadHint">支持 MP4、WebM、OGG，单个文件不超过 50 MB。</small></label>
+              <div class="video-upload-panel" id="videoUploadPanel" hidden>
+                <div><strong id="videoUploadName">等待上传</strong><span id="videoUploadSize">0 MB</span></div>
+                <p id="videoUploadStatus">等待上传</p>
+                <progress id="videoUploadProgress" value="0" max="100"></progress>
+                <div class="video-upload-meta">
+                  <span id="videoUploadPercent">0%</span>
+                  <span id="videoUploadBytes">0 MB / 0 MB</span>
+                  <span id="videoUploadPart">分片 0 / 0</span>
+                  <span id="videoUploadSpeed">0 MB/s</span>
+                  <span id="videoUploadEta">剩余 --</span>
+                </div>
+                <div class="video-upload-actions">
+                  <button class="text-button" type="button" id="cancelVideoUpload" hidden>取消上传</button>
+                  <button class="text-button" type="button" id="retryVideoUpload" hidden>重新上传</button>
+                </div>
+              </div>
               <label><span>或填写视频直链</span><input type="url" name="videoUrl" placeholder="https://example.com/video.mp4" /></label>
               <label><span>封面图片地址</span><input type="url" name="videoPoster" placeholder="可留空，或使用附件中的首张图片" /></label>
               <p class="current-video" id="currentVideo" hidden></p>
@@ -152,11 +168,12 @@
     <script src="./assets/vendor/supabase/supabase-2.108.2.js"></script>
     <script src="./supabase-config.js"></script>
     <script src="./article-service.js?v=7"></script>
+    <script src="./video-uploader.js?v=1"></script>
     <script src="./markdown.js?v=5"></script>
     <script defer src="./assets/vendor/katex/katex-0.16.22.min.js"></script>
     <script defer src="./assets/vendor/katex/auto-render-0.16.22.min.js"></script>
     <script src="./theme.js?v=16"></script>
     <script src="./motion-core.js?v=3"></script>
-    <script src="./admin.js?v=7"></script>
+    <script src="./admin.js?v=8"></script>
   </body>
 </html>
