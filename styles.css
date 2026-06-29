@@ -2872,15 +2872,19 @@ body:has(.fortune-dialog[open]) {
 .kurumi-portal-copy {
   position: relative;
   z-index: 1;
-  width: min(520px, 88vw);
+  width: min(680px, 88vw);
 }
 
 .kurumi-portal h2 {
   margin: 0;
   font-family: var(--brush);
-  font-size: clamp(72px, 10vw, 132px);
+  max-width: 100%;
+  font-size: clamp(76px, 8.6vw, 120px);
   font-weight: 400;
   line-height: 1;
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 
 .kurumi-portal p:not(.eyebrow) {
@@ -3055,26 +3059,26 @@ body:has(.fortune-dialog[open]) {
 
 @media (min-width: 901px) {
   .kurumi-page-hero-copy {
-    width: min(58vw, 760px);
-    max-width: calc(100vw - 56px);
+    width: min(430px, 42vw);
+    max-width: calc(100vw - 72px);
   }
 
   .kurumi-page-hero-copy h1 {
     display: inline-flex;
-    flex-flow: row nowrap;
-    align-items: baseline;
+    flex-flow: column nowrap;
+    align-items: flex-start;
     flex-wrap: nowrap;
-    gap: clamp(12px, 1.2vw, 22px);
-    width: max-content;
+    gap: clamp(2px, 0.45vw, 8px);
+    width: auto;
     max-width: 100%;
     white-space: nowrap;
     word-break: keep-all;
     overflow-wrap: normal;
-    line-height: 0.96;
+    line-height: 0.86;
   }
 
   .kurumi-page-hero-copy h1 > span {
-    display: inline-block;
+    display: block;
     flex: 0 0 auto;
     white-space: nowrap;
     word-break: keep-all;
@@ -3082,12 +3086,12 @@ body:has(.fortune-dialog[open]) {
   }
 
   .kurumi-family-name {
-    font-size: clamp(58px, 5.4vw, 94px);
+    font-size: clamp(58px, 4.8vw, 82px);
   }
 
   .kurumi-given-name {
-    margin-left: 0;
-    font-size: clamp(76px, 7.6vw, 126px);
+    margin-left: clamp(18px, 2.4vw, 42px);
+    font-size: clamp(82px, 6.7vw, 118px);
   }
 }
 
