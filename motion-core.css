@@ -14,7 +14,7 @@
   pointer-events: none;
   background:
     linear-gradient(105deg, rgba(247, 239, 222, 0.98), rgba(235, 224, 203, 0.96)),
-    url("./assets/hutao-ink/PaperTexture.png") center / 720px auto repeat;
+    url("./assets/hutao-ink/PaperTexture.webp") center / 720px auto repeat;
   opacity: 0;
   transform: translate3d(-102%, 0, 0);
   will-change: transform, opacity;
@@ -34,7 +34,7 @@ body:not(.page-motion-leaving):not(.page-motion-entering) .ink-page-transition {
   min-width: 90px;
   height: 124%;
   opacity: 0.28;
-  background: url("./assets/hutao-ink/InkFog_02.png") center / cover no-repeat;
+  background: url("./assets/hutao-ink/InkFog_02.webp") center / cover no-repeat;
   mix-blend-mode: multiply;
 }
 

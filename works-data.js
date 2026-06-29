@@ -22,7 +22,7 @@
         date: "2026-06",
         demo: "./kurumi.html",
         source: "https://github.com/Herobrine-Z/personal-blog",
-        cover: "./assets/kurumi-portrait-red-moon.png",
+        cover: "./assets/kurumi-portrait-red-moon.webp",
       },
       {
         title: "Live2D 桌宠小屋",
@@ -32,7 +32,7 @@
         date: "2026-06",
         demo: "./pet.html",
         source: "https://github.com/Herobrine-Z/personal-blog",
-        cover: "./assets/hutao-entry-shanshui.png",
+        cover: "./assets/hutao-entry-shanshui.webp",
       },
     ],
     logs: [

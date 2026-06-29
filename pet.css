@@ -30,7 +30,7 @@
 .pet-entry-landscape {
   position: absolute;
   inset: 0;
-  background: url("./assets/hutao-entry-shanshui.png") center / cover no-repeat;
+  background: url("./assets/hutao-entry-shanshui.webp") center / cover no-repeat;
   filter: saturate(0.86) contrast(1.04);
   animation: shanshui-breathe 7s ease-out both;
   will-change: transform;
@@ -87,14 +87,14 @@
 
 .pet-entry-title h1 {
   margin: 0.06em 0 0;
-  font: 400 clamp(64px, 8vw, 120px)/1 "Ma Shan Zheng", cursive;
+  font: 400 clamp(64px, 8vw, 120px)/1 var(--font-brush);
   letter-spacing: 0.08em;
 }
 
 .pet-entry-title p {
   margin: 12px 0 0;
   color: rgba(63, 62, 55, 0.78);
-  font: 400 clamp(18px, 2vw, 27px)/1.4 "Long Cang", cursive;
+  font: 400 clamp(18px, 2vw, 27px)/1.4 var(--font-brush);
   letter-spacing: 0.2em;
 }
 
@@ -179,7 +179,7 @@
   z-index: -1;
   content: "";
   opacity: 0.2;
-  background-image: url("./assets/ink-scroll.png");
+  background-image: url("./assets/ink-scroll.webp");
   background-size: 620px auto;
   mix-blend-mode: multiply;
 }
@@ -196,7 +196,7 @@
 }
 
 .pet-kicker { margin: 0 0 8px; color: var(--pet-red); font: 700 0.72rem/1.2 sans-serif; letter-spacing: 0.22em; }
-.pet-heading h1 { margin: 0; color: #4d1620; font: 400 clamp(2.7rem, 6vw, 5.2rem)/0.95 "Ma Shan Zheng", cursive; }
+.pet-heading h1 { margin: 0; color: #4d1620; font: 400 clamp(2.7rem, 6vw, 5.2rem)/0.95 var(--font-brush); }
 .pet-heading > div > p:last-child { max-width: 660px; margin: 14px 0 0; color: #795c53; line-height: 1.8; }
 
 .pet-now {
@@ -208,7 +208,7 @@
   box-shadow: 0 14px 35px rgba(67, 34, 28, 0.08);
 }
 .pet-now span, .pet-now small { display: block; color: #86665d; }
-.pet-now strong { display: block; margin: 3px 0; color: var(--pet-red); font: 500 1.8rem/1.1 "Noto Serif SC", serif; }
+.pet-now strong { display: block; margin: 3px 0; color: var(--pet-red); font: 500 1.8rem/1.1 var(--font-body); }
 
 .pet-entry-replay {
   min-height: 44px;
@@ -305,7 +305,7 @@
 .profile-row { display: grid; grid-template-columns: 45px 1fr auto; align-items: center; gap: 10px; }
 .profile-avatar { position: relative; display: block; width: 45px; height: 45px; overflow: hidden; border: 1px solid #bd8959; border-radius: 50%; background: #8c2733; }
 .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.profile-avatar b { display: none; place-items: center; width: 100%; height: 100%; color: #ffe0a1; background: linear-gradient(145deg, #73291f, #281717); font: 400 1.35rem/1 "Ma Shan Zheng", cursive; }
+.profile-avatar b { display: none; place-items: center; width: 100%; height: 100%; color: #ffe0a1; background: linear-gradient(145deg, #73291f, #281717); font: 400 1.35rem/1 var(--font-brush); }
 .hutao-house.is-visitor .profile-avatar img { display: none; }
 .hutao-house.is-visitor .profile-avatar b { display: grid; }
 .profile-row small, .control-title small { display: block; color: #c5a594; font-size: 0.72rem; }
@@ -330,7 +330,7 @@
 .text-control { border: 0; color: #d9b978; background: none; cursor: pointer; }
 .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .visit-control { display: grid; grid-template-columns: 48px 1fr; align-items: center; width: 100%; margin-bottom: 12px; padding: 10px 12px; border: 1px solid rgba(239, 186, 103, 0.34); border-radius: 13px; color: #f7dfba; background: linear-gradient(110deg, rgba(161, 67, 48, 0.38), rgba(255,255,255,0.04)); text-align: left; cursor: pointer; }
-.visit-control span { font: 400 1.08rem/1 "Ma Shan Zheng", cursive; }
+.visit-control span { font: 400 1.08rem/1 var(--font-brush); }
 .visit-control strong { font-size: 0.72rem; font-weight: 500; }
 .visit-control:hover { border-color: rgba(239, 186, 103, 0.7); background-color: rgba(168, 64, 63, 0.25); }
 .visit-control.is-active { color: #d9c8b8; border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); }
@@ -352,7 +352,7 @@
 .live-status.is-error i { background: #d85a67; box-shadow: none; animation: none; }
 
 .speech-bubble { position: absolute; top: 98px; left: 50%; z-index: 5; width: min(290px, 35%); translate: -50%; padding: 12px 17px; border: 1px solid rgba(255, 234, 204, 0.2); border-radius: 17px 17px 17px 4px; color: #f8ead5; background: rgba(42, 17, 22, 0.7); backdrop-filter: blur(10px); text-align: center; }
-.speech-bubble small { color: #dfaf71; font-family: "Ma Shan Zheng", cursive; font-size: 1rem; }
+.speech-bubble small { color: #dfaf71; font-family: var(--font-brush); font-size: 1rem; }
 .speech-bubble p { margin: 3px 0 0; font-size: 0.8rem; line-height: 1.55; }
 
 .pet-stage { position: absolute; left: 50%; bottom: 76px; z-index: 3; width: min(470px, 42vw); height: 540px; translate: -50%; touch-action: none; }
@@ -370,7 +370,7 @@
 
 .pet-notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 18px; }
 .pet-notes article { display: flex; gap: 15px; padding: 20px; border: 1px solid rgba(107, 52, 48, 0.14); border-radius: 18px; background: rgba(255, 249, 237, 0.48); }
-.pet-notes article > span { color: var(--pet-red); font: 500 1.4rem/1 "Noto Serif SC", serif; }
+.pet-notes article > span { color: var(--pet-red); font: 500 1.4rem/1 var(--font-body); }
 .pet-notes h2 { margin: 0 0 6px; color: #51232a; font-size: 0.95rem; }
 .pet-notes p { margin: 0; color: #80665d; font-size: 0.76rem; line-height: 1.65; }
 
@@ -406,7 +406,7 @@
 .pet-archive-tag {
   flex: 0 0 auto;
   color: #8d333d;
-  font: 400 1.25rem/1 "Ma Shan Zheng", cursive;
+  font: 400 1.25rem/1 var(--font-brush);
 }
 
 .pet-archive-grid {
@@ -426,7 +426,7 @@
 .pet-archive-grid span {
   display: block;
   color: #9a3440;
-  font: 400 1.15rem/1 "Ma Shan Zheng", cursive;
+  font: 400 1.15rem/1 var(--font-brush);
 }
 
 .pet-archive-grid h3 {
@@ -584,7 +584,7 @@
   border-radius: 16px;
   background:
     linear-gradient(135deg, rgba(37, 16, 21, 0.82), rgba(37, 16, 21, 0.66)),
-    url("./assets/hutao-ink/PaperTexture.png") center / 460px auto repeat;
+    url("./assets/hutao-ink/PaperTexture.webp") center / 460px auto repeat;
   backdrop-filter: blur(6px);
 }
 

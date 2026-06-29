@@ -9,7 +9,7 @@
 }
 
 .home-page .hero-art {
-  transform: translate3d(var(--home-parallax-x), var(--home-parallax-y), 0) scale(1.025);
+  transform: translate3d(var(--home-parallax-x), var(--home-parallax-y), 0);
   transition: transform 900ms var(--ease-ink);
   will-change: transform;
 }
@@ -23,7 +23,7 @@
   opacity: 0;
   background:
     linear-gradient(90deg, transparent 0 8%, color-mix(in srgb, var(--ink) 20%, transparent) 18%, transparent 46%),
-    url("./assets/hutao-ink/PaperTexture.png") center / 680px auto repeat;
+    url("./assets/hutao-ink/PaperTexture.webp") center / 680px auto repeat;
   mix-blend-mode: multiply;
   transform: translate3d(-18%, 0, 0) scaleX(0.7);
 }

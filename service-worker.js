@@ -1,4 +1,5 @@
-const CACHE_NAME = "hutao-blog-v52";
+﻿const CACHE_NAME = "hutao-blog-v53";
+
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -8,7 +9,10 @@ const APP_SHELL = [
   "./works.html",
   "./kurumi.html",
   "./pet.html",
+  "./admin.html",
+  "./404.html",
   "./manifest.webmanifest",
+  "./fonts.css",
   "./styles.css",
   "./hutao-exhibit.css",
   "./motion-core.css",
@@ -34,77 +38,27 @@ const APP_SHELL = [
   "./kurumi.js",
   "./pet-rig.js",
   "./pet.js",
-  "./assets/vendor/live2dcubismcore.min.js",
-  "./assets/vendor/pixi.min.js",
-  "./assets/vendor/pixi-live2d-display.min.js",
-  "./assets/models/HutaoSeethrough/seethrough_output.model3.json",
-  "./assets/models/HutaoSeethrough/seethrough_output.moc3",
-  "./assets/models/HutaoSeethrough/seethrough_output.physics3.json",
-  "./assets/models/HutaoSeethrough/seethrough_output.cdi3.json",
-  "./assets/models/HutaoSeethrough/seethrough_output.motionsync3.json",
-  "./assets/models/HutaoSeethrough/seethrough_output.2048/texture_00.png",
-  "./assets/models/Fireman/Fireman.model3.json",
-  "./assets/models/Fireman/Fireman.moc3",
-  "./assets/models/Fireman/Fireman.physics3.json",
-  "./assets/models/Fireman/Fireman.cdi3.json",
-  "./assets/models/Fireman/Fireman.motionsync3.json",
-  "./assets/models/Fireman/Fireman.2048/texture_00.png",
-  "./assets/models/Zhang/Zhang.model3.json",
-  "./assets/models/Zhang/Zhang.moc3",
-  "./assets/models/Zhang/Zhang.physics3.json",
-  "./assets/models/Zhang/Zhang.cdi3.json",
-  "./assets/models/Zhang/Zhang.2048/texture_00.png",
-  "./assets/icon.png",
+  "./assets/vendor/gsap/gsap-3.13.0.min.js",
+  "./assets/vendor/supabase/supabase-2.108.2.js",
+  "./assets/vendor/katex/katex-0.16.22.min.css",
+  "./assets/vendor/katex/katex-0.16.22.min.js",
+  "./assets/vendor/katex/auto-render-0.16.22.min.js",
   "./assets/icon-96.webp",
-  "./assets/hutao-entry-shanshui.png",
-  "./assets/ink-hero.png",
   "./assets/ink-hero-desktop.webp",
   "./assets/ink-hero-tablet.webp",
   "./assets/ink-hero-mobile.webp",
-  "./assets/ink-scroll.png",
-  "./assets/phase1/scroll_paper_full.png",
-  "./assets/phase1/scroll_rod_left.png",
-  "./assets/phase1/scroll_rod_right.png",
-  "./assets/phase1/ink_splash_mask.png",
-  "./assets/phase1/peach_petals_sprites.png",
-  "./assets/phase1/ink_mountain_bg.png",
-  "./assets/phase1/decor_corner_peach.png",
-  "./assets/next/favicon.ico",
-  "./assets/next/favicon_hutao_tigerhat_ink_16.png",
-  "./assets/next/favicon_hutao_tigerhat_ink_32.png",
-  "./assets/next/favicon_hutao_tigerhat_ink_64.png",
-  "./assets/next/favicon_hutao_tigerhat_ink_128.png",
-  "./assets/next/favicon_hutao_tigerhat_ink_180.png",
-  "./assets/next/favicon_hutao_tigerhat_ink_256.png",
-  "./assets/next/favicon_hutao_tigerhat_ink_512.png",
-  "./assets/next/favicon_hutao_tigerhat_ink_1024.png",
-  "./assets/next/hero_bg_from_mp4_optimized.gif",
-  "./assets/next/palette.png",
-  "./assets/next/parallax_mist_foreground.png",
-  "./assets/next/parallax_mountain_mid.png",
-  "./assets/next/parallax_peach_branch_foreground.png",
-  "./assets/next/ui_input_brush_frame.png",
-  "./assets/next/ui_speech_bubble_jianghu.png",
-  "./assets/next/ui_toast_ink_banner.png",
-  "./assets/hutao-ink/BambooLeaf_01.png",
-  "./assets/hutao-ink/InkCardFrame.png",
-  "./assets/hutao-ink/InkFog_01.png",
-  "./assets/hutao-ink/InkFog_02.png",
-  "./assets/hutao-ink/InkFog_03.png",
-  "./assets/hutao-ink/InkMountain_01.png",
-  "./assets/hutao-ink/InkMountain_02.png",
-  "./assets/hutao-ink/InkMountain_03.png",
-  "./assets/hutao-ink/InkParticle_01.png",
-  "./assets/hutao-ink/InkParticle_02.png",
-  "./assets/hutao-ink/JadePlayButton.png",
-  "./assets/hutao-ink/PaperTexture.png",
-  "./assets/kurumi-portrait-red-moon.png",
-  "./assets/kurumi-tiger.png",
-  "./assets/kurumi-spring-smile.png",
-  "./assets/kurumi-mountains.png",
-  "./assets/kurumi-vertical.png",
-  "./assets/hutao.png",
-  "./assets/live2d/reference_sheets/character_full_reference.png"
+  "./assets/hutao-entry-shanshui.webp",
+  "./assets/ink-scroll.webp",
+  "./assets/kurumi-portrait-red-moon.webp",
+  "./assets/kurumi-tiger.webp",
+  "./assets/kurumi-spring-smile.webp",
+  "./assets/kurumi-mountains.webp",
+  "./assets/kurumi-vertical.webp",
+  "./assets/hutao-ink/PaperTexture.webp",
+  "./assets/hutao-ink/InkFog_01.webp",
+  "./assets/hutao-ink/InkFog_02.webp",
+  "./assets/hutao-ink/InkFog_03.webp",
+  "./assets/hutao-ink/BambooLeaf_01.webp"
 ];
 
 self.addEventListener("install", (event) => {
@@ -127,13 +81,22 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        if (response && response.ok && event.request.url.startsWith(self.location.origin)) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        }
         return response;
       })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match("./index.html"))),
+      .catch(() =>
+        caches.match(event.request).then((cached) => {
+          if (cached) return cached;
+          if (event.request.mode === "navigate") return caches.match("./index.html");
+          return Response.error();
+        }),
+      ),
   );
 });

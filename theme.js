@@ -26,6 +26,16 @@
   render();
   document.body.appendChild(button);
 
+  const warmUpFonts = () => {
+    if (!document.fonts?.load) return;
+    Promise.allSettled([
+      document.fonts.load('16px "Blog Serif"', "桃"),
+      document.fonts.load('48px "Blog Brush"', "桃"),
+    ]).catch(() => {});
+  };
+
+  window.setTimeout(warmUpFonts, 1200);
+
   const header = document.querySelector(".site-header");
   const navigation = header?.querySelector("nav");
   let menuToggle = header?.querySelector(".menu-toggle");

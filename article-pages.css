@@ -45,7 +45,7 @@
   border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(255, 250, 239, 0.72), rgba(255, 250, 239, 0.42)),
-    url("./assets/hutao-ink/PaperTexture.png") center / 520px auto repeat;
+    url("./assets/hutao-ink/PaperTexture.webp") center / 520px auto repeat;
 }
 
 .article-filters:has(#sortArticles) {

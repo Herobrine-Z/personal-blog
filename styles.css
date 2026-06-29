@@ -10,9 +10,23 @@
   --line: rgba(24, 32, 29, 0.18);
   --ink-wash: rgba(32, 48, 42, 0.08);
   --surface: rgba(250, 250, 246, 0.68);
-  --serif: "Noto Serif CJK SC", "Source Han Serif SC", "Noto Serif SC", "Songti SC", "STSong", "SimSun", ui-serif, serif;
-  --brush: "Ma Shan Zheng", "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif CJK SC", ui-serif, serif;
-  --hand: "Long Cang", "Kaiti SC", "STKaiti", "KaiTi", "Noto Serif CJK SC", ui-serif, serif;
+  --font-body: "Blog Serif", ui-serif, serif;
+  --font-heading: "Blog Serif", ui-serif, serif;
+  --font-brush: "Blog Brush", "Blog Serif", ui-serif, serif;
+  --serif: var(--font-body);
+  --brush: var(--font-brush);
+  --hand: var(--font-brush);
+  --text-xs: clamp(0.76rem, 0.72rem + 0.18vw, 0.86rem);
+  --text-sm: clamp(0.86rem, 0.82rem + 0.2vw, 0.98rem);
+  --text-base: clamp(0.98rem, 0.94rem + 0.22vw, 1.08rem);
+  --text-lg: clamp(1.08rem, 1rem + 0.38vw, 1.26rem);
+  --title-card: clamp(1.35rem, 1.08rem + 1.1vw, 2rem);
+  --title-section: clamp(2.1rem, 1.55rem + 2.4vw, 4.6rem);
+  --title-page: clamp(3rem, 2.2rem + 4vw, 6.2rem);
+  --title-hero: clamp(4.4rem, 2.3rem + 8.5vw, 10rem);
+  --line-tight: 1.15;
+  --line-title: 1.28;
+  --line-body: 1.82;
   --z-content: 1;
   --z-floating: 40;
   --z-header: 1000;
@@ -29,6 +43,9 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -36,11 +53,29 @@ body {
   color: var(--ink);
   background: var(--paper);
   font-family: var(--serif);
-  font-size: 16px;
-  line-height: 1.75;
+  font-size: var(--text-base);
+  line-height: var(--line-body);
   letter-spacing: 0.015em;
   text-rendering: optimizeLegibility;
   overflow-x: clip;
+}
+
+:where(h1, h2, h3, h4, h5, h6, p, li, blockquote, figcaption, td, th, a, button, input, textarea, select) {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-heading);
+  line-height: var(--line-title);
+}
+
+:where(section, article, aside, header, footer, main, nav, div, ul, ol, form, label) {
+  min-width: 0;
+}
+
+:where(section[id], article[id], [id]) {
+  scroll-margin-top: calc(96px + env(safe-area-inset-top));
 }
 
 body::before {
@@ -70,6 +105,13 @@ input,
 textarea,
 select {
   font: inherit;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
 }
 
 [data-theme="dark"] {
@@ -140,7 +182,8 @@ button {
   position: fixed;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
+  overflow: clip;
+  contain: layout paint;
   pointer-events: none;
 }
 
@@ -160,13 +203,13 @@ button {
 
 .ink-drift-one {
   top: 18%;
-  left: -12vw;
+  left: 0;
   transform: rotate(8deg);
 }
 
 .ink-drift-two {
   top: 48%;
-  right: -15vw;
+  right: clamp(56px, 7vw, 108px);
   transform: rotate(-14deg) scale(1.18);
 }
 
@@ -186,7 +229,8 @@ button {
   inset: 0;
   z-index: var(--z-content);
   pointer-events: none;
-  overflow: hidden;
+  overflow: clip;
+  contain: layout paint;
 }
 
 .falling-piece {
@@ -466,15 +510,18 @@ button {
   object-fit: cover;
   object-position: center;
   filter: saturate(0.92) contrast(1.02);
-  transform: scale(1.025);
+  transform: none;
 }
 
 .flowing-landscape {
   position: absolute;
-  inset: auto -8% 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 2;
   height: 48%;
-  overflow: hidden;
+  overflow: clip;
+  contain: layout paint;
   pointer-events: none;
   opacity: 0.9;
   mix-blend-mode: multiply;
@@ -483,8 +530,8 @@ button {
 .landscape-layer {
   position: absolute;
   bottom: -2px;
-  left: -4%;
-  width: 108%;
+  left: 0;
+  width: 100%;
   height: 100%;
   fill: var(--ink);
   will-change: transform, opacity;
@@ -546,7 +593,7 @@ button {
   margin: 0 0 12px;
   color: var(--cinnabar);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.38em;
   text-transform: uppercase;
 }
@@ -842,16 +889,16 @@ button {
 
 .card-content h3 {
   margin: 28px 0 17px;
-  font-size: clamp(22px, 2.6vw, 34px);
-  font-weight: 600;
-  line-height: 1.4;
+  font-size: var(--title-card);
+  font-weight: 500;
+  line-height: var(--line-title);
 }
 
 .card-content p {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 15px;
-  line-height: 2;
+  font-size: var(--text-sm);
+  line-height: var(--line-body);
 }
 
 .card-content a {
@@ -874,10 +921,10 @@ button {
 .about-section {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(310px, 0.8fr) 1.2fr;
-  gap: clamp(60px, 9vw, 150px);
+  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(36px, 5vw, 86px);
   align-items: center;
-  padding: 130px max(24px, calc((100vw - 1100px) / 2));
+  padding: clamp(72px, 8vw, 110px) max(24px, calc((100vw - 1100px) / 2));
   overflow: hidden;
   background: #29322e;
   color: var(--paper);
@@ -938,18 +985,21 @@ button {
 
 .about-copy h2 {
   color: #f2e9db;
+  font-size: var(--title-section);
+  line-height: 1.12;
+  overflow-wrap: normal;
 }
 
 .about-lead {
   margin: 28px 0 18px;
   color: #e4b5a8 !important;
-  font-size: 20px !important;
+  font-size: var(--text-lg) !important;
 }
 
 .about-copy > p {
   color: rgba(240, 235, 220, 0.7);
-  font-size: 15px;
-  line-height: 2.15;
+  font-size: var(--text-sm);
+  line-height: var(--line-body);
 }
 
 .traits {
@@ -1928,7 +1978,7 @@ footer {
   border-radius: 10px;
   background:
     linear-gradient(135deg, rgba(250, 246, 236, 0.94), rgba(239, 229, 209, 0.82)),
-    url("./assets/hutao-ink/PaperTexture.png") center / 560px auto repeat;
+    url("./assets/hutao-ink/PaperTexture.webp") center / 560px auto repeat;
   box-shadow: 0 12px 34px rgba(36, 29, 21, 0.1);
 }
 
@@ -1979,14 +2029,14 @@ footer {
 
 @media (min-width: 901px) {
   .home-page .about-section {
-    grid-template-columns: minmax(250px, 0.78fr) minmax(430px, 1.35fr);
-    gap: clamp(68px, 7.5vw, 122px);
+    grid-template-columns: minmax(248px, 0.82fr) minmax(0, 1.18fr);
+    gap: clamp(42px, 5vw, 76px);
     align-items: center;
     padding:
-      clamp(96px, 9vw, 138px)
-      max(42px, calc((100vw - 980px) / 2 + 26px))
-      clamp(112px, 10vw, 162px)
-      max(30px, calc((100vw - 980px) / 2 - 28px));
+      clamp(68px, 7vw, 98px)
+      max(34px, calc((100vw - 1060px) / 2))
+      clamp(74px, 7.5vw, 108px)
+      max(34px, calc((100vw - 1060px) / 2));
     overflow: hidden;
     background:
       radial-gradient(circle at 20% 16%, rgba(166, 52, 45, 0.1), transparent 27%),
@@ -2004,7 +2054,7 @@ footer {
     bottom: 0;
     left: 0;
     z-index: 1;
-    height: 118px;
+    height: 72px;
     pointer-events: none;
     background: linear-gradient(
       to bottom,
@@ -2015,9 +2065,9 @@ footer {
   }
 
   .home-page .portrait-panel {
-    width: min(330px, 100%);
+    width: min(310px, 100%);
     justify-self: end;
-    margin-top: clamp(42px, 4.2vw, 58px);
+    margin-top: 0;
     background: rgba(250, 247, 238, 0.28);
     border-color: rgba(70, 55, 40, 0.12);
     box-shadow: 0 16px 38px rgba(65, 49, 37, 0.08);
@@ -2039,16 +2089,16 @@ footer {
   }
 
   .home-page .about-copy {
-    width: min(480px, 100%);
-    max-width: 480px;
+    width: min(540px, 100%);
+    max-width: 540px;
     min-height: 0;
     justify-self: start;
     padding: clamp(30px, 3.1vw, 42px) clamp(32px, 3.4vw, 46px) clamp(28px, 3vw, 38px);
-    overflow: hidden;
+    overflow: visible;
     color: rgba(44, 42, 37, 0.78);
     background:
       linear-gradient(135deg, rgba(250, 247, 238, 0.88), rgba(244, 236, 220, 0.82)),
-      url("./assets/hutao-ink/PaperTexture.png") center / 520px auto repeat;
+      url("./assets/hutao-ink/PaperTexture.webp") center / 520px auto repeat;
     border: 1px solid rgba(70, 55, 40, 0.14);
     box-shadow:
       0 20px 55px rgba(65, 49, 37, 0.11),
@@ -2059,13 +2109,13 @@ footer {
   .home-page .about-copy::before {
     content: "在下，虎桃不会振刀";
     position: absolute;
-    top: clamp(60px, 6vw, 82px);
+    top: clamp(36px, 4vw, 58px);
     left: clamp(24px, 3vw, 42px);
     z-index: 0;
-    max-width: 410px;
+    max-width: min(100% - 48px, 410px);
     color: rgba(104, 75, 54, 0.09);
     font-family: var(--brush);
-    font-size: clamp(54px, 5.8vw, 78px);
+    font-size: clamp(42px, 4.6vw, 64px);
     font-weight: 500;
     line-height: 1.4;
     letter-spacing: 0.04em;
@@ -2100,7 +2150,7 @@ footer {
   .home-page .about-lead {
     margin: 16px 0 14px;
     color: rgba(44, 42, 37, 0.78) !important;
-    font-size: clamp(17px, 1.15vw, 19px) !important;
+    font-size: clamp(16px, 1vw, 18px) !important;
     font-weight: 500;
     line-height: 1.9;
   }
@@ -2108,7 +2158,7 @@ footer {
   .home-page .about-copy > p:not(.eyebrow):not(.about-lead) {
     margin: 0;
     color: rgba(55, 52, 47, 0.68);
-    font-size: clamp(14px, 0.95vw, 16px);
+    font-size: clamp(14px, 0.9vw, 16px);
     font-weight: 500;
     line-height: 2;
   }
@@ -2134,7 +2184,7 @@ footer {
     border-left: 3px solid rgba(159, 48, 41, 0.72);
     color: rgba(67, 40, 32, 0.78);
     background: transparent;
-    font-size: clamp(24px, 2.6vw, 30px);
+    font-size: clamp(22px, 2.2vw, 28px);
     line-height: 1.35;
   }
 
@@ -2149,28 +2199,28 @@ footer {
 
 @media (min-width: 901px) and (max-width: 1450px) {
   .home-page .about-section {
-    grid-template-columns: minmax(230px, 0.72fr) minmax(410px, 1.18fr);
-    gap: clamp(54px, 6vw, 86px);
+    grid-template-columns: minmax(220px, 0.78fr) minmax(0, 1.18fr);
+    gap: clamp(34px, 4.2vw, 58px);
     padding:
-      clamp(78px, 8vw, 112px)
-      max(34px, calc((100vw - 910px) / 2 + 18px))
-      clamp(104px, 9vw, 136px)
-      max(24px, calc((100vw - 910px) / 2 - 20px));
+      clamp(58px, 6vw, 78px)
+      max(28px, calc((100vw - 960px) / 2))
+      clamp(64px, 6vw, 88px)
+      max(28px, calc((100vw - 960px) / 2));
   }
 
   .home-page .portrait-panel {
-    width: min(300px, 100%);
-    margin-top: 46px;
+    width: min(280px, 100%);
+    margin-top: 0;
   }
 
   .home-page .about-copy {
-    width: min(460px, 100%);
-    max-width: 460px;
-    padding: 30px 36px 30px;
+    width: min(520px, 100%);
+    max-width: 520px;
+    padding: 28px 34px 28px;
   }
 
   .home-page .about-copy::before {
-    font-size: clamp(48px, 5.2vw, 66px);
+    font-size: clamp(40px, 4.6vw, 58px);
   }
 }
 
@@ -2223,6 +2273,15 @@ footer {
 
 .home-page .static-fallback {
   opacity: 1;
+}
+
+.home-page :where(h2, h3, strong) {
+  font-weight: 500;
+}
+
+.home-page main > section:not(.hero) {
+  content-visibility: auto;
+  contain-intrinsic-size: 640px;
 }
 
 @media (max-width: 1080px) {
@@ -2565,7 +2624,7 @@ footer {
 .fortune-scroll header p {
   color: var(--cinnabar);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.3em;
 }
 
@@ -2796,7 +2855,7 @@ body:has(.fortune-dialog[open]) {
   color: #f8efe4;
   background:
     linear-gradient(90deg, rgba(14, 15, 14, 0.92) 0%, rgba(14, 15, 14, 0.66) 40%, rgba(14, 15, 14, 0.08) 72%),
-    url("./assets/kurumi-tiger.png") center 36% / cover no-repeat;
+    url("./assets/kurumi-tiger.webp") center 36% / cover no-repeat;
 }
 
 .kurumi-portal::after {
@@ -2840,7 +2899,7 @@ body:has(.fortune-dialog[open]) {
 .kurumi-page {
   background:
     linear-gradient(rgba(244, 239, 229, 0.94), rgba(244, 239, 229, 0.94)),
-    url("./assets/kurumi-mountains.png") center / cover fixed;
+    url("./assets/kurumi-mountains.webp") center / cover fixed;
 }
 
 .kurumi-header {
@@ -3613,16 +3672,16 @@ body:has(.fortune-dialog[open]) {
 }
 
 .friend-logo-word {
-  font-family: Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 9px;
-  font-weight: 800;
+  font-weight: 500;
   letter-spacing: -0.04em;
 }
 
 .friend-logo-letter {
-  font-family: Georgia, serif;
+  font-family: var(--font-heading);
   font-size: 23px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .friend-card > span:nth-child(2) {
@@ -3705,7 +3764,7 @@ body:has(.fortune-dialog[open]) {
   body.is-scrolled .site-header {
     background:
       linear-gradient(180deg, color-mix(in srgb, var(--paper) 98%, transparent), color-mix(in srgb, var(--paper) 94%, transparent)),
-      url("./assets/hutao-ink/PaperTexture.png") center / 520px auto repeat;
+      url("./assets/hutao-ink/PaperTexture.webp") center / 520px auto repeat;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
@@ -3951,6 +4010,27 @@ body:has(.fortune-dialog[open]) {
 }
 /* ===== Responsive readability repair v2 ===== */
 @media (max-width: 840px) {
+  .paper-noise,
+  .ink-atmosphere,
+  .ink-drift,
+  .flowing-landscape,
+  .landscape-mist,
+  .ink-cloud {
+    animation: none;
+    filter: none;
+  }
+
+  .ink-drift {
+    opacity: 0.22;
+    will-change: auto;
+  }
+
+  .kurumi-gallery-section,
+  .kurumi-page-hero,
+  .pet-entry-landscape {
+    background-attachment: scroll;
+  }
+
   :where(
     .article-card,
     .home-video-card,
@@ -4158,4 +4238,8 @@ body:has(.fortune-dialog[open]) {
   .kurumi-art-card:nth-child(5) {
     height: 420px !important;
   }
+}
+
+body.home-page :where(.article-card, .home-video-card, .achievement-section, .links-section) :where(h2, h3, strong) {
+  font-weight: 500;
 }
