@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = "hutao-blog-v53";
+﻿const CACHE_NAME = "hutao-blog-v54";
 
 const APP_SHELL = [
   "./",
@@ -47,6 +47,8 @@ const APP_SHELL = [
   "./assets/ink-hero-desktop.webp",
   "./assets/ink-hero-tablet.webp",
   "./assets/ink-hero-mobile.webp",
+  "./assets/ink-hero.webp",
+  "./assets/hutao.webp",
   "./assets/hutao-entry-shanshui.webp",
   "./assets/ink-scroll.webp",
   "./assets/kurumi-portrait-red-moon.webp",
@@ -54,6 +56,7 @@ const APP_SHELL = [
   "./assets/kurumi-spring-smile.webp",
   "./assets/kurumi-mountains.webp",
   "./assets/kurumi-vertical.webp",
+  "./assets/next/parallax_mist_foreground.webp",
   "./assets/hutao-ink/PaperTexture.webp",
   "./assets/hutao-ink/InkFog_01.webp",
   "./assets/hutao-ink/InkFog_02.webp",
@@ -69,7 +72,6 @@ self.addEventListener("install", (event) => {
   );
   self.skipWaiting();
 });
-
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>

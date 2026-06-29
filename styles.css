@@ -2982,7 +2982,7 @@ body:has(.fortune-dialog[open]) {
   inset: 12% 0 auto;
   height: 44%;
   opacity: 0.22;
-  background: url("./assets/next/parallax_mist_foreground.png") center / cover no-repeat;
+  background: url("./assets/next/parallax_mist_foreground.webp") center / cover no-repeat;
   animation: kurumiMistDrift 12s ease-in-out infinite alternate;
 }
 
