@@ -8,52 +8,6 @@
   --z-select-panel: 1250;
 }
 
-.ink-page-transition {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-transition, 10020);
-  overflow: hidden;
-  pointer-events: none;
-  background:
-    linear-gradient(105deg, rgba(247, 239, 222, 0.98), rgba(235, 224, 203, 0.96)),
-    url("./assets/hutao-ink/PaperTexture.webp") center / 720px auto repeat;
-  opacity: 0;
-  transform: translate3d(-102%, 0, 0);
-  will-change: transform, opacity;
-}
-
-body:not(.page-motion-leaving):not(.page-motion-entering) .ink-page-transition {
-  visibility: hidden;
-  transform: none;
-}
-
-.ink-page-transition::after {
-  content: "";
-  position: absolute;
-  top: -12%;
-  right: -8vw;
-  width: 18vw;
-  min-width: 90px;
-  height: 124%;
-  opacity: 0.28;
-  background: url("./assets/hutao-ink/InkFog_02.webp") center / cover no-repeat;
-  mix-blend-mode: multiply;
-}
-
-body.page-motion-leaving .ink-page-transition {
-  animation: inkPageCover 0.34s var(--ease-page) both;
-}
-
-body.page-motion-entering .ink-page-transition {
-  animation: inkPageReveal 0.42s var(--ease-ink) both;
-}
-
-body.page-motion-leaving main {
-  opacity: 0.88;
-  transform: translate3d(0, 6px, 0);
-  transition: opacity 0.24s ease, transform 0.3s var(--ease-ink);
-}
-
 .motion-scroll-progress {
   position: fixed;
   z-index: var(--z-floating, 40);
@@ -376,18 +330,6 @@ body.page-motion-leaving main {
   animation: inkClickPetal var(--click-duration, 440ms) var(--ease-ink) forwards;
 }
 
-@keyframes inkPageCover {
-  from { opacity: 0; transform: translate3d(-102%, 0, 0); }
-  12% { opacity: 1; }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
-}
-
-@keyframes inkPageReveal {
-  from { opacity: 1; transform: translate3d(0, 0, 0); }
-  82% { opacity: 1; }
-  to { opacity: 0; transform: translate3d(102%, 0, 0); }
-}
-
 @keyframes inkClickRipple {
   from { opacity: 0.42; transform: translate3d(var(--click-x), var(--click-y), 0) scale(0.32); filter: blur(0); }
   to { opacity: 0; transform: translate3d(var(--click-x), var(--click-y), 0) scale(1); filter: blur(1px); }
@@ -431,16 +373,6 @@ body.page-motion-leaving main {
     transform: none !important;
     filter: none !important;
     transition: opacity var(--motion-fast) linear !important;
-  }
-
-  body.page-motion-leaving .ink-page-transition,
-  body.page-motion-entering .ink-page-transition {
-    animation-duration: 0.01ms !important;
-  }
-
-  body.page-motion-leaving main {
-    transform: none;
-    transition: none;
   }
 
   .ink-click-ripple {

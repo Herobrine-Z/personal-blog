@@ -1,0 +1,87 @@
+:root {
+  --z-lottie-loader: 11000;
+}
+
+.ink-site-loader {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-lottie-loader);
+  display: grid;
+  place-items: center;
+  padding: max(24px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--paper) 82%, transparent), transparent 42%),
+    linear-gradient(135deg, color-mix(in srgb, var(--paper) 98%, white), color-mix(in srgb, var(--paper-deep) 86%, var(--paper))),
+    url("./assets/hutao-ink/PaperTexture.webp") center / 720px auto repeat;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 520ms var(--ease-ink),
+    visibility 520ms linear;
+}
+
+.ink-site-loader.is-leaving {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.ink-site-loader__inner {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  transform: none;
+  transition: opacity 520ms var(--ease-ink);
+}
+
+.ink-site-loader.is-leaving .ink-site-loader__inner {
+  opacity: 0;
+  transform: none;
+}
+
+.ink-site-loader__animation {
+  width: clamp(132px, 22vw, 210px);
+  aspect-ratio: 1;
+  opacity: 0.92;
+}
+
+.ink-site-loader__animation > svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.ink-site-loader__text {
+  margin: 0;
+  font-family: var(--font-brush);
+  font-size: clamp(1.2rem, 1rem + 0.8vw, 1.75rem);
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  color: color-mix(in srgb, var(--ink) 86%, var(--cinnabar));
+}
+
+.ink-site-loader__fallback {
+  width: clamp(86px, 16vw, 132px);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 38% 34%, color-mix(in srgb, var(--ink) 24%, transparent), transparent 24%),
+    radial-gradient(circle, transparent 48%, color-mix(in srgb, var(--cinnabar) 18%, transparent) 49% 53%, transparent 54%);
+}
+
+@media (max-width: 840px), (pointer: coarse) {
+  .ink-site-loader__animation {
+    width: clamp(112px, 34vw, 156px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ink-site-loader {
+    transition: opacity 160ms linear, visibility 160ms linear;
+  }
+
+  .ink-site-loader__animation {
+    display: none !important;
+  }
+}
