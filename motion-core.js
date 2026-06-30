@@ -52,73 +52,6 @@
     }
   }
 
-  function ensureVeil() {
-    let veil = document.querySelector(".ink-page-transition");
-    if (!veil) {
-      veil = document.createElement("div");
-      veil.className = "ink-page-transition";
-      veil.setAttribute("aria-hidden", "true");
-      document.body.prepend(veil);
-    }
-    return veil;
-  }
-
-  function enterPage() {
-    ensureVeil();
-    window.InkLottie?.resetPageTransition?.();
-    document.body.classList.remove("page-motion-leaving");
-    document.body.classList.add("page-motion-entering");
-    window.setTimeout(() => {
-      document.body.classList.remove("page-motion-entering");
-      state.leaving = false;
-    }, state.reduced ? 20 : 460);
-  }
-
-  function shouldTransition(anchor, event) {
-    if (!anchor || event.defaultPrevented || state.leaving) return false;
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
-    if (anchor.target && anchor.target !== "_self") return false;
-    if (anchor.hasAttribute("download")) return false;
-
-    let url;
-    try {
-      url = new URL(anchor.href, window.location.href);
-    } catch {
-      return false;
-    }
-
-    if (url.origin !== window.location.origin) return false;
-    const sameDocument = url.pathname === location.pathname && url.search === location.search;
-    if (sameDocument) return false;
-    return true;
-  }
-
-  function setupPageTransition() {
-    enterPage();
-
-    document.addEventListener("click", (event) => {
-      const anchor = event.target.closest?.("a[href]");
-      if (!shouldTransition(anchor, event)) return;
-
-      event.preventDefault();
-      state.leaving = true;
-      ensureVeil();
-      document.body.classList.add("page-motion-leaving");
-      const navigate = () => { window.location.href = anchor.href; };
-      if (window.InkLottie?.playPageTransition && !state.reduced) {
-        window.InkLottie.playPageTransition().then(navigate, navigate);
-        return;
-      }
-      window.setTimeout(navigate, state.reduced ? 10 : 320);
-    });
-
-    window.addEventListener("pageshow", () => {
-      state.leaving = false;
-      document.body.classList.remove("page-motion-leaving", "page-motion-entering");
-      enterPage();
-    });
-  }
-
   function addReveal(element, index = 0) {
     if (!(element instanceof HTMLElement)) return;
     if (element.closest(".hero, .pet-entry") || element.classList.contains("motion-reveal")) return;
@@ -669,7 +602,6 @@
 
   onReady(() => {
     document.documentElement.classList.add("motion-core-ready");
-    setupPageTransition();
     setupReveal();
     setupDynamicReveal();
     setupScrollProgress();

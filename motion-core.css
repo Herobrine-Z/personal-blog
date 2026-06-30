@@ -8,41 +8,6 @@
   --z-select-panel: 1250;
 }
 
-.ink-page-transition {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-transition, 10020);
-  overflow: hidden;
-  pointer-events: none;
-  background: transparent;
-  opacity: 0;
-  transform: none;
-  will-change: opacity;
-}
-
-body:not(.page-motion-leaving):not(.page-motion-entering) .ink-page-transition {
-  visibility: hidden;
-  transform: none;
-}
-
-.ink-page-transition::after {
-  content: none;
-}
-
-body.page-motion-leaving .ink-page-transition {
-  animation: none;
-}
-
-body.page-motion-entering .ink-page-transition {
-  animation: none;
-}
-
-body.page-motion-leaving main {
-  opacity: 1;
-  transform: none;
-  transition: none;
-}
-
 .motion-scroll-progress {
   position: fixed;
   z-index: var(--z-floating, 40);
@@ -365,18 +330,6 @@ body.page-motion-leaving main {
   animation: inkClickPetal var(--click-duration, 440ms) var(--ease-ink) forwards;
 }
 
-@keyframes inkPageCover {
-  from { opacity: 0; transform: translate3d(-102%, 0, 0); }
-  12% { opacity: 1; }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
-}
-
-@keyframes inkPageReveal {
-  from { opacity: 1; transform: translate3d(0, 0, 0); }
-  82% { opacity: 1; }
-  to { opacity: 0; transform: translate3d(102%, 0, 0); }
-}
-
 @keyframes inkClickRipple {
   from { opacity: 0.42; transform: translate3d(var(--click-x), var(--click-y), 0) scale(0.32); filter: blur(0); }
   to { opacity: 0; transform: translate3d(var(--click-x), var(--click-y), 0) scale(1); filter: blur(1px); }
@@ -420,16 +373,6 @@ body.page-motion-leaving main {
     transform: none !important;
     filter: none !important;
     transition: opacity var(--motion-fast) linear !important;
-  }
-
-  body.page-motion-leaving .ink-page-transition,
-  body.page-motion-entering .ink-page-transition {
-    animation-duration: 0.01ms !important;
-  }
-
-  body.page-motion-leaving main {
-    transform: none;
-    transition: none;
   }
 
   .ink-click-ripple {

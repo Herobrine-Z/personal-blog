@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-blog-v63";
+const CACHE_NAME = "hutao-blog-v64";
 
 const APP_SHELL = [
   "./",
@@ -67,12 +67,7 @@ const APP_SHELL = [
   "./assets/hutao-ink/InkFog_02.webp",
   "./assets/hutao-ink/InkFog_03.webp",
   "./assets/hutao-ink/BambooLeaf_01.webp",
-  "./assets/lottie/bamboo-leaf-fall.json",
-  "./assets/lottie/ink-drop-loading.json",
-  "./assets/lottie/ink-loading.json",
-  "./assets/lottie/ink-splash-transition.json",
-  "./assets/lottie/red-seal-stamp.json",
-  "./assets/lottie/scroll-open.json"
+  "./assets/lottie/ink-loading.json"
 ];
 
 self.addEventListener("install", (event) => {

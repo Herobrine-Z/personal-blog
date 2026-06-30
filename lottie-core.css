@@ -1,6 +1,5 @@
 :root {
   --z-lottie-loader: 11000;
-  --z-lottie-transition: 10030;
 }
 
 .ink-site-loader {
@@ -31,7 +30,7 @@
 .ink-site-loader__inner {
   display: grid;
   justify-items: center;
-  gap: 12px;
+  gap: 10px;
   transform: none;
   transition: opacity 520ms var(--ease-ink);
 }
@@ -41,33 +40,15 @@
   transform: none;
 }
 
-.ink-site-loader__mark {
-  position: relative;
+.ink-site-loader__animation {
   width: clamp(132px, 22vw, 210px);
   aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-}
-
-.ink-site-loader__animation,
-.ink-site-loader__drop {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
   opacity: 0.92;
 }
 
-.ink-site-loader__animation > svg,
-.ink-site-loader__drop > svg {
+.ink-site-loader__animation > svg {
   width: 100% !important;
   height: 100% !important;
-}
-
-.ink-site-loader__drop {
-  inset: 18%;
-  opacity: 0.78;
-  mix-blend-mode: multiply;
 }
 
 .ink-site-loader__text {
@@ -89,128 +70,8 @@
     radial-gradient(circle, transparent 48%, color-mix(in srgb, var(--cinnabar) 18%, transparent) 49% 53%, transparent 54%);
 }
 
-.ink-page-transition__lottie {
-  position: absolute;
-  inset: -12vh -12vw;
-  display: grid;
-  place-items: center;
-  opacity: 0;
-  transform: scale(1.06);
-  pointer-events: none;
-}
-
-.ink-page-transition__lottie > svg {
-  width: 124vw !important;
-  height: 124vh !important;
-  object-fit: cover;
-}
-
-body.lottie-transition-active .ink-page-transition {
-  z-index: var(--z-lottie-transition);
-  pointer-events: auto;
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-  background:
-    linear-gradient(105deg, rgba(247, 239, 222, 0.92), rgba(235, 224, 203, 0.86)),
-    url("./assets/hutao-ink/PaperTexture.webp") center / 720px auto repeat;
-}
-
-body.lottie-transition-active .ink-page-transition__lottie {
-  opacity: 1;
-}
-
-.lottie-bamboo-leaves {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  overflow: hidden;
-  pointer-events: none;
-  opacity: 0.34;
-  mix-blend-mode: multiply;
-}
-
-.lottie-bamboo-leaves > svg {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover;
-}
-
-.lottie-scroll-opening {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 5;
-  width: min(86vw, 760px);
-  aspect-ratio: 2.35;
-  pointer-events: none;
-  opacity: 0.86;
-  transform: translate(-50%, -50%);
-  mix-blend-mode: multiply;
-}
-
-.lottie-scroll-opening.is-complete {
-  opacity: 0;
-  transition: opacity 460ms var(--ease-ink);
-}
-
-.ink-drop-loader {
-  display: inline-grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  margin: 0 auto 10px;
-  vertical-align: middle;
-}
-
-.ink-drop-loader > svg {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-.article-state .ink-drop-loader,
-.comment-status .ink-drop-loader,
-.achievement-status .ink-drop-loader {
-  display: grid;
-}
-
-.lottie-seal-stamp {
-  width: clamp(72px, 12vw, 108px);
-  aspect-ratio: 1;
-  margin: 12px auto 0;
-  opacity: 0.9;
-  pointer-events: none;
-  mix-blend-mode: multiply;
-}
-
-.lottie-seal-stamp > svg {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-[data-theme="dark"] .ink-site-loader,
-[data-theme="dark"] .ink-page-transition,
-[data-theme="dark"] .lottie-bamboo-leaves,
-[data-theme="dark"] .lottie-seal-stamp {
-  mix-blend-mode: normal;
-}
-
 @media (max-width: 840px), (pointer: coarse) {
-  .lottie-bamboo-leaves {
-    inset: 0 -18vw;
-    opacity: 0.24;
-  }
-
-  .lottie-scroll-opening {
-    width: min(96vw, 520px);
-    opacity: 0.72;
-  }
-
   .ink-site-loader__animation {
-    width: auto;
-  }
-
-  .ink-site-loader__mark {
     width: clamp(112px, 34vw, 156px);
   }
 }
@@ -220,16 +81,7 @@ body.lottie-transition-active .ink-page-transition__lottie {
     transition: opacity 160ms linear, visibility 160ms linear;
   }
 
-  .ink-site-loader__animation,
-  .ink-site-loader__drop,
-  .ink-page-transition__lottie,
-  .lottie-bamboo-leaves,
-  .lottie-scroll-opening {
+  .ink-site-loader__animation {
     display: none !important;
-  }
-
-  body.lottie-transition-active .ink-page-transition {
-    opacity: 0;
-    pointer-events: none;
   }
 }
