@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-blog-v61";
+const CACHE_NAME = "hutao-blog-v62";
 
 const APP_SHELL = [
   "./",
@@ -16,12 +16,14 @@ const APP_SHELL = [
   "./styles.css",
   "./hutao-exhibit.css",
   "./motion-core.css",
+  "./lottie-core.css",
   "./motion-home.css",
   "./works.css",
   "./pet.css",
   "./article-pages.css",
   "./script.js",
   "./motion-core.js",
+  "./lottie-core.js",
   "./motion-home.js",
   "./motion-articles.js",
   "./motion-video.js",
@@ -41,6 +43,7 @@ const APP_SHELL = [
   "./pet-voices.js",
   "./pet.js",
   "./assets/vendor/gsap/gsap-3.13.0.min.js",
+  "./assets/vendor/lottie-web/lottie_light-5.13.0.min.js",
   "./assets/vendor/supabase/supabase-2.108.2.js",
   "./assets/vendor/katex/katex-0.16.22.min.css",
   "./assets/vendor/katex/katex-0.16.22.min.js",
@@ -63,7 +66,13 @@ const APP_SHELL = [
   "./assets/hutao-ink/InkFog_01.webp",
   "./assets/hutao-ink/InkFog_02.webp",
   "./assets/hutao-ink/InkFog_03.webp",
-  "./assets/hutao-ink/BambooLeaf_01.webp"
+  "./assets/hutao-ink/BambooLeaf_01.webp",
+  "./assets/lottie/bamboo-leaf-fall.json",
+  "./assets/lottie/ink-drop-loading.json",
+  "./assets/lottie/ink-loading.json",
+  "./assets/lottie/ink-splash-transition.json",
+  "./assets/lottie/red-seal-stamp.json",
+  "./assets/lottie/scroll-open.json"
 ];
 
 self.addEventListener("install", (event) => {

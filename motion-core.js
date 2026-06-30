@@ -65,6 +65,7 @@
 
   function enterPage() {
     ensureVeil();
+    window.InkLottie?.resetPageTransition?.();
     document.body.classList.remove("page-motion-leaving");
     document.body.classList.add("page-motion-entering");
     window.setTimeout(() => {
@@ -103,9 +104,12 @@
       state.leaving = true;
       ensureVeil();
       document.body.classList.add("page-motion-leaving");
-      window.setTimeout(() => {
-        window.location.href = anchor.href;
-      }, state.reduced ? 10 : 320);
+      const navigate = () => { window.location.href = anchor.href; };
+      if (window.InkLottie?.playPageTransition && !state.reduced) {
+        window.InkLottie.playPageTransition().then(navigate, navigate);
+        return;
+      }
+      window.setTimeout(navigate, state.reduced ? 10 : 320);
     });
 
     window.addEventListener("pageshow", () => {
