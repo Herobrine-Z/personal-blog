@@ -320,12 +320,14 @@
     const panel = document.createElement("div");
     panel.className = "animated-select__panel";
     panel.id = panelId;
+    panel.dataset.selectPortal = select.id || panelId;
     const listbox = document.createElement("div");
     listbox.className = "animated-select__list";
     listbox.setAttribute("role", "listbox");
     panel.appendChild(listbox);
-    wrapper.append(trigger, panel);
+    wrapper.append(trigger);
     select.after(wrapper);
+    document.body.appendChild(panel);
     select.classList.add("native-select-hidden");
     select.dataset.animatedReady = "true";
     select.setAttribute("aria-hidden", "true");
@@ -338,6 +340,16 @@
     let open = false;
     let panelAnimation = null;
     let optionAnimations = [];
+
+    function stopSelectEvent(event) {
+      event.stopPropagation();
+    }
+
+    [wrapper, panel].forEach((element) => {
+      element.addEventListener("pointerdown", stopSelectEvent);
+      element.addEventListener("mousedown", stopSelectEvent);
+      element.addEventListener("click", stopSelectEvent);
+    });
 
     function selectedIndex() {
       const index = Array.from(select.options).findIndex((option) => option.value === select.value);
@@ -368,7 +380,10 @@
         button.setAttribute("role", "option");
         button.dataset.value = option.value;
         button.textContent = optionLabel(option);
-        button.addEventListener("click", () => {
+        button.addEventListener("pointerdown", stopSelectEvent);
+        button.addEventListener("mousedown", stopSelectEvent);
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
           setSelected(index);
           close(true);
           trigger.focus({ preventScroll: true });
@@ -386,6 +401,26 @@
       optionAnimations = [];
     }
 
+    function updatePosition() {
+      if (!open) return;
+      const rect = trigger.getBoundingClientRect();
+      const viewportWidth = document.documentElement.clientWidth;
+      const viewportHeight = document.documentElement.clientHeight;
+      const gutter = 14;
+      const width = Math.min(Math.max(rect.width, 180), Math.max(180, viewportWidth - gutter * 2));
+      const left = Math.min(Math.max(gutter, rect.left), Math.max(gutter, viewportWidth - width - gutter));
+      const below = Math.max(120, viewportHeight - rect.bottom - gutter);
+      const above = Math.max(120, rect.top - gutter);
+      const openUp = below < 180 && above > below;
+      const maxHeight = Math.min(320, openUp ? above - 8 : below - 8);
+      panel.classList.toggle("is-above", openUp);
+      panel.style.width = `${width}px`;
+      panel.style.left = `${left}px`;
+      panel.style.top = openUp ? "auto" : `${rect.bottom + 8}px`;
+      panel.style.bottom = openUp ? `${viewportHeight - rect.top + 8}px` : "auto";
+      panel.style.setProperty("--animated-select-max-height", `${Math.max(120, maxHeight)}px`);
+    }
+
     function openPanel() {
       if (open) return;
       closeOpenSelect(api);
@@ -393,7 +428,9 @@
       state.openSelect = api;
       cancelAnimations();
       wrapper.classList.add("is-open");
+      panel.classList.add("is-portaled", "is-open");
       trigger.setAttribute("aria-expanded", "true");
+      updatePosition();
       panel.style.visibility = "visible";
       panel.style.pointerEvents = "auto";
       const duration = state.reduced ? 1 : 210;
@@ -428,6 +465,7 @@
       if (state.openSelect === api) state.openSelect = null;
       cancelAnimations();
       wrapper.classList.remove("is-open");
+      panel.classList.remove("is-open");
       trigger.setAttribute("aria-expanded", "false");
       const duration = state.reduced ? 1 : 150;
       optionButtons.forEach((button) => {
@@ -447,6 +485,7 @@
         if (open) return;
         panel.style.visibility = "hidden";
         panel.style.pointerEvents = "none";
+        panel.classList.remove("is-portaled", "is-above");
       };
       if (returnFocus) trigger.focus({ preventScroll: true });
     }
@@ -458,7 +497,12 @@
       optionButtons[activeIndex].focus({ preventScroll: true });
     }
 
-    trigger.addEventListener("click", () => (open ? close() : openPanel()));
+    trigger.addEventListener("pointerdown", stopSelectEvent);
+    trigger.addEventListener("mousedown", stopSelectEvent);
+    trigger.addEventListener("click", (event) => {
+      event.stopPropagation();
+      open ? close() : openPanel();
+    });
     trigger.addEventListener("keydown", (event) => {
       if (["Enter", " ", "ArrowDown", "ArrowUp"].includes(event.key)) {
         event.preventDefault();
@@ -497,7 +541,7 @@
     });
     select.addEventListener("change", () => setSelected(selectedIndex(), false));
 
-    const api = { select, wrapper, trigger, refresh, close, open: openPanel };
+    const api = { select, wrapper, trigger, panel, refresh, close, open: openPanel, updatePosition };
     selectInstances.set(select, api);
     refresh();
     return api;
@@ -597,7 +641,7 @@
 
   document.addEventListener("pointerdown", (event) => {
     if (!state.openSelect) return;
-    if (event.target.closest?.(".animated-select")) return;
+    if (event.target.closest?.(".animated-select, .animated-select__panel")) return;
     state.openSelect.close();
   }, { passive: true });
 
@@ -605,8 +649,8 @@
     if (event.key === "Escape") state.openSelect?.close(true);
   });
 
-  window.addEventListener("scroll", () => state.openSelect?.close(), { passive: true });
-  window.addEventListener("resize", () => state.openSelect?.close(), { passive: true });
+  window.addEventListener("scroll", () => state.openSelect?.updatePosition(), { passive: true });
+  window.addEventListener("resize", () => state.openSelect?.updatePosition(), { passive: true });
 
   window.MotionCore = {
     state,
