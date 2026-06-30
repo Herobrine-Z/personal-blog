@@ -1247,6 +1247,10 @@ footer {
   letter-spacing: 0.16em;
 }
 
+.mobile-control-dock {
+  display: contents;
+}
+
 @media (hover: hover) and (pointer: fine) {
   html.cursor-ready,
   html.cursor-ready body,
@@ -1778,61 +1782,93 @@ footer {
   transform: translate3d(0, 0, 0) scale(1);
 }
 
-@media (max-width: 840px) {
-  .theme-toggle,
-  .wind-toggle,
-  .back-to-top {
+@media (max-width: 900px) {
+  .mobile-control-dock {
+    position: fixed;
+    z-index: var(--z-floating);
+    right: max(14px, calc(env(safe-area-inset-right) + 14px));
+    bottom: max(18px, calc(env(safe-area-inset-bottom) + 14px));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 44px;
+    opacity: 1;
+    pointer-events: none;
+    transform: translate3d(0, 0, 0);
     transition:
       opacity 220ms var(--ease-ink),
       transform 280ms var(--ease-ink);
     will-change: opacity, transform;
   }
 
-  .theme-toggle {
-    left: max(12px, calc(env(safe-area-inset-left) + 12px));
-    bottom: max(14px, calc(env(safe-area-inset-bottom) + 14px));
+  body.mobile-chrome-visible .mobile-control-dock {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 
-  .wind-toggle {
-    right: max(64px, calc(env(safe-area-inset-right) + 64px));
-    bottom: max(14px, calc(env(safe-area-inset-bottom) + 14px));
+  body.mobile-chrome-hidden .mobile-control-dock {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(calc(100% + env(safe-area-inset-right) + 24px), 0, 0);
+  }
+
+  .mobile-control-dock > .theme-toggle,
+  .mobile-control-dock > .wind-toggle,
+  .mobile-control-dock > .back-to-top {
+    position: relative;
+    inset: auto;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    z-index: auto;
+    flex: 0 0 auto;
     width: 44px;
     height: 44px;
+    min-width: 44px;
     min-height: 44px;
+    margin: 0;
     padding: 0;
-    justify-content: center;
+    opacity: 0.94;
+    pointer-events: auto;
+    transform: none;
+    transition: opacity 180ms var(--ease-ink);
+  }
+
+  .mobile-control-dock > .theme-toggle,
+  .mobile-control-dock > .back-to-top {
+    display: grid;
+    place-items: center;
+  }
+
+  .mobile-control-dock > .wind-toggle {
+    display: grid;
+    place-items: center;
     border-radius: 50%;
   }
 
-  .back-to-top {
-    right: max(12px, calc(env(safe-area-inset-right) + 12px));
-    bottom: max(14px, calc(env(safe-area-inset-bottom) + 14px));
+  .mobile-control-dock > .back-to-top {
+    order: 1;
   }
 
-  .floating-controls-ready .theme-toggle,
-  .floating-controls-ready .wind-toggle,
-  .floating-controls-ready .back-to-top.visible,
-  body.mobile-chrome-visible .theme-toggle,
-  body.mobile-chrome-visible .wind-toggle,
-  body.mobile-chrome-visible .back-to-top.visible {
+  .mobile-control-dock > .wind-toggle {
+    order: 2;
+  }
+
+  .mobile-control-dock > .theme-toggle {
+    order: 3;
+  }
+
+  .mobile-control-dock > .back-to-top:not(.visible) {
+    display: none;
+  }
+
+  .mobile-control-dock > .back-to-top.visible {
+    display: grid;
     opacity: 0.94;
     pointer-events: auto;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  .back-to-top:not(.visible),
-  body.mobile-chrome-visible .back-to-top:not(.visible) {
-    opacity: 0;
-    pointer-events: none;
-    transform: translate3d(0, 10px, 0) scale(1);
-  }
-
-  body.mobile-chrome-hidden .theme-toggle,
-  body.mobile-chrome-hidden .wind-toggle,
-  body.mobile-chrome-hidden .back-to-top.visible {
-    opacity: 0;
-    pointer-events: none;
-    transform: translate3d(0, calc(100% + env(safe-area-inset-bottom) + 26px), 0) scale(1);
+    transform: none;
   }
 }
 
@@ -2084,6 +2120,10 @@ footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .mobile-control-dock {
+    transition: none;
+  }
+
   html {
     scroll-behavior: auto;
   }

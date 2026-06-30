@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-blog-v60";
+const CACHE_NAME = "hutao-blog-v61";
 
 const APP_SHELL = [
   "./",

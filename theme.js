@@ -291,7 +291,7 @@
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function setupMobileScrollChrome() {
-    const mobileQuery = window.matchMedia("(max-width: 840px)");
+    const mobileQuery = window.matchMedia("(max-width: 900px)");
     let lastScrollY = clampScrollY();
     let accumulatedDelta = 0;
     let scrollFrame = 0;
@@ -389,6 +389,23 @@
     return { forceVisible, reset: () => reset(true), requestUpdate };
   }
 
+  function setupMobileControlDock({ themeToggle, windToggle, backToTop }) {
+    let dock = document.querySelector(".mobile-control-dock");
+
+    if (!dock) {
+      dock = document.createElement("div");
+      dock.className = "mobile-control-dock";
+      dock.setAttribute("aria-label", "页面快捷操作");
+      document.body.appendChild(dock);
+    }
+
+    [backToTop, windToggle, themeToggle].filter(Boolean).forEach((control) => {
+      dock.appendChild(control);
+    });
+
+    return dock;
+  }
+
   function setupFloatingControls() {
     const windToggle = document.querySelector(".wind-toggle");
     const leftControls = [button].filter(Boolean);
@@ -399,7 +416,7 @@
 
     if (!finePointer) {
       document.body.classList.remove("floating-left-open", "floating-right-open", "floating-controls-awake");
-      if (!window.matchMedia("(max-width: 840px)").matches) {
+      if (!window.matchMedia("(max-width: 900px)").matches) {
         document.body.classList.add("floating-left-open", "floating-right-open");
       }
       return;
@@ -460,6 +477,11 @@
   }
 
   mobileChromeController = setupMobileScrollChrome();
+  setupMobileControlDock({
+    themeToggle: button,
+    windToggle: document.querySelector(".wind-toggle"),
+    backToTop,
+  });
   setupFloatingControls();
 
   if (finePointer && !reducedMotion && !document.querySelector(".ink-cursor")) {
