@@ -110,23 +110,36 @@
     loader.setAttribute("aria-hidden", "true");
     loader.innerHTML = [
       '<div class="ink-site-loader__inner">',
+      '<div class="ink-site-loader__mark">',
       '<div class="ink-site-loader__animation"></div>',
+      '<div class="ink-site-loader__drop"></div>',
+      "</div>",
       '<p class="ink-site-loader__text">墨卷初开</p>',
       "</div>",
     ].join("");
     document.body.prepend(loader);
 
     const animationNode = loader.querySelector(".ink-site-loader__animation");
-    let animation = null;
+    const dropNode = loader.querySelector(".ink-site-loader__drop");
+    const animations = [];
     try {
-      animation = await createAnimation(animationNode, {
+      const ring = await createAnimation(animationNode, {
         name: config.inkLoading,
         loop: true,
         preserveAspectRatio: "xMidYMid meet",
       });
+      if (ring) animations.push(ring);
+      const drop = await createAnimation(dropNode, {
+        name: config.inkDrop,
+        loop: true,
+        preserveAspectRatio: "xMidYMid meet",
+        speed: 0.82,
+      });
+      if (drop) animations.push(drop);
     } catch (error) {
       console.warn("[InkLottie] loading animation failed", error);
       animationNode.classList.add("ink-site-loader__fallback");
+      dropNode?.remove();
     }
 
     await Promise.allSettled([
@@ -136,11 +149,11 @@
     await wait(saveData || isReduced() ? 80 : 120);
     loader.classList.add("is-leaving");
     loader.addEventListener("transitionend", () => {
-      animation?.destroy();
+      animations.forEach((animation) => animation.destroy());
       loader.remove();
     }, { once: true });
     window.setTimeout(() => {
-      animation?.destroy();
+      animations.forEach((animation) => animation.destroy());
       loader.remove();
     }, 900);
   }
