@@ -9,9 +9,9 @@
     <title>站长工作台 | 虎桃不会振刀</title>
     <link rel="stylesheet" href="./assets/vendor/katex/katex-0.16.22.min.css" />
     <link rel="stylesheet" href="./fonts.css?v=1" />
-    <link rel="stylesheet" href="./styles.css?v=18" />
-    <link rel="stylesheet" href="./motion-core.css?v=3" />
-    <link rel="stylesheet" href="./article-pages.css?v=11" />
+    <link rel="stylesheet" href="./styles.css?v=19" />
+    <link rel="stylesheet" href="./motion-core.css?v=4" />
+    <link rel="stylesheet" href="./article-pages.css?v=12" />
   </head>
   <body class="inner-page" data-page="admin">
     <div class="paper-noise" aria-hidden="true"></div>
@@ -84,6 +84,18 @@
             <button type="button" data-work-filter="video">视频</button>
             <button type="button" data-work-filter="trash">回收站</button>
             <button class="danger" id="bulkTrashButton" type="button">批量移入回收站</button>
+          </div>
+          <div class="admin-work-tools" aria-label="作品筛选">
+            <label><span class="sr-only">搜索作品</span><input id="adminWorkSearch" type="search" placeholder="搜索标题、摘要或标签" /></label>
+            <select id="adminCategoryFilter" class="admin-enhanced-select" aria-label="按分类筛选"><option value="">全部分类</option></select>
+            <select id="adminSeriesFilter" class="admin-enhanced-select" aria-label="按系列筛选"><option value="">全部系列</option></select>
+            <select id="adminSortWorks" class="admin-enhanced-select" aria-label="作品排序">
+              <option value="updated-desc">最近更新</option>
+              <option value="published-desc">最新发布</option>
+              <option value="views-desc">最多浏览</option>
+            </select>
+            <button class="text-button" id="selectVisibleWorks" type="button">全选当前结果</button>
+            <button class="text-button" id="clearSelectedWorks" type="button">取消全选</button>
           </div>
           <div id="adminArticleList"><p class="article-state">正在读取作品……</p></div>
         </section>
@@ -172,8 +184,8 @@
     <script src="./markdown.js?v=5"></script>
     <script defer src="./assets/vendor/katex/katex-0.16.22.min.js"></script>
     <script defer src="./assets/vendor/katex/auto-render-0.16.22.min.js"></script>
-    <script src="./theme.js?v=16"></script>
-    <script src="./motion-core.js?v=3"></script>
-    <script src="./admin.js?v=8"></script>
+    <script src="./theme.js?v=17"></script>
+    <script src="./motion-core.js?v=4"></script>
+    <script src="./admin.js?v=9"></script>
   </body>
 </html>

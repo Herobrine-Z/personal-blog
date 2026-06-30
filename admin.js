@@ -28,12 +28,21 @@ const videoUploadSpeed = document.querySelector("#videoUploadSpeed");
 const videoUploadEta = document.querySelector("#videoUploadEta");
 const cancelVideoUpload = document.querySelector("#cancelVideoUpload");
 const retryVideoUpload = document.querySelector("#retryVideoUpload");
+const adminWorkSearch = document.querySelector("#adminWorkSearch");
+const adminCategoryFilter = document.querySelector("#adminCategoryFilter");
+const adminSeriesFilter = document.querySelector("#adminSeriesFilter");
+const adminSortWorks = document.querySelector("#adminSortWorks");
+const selectVisibleWorks = document.querySelector("#selectVisibleWorks");
+const clearSelectedWorks = document.querySelector("#clearSelectedWorks");
 
 let articles = [];
 let comments = [];
 let messages = [];
 let editingArticle = null;
 let workFilter = "all";
+let adminMetadata = { categories: new Map(), tags: new Map(), series: new Map() };
+let visibleAdminWorks = [];
+let adminListReady = false;
 const selectedWorks = new Set();
 let autosaveTimer = null;
 let currentVideoUpload = null;
@@ -151,6 +160,114 @@ function setStatus(message, isError = false) {
   statusElement.classList.toggle("error", isError);
 }
 
+function adminDialog({ title, message, input = false, danger = false }) {
+  return new Promise((resolve) => {
+    const dialog = document.createElement("dialog");
+    dialog.className = `admin-dialog${danger ? " danger" : ""}`;
+    dialog.innerHTML = `
+      <form method="dialog" class="admin-dialog__shell">
+        <h2></h2>
+        <p></p>
+        ${input ? '<textarea rows="5" maxlength="800" autofocus></textarea>' : ""}
+        <div class="admin-dialog__actions">
+          <button class="text-button" value="cancel" type="submit">取消</button>
+          <button class="ink-button" value="ok" type="submit">${danger ? "确认操作" : "确认"}</button>
+        </div>
+      </form>`;
+    dialog.querySelector("h2").textContent = title;
+    dialog.querySelector("p").textContent = message;
+    document.body.appendChild(dialog);
+    dialog.addEventListener("close", () => {
+      const textarea = dialog.querySelector("textarea");
+      const value = dialog.returnValue === "ok" ? (input ? textarea.value.trim() : true) : null;
+      dialog.remove();
+      resolve(value);
+    }, { once: true });
+    dialog.showModal();
+  });
+}
+
+function confirmAction(message, danger = false) {
+  return adminDialog({ title: danger ? "危险操作" : "确认操作", message, danger });
+}
+
+function promptOwnerReply(name) {
+  return adminDialog({ title: "站长回复", message: `回复 ${name}：`, input: true });
+}
+
+function buildAdminMetadata() {
+  const categories = new Map();
+  const tags = new Map();
+  const series = new Map();
+  articles.filter((article) => !article.deleted_at).forEach((article) => {
+    const type = article.content_type === "video" ? "video" : "article";
+    const category = article.category || (type === "video" ? "视频" : "随笔");
+    const categoryMeta = categories.get(category) || { name: category, total: 0, article: 0, video: 0 };
+    categoryMeta.total += 1;
+    categoryMeta[type] += 1;
+    categories.set(category, categoryMeta);
+    (article.tags || []).forEach((tag) => {
+      tags.set(tag, (tags.get(tag) || 0) + 1);
+    });
+    if (type === "video" && article.series_name) {
+      const item = series.get(article.series_name) || { name: article.series_name, total: 0, episodes: [] };
+      item.total += 1;
+      if (article.episode_number) item.episodes.push({ number: Number(article.episode_number), id: article.id });
+      series.set(article.series_name, item);
+    }
+  });
+  adminMetadata = { categories, tags, series };
+  return adminMetadata;
+}
+
+function getCategoriesByContentType(type = selectedContentType()) {
+  return [...adminMetadata.categories.values()]
+    .filter((item) => !type || item[type] || item.total)
+    .sort((a, b) => (b[type] || b.total) - (a[type] || a.total) || a.name.localeCompare(b.name, "zh-CN"));
+}
+
+function getExistingTags() {
+  return [...adminMetadata.tags.entries()]
+    .map(([name, total]) => ({ name, total }))
+    .sort((a, b) => b.total - a.total || a.name.localeCompare(b.name, "zh-CN"));
+}
+
+function getVideoSeries() {
+  return [...adminMetadata.series.values()].sort((a, b) => b.total - a.total || a.name.localeCompare(b.name, "zh-CN"));
+}
+
+function getEpisodesForSeries(seriesName) {
+  return (adminMetadata.series.get(seriesName)?.episodes || [])
+    .map((item) => item.number)
+    .filter(Number.isFinite)
+    .sort((a, b) => a - b);
+}
+
+function getNextEpisodeNumber(seriesName) {
+  const episodes = getEpisodesForSeries(seriesName);
+  return episodes.length ? Math.max(...episodes) + 1 : 1;
+}
+
+function replaceOptions(select, values, firstLabel) {
+  if (!select) return;
+  const current = select.value;
+  select.replaceChildren(new Option(firstLabel, ""));
+  values.forEach((item) => {
+    const label = item.total ? `${item.name}（${item.total}）` : item.name;
+    select.appendChild(new Option(label, item.name));
+  });
+  select.value = [...select.options].some((option) => option.value === current) ? current : "";
+  window.MotionCore?.createAnimatedSelect?.(select)?.refresh();
+}
+
+function refreshAdminSuggestions() {
+  buildAdminMetadata();
+  replaceOptions(adminCategoryFilter, [...adminMetadata.categories.values()].sort((a, b) => b.total - a.total), "全部分类");
+  replaceOptions(adminSeriesFilter, getVideoSeries(), "全部系列");
+  window.MotionCore?.setupCustomSelects?.(document);
+  window.dispatchEvent(new CustomEvent("admin-metadata-ready"));
+}
+
 function switchPanel(panelId) {
   document.querySelectorAll(".admin-tab-panel").forEach((panel) => {
     panel.classList.toggle("active", panel.id === panelId);
@@ -185,6 +302,135 @@ function updateEditorMode() {
     ? "保存修改"
     : isVideo ? "发布视频" : "发布文章";
   updateVideoUploadHint();
+  refreshEditorSuggestionPanels();
+  updateEpisodeHelper();
+}
+
+function ensureSuggestionPanel(input, className) {
+  let panel = input.parentElement.querySelector(`.${className}`);
+  if (!panel) {
+    panel = document.createElement("div");
+    panel.className = `admin-suggestion-panel ${className}`;
+    input.after(panel);
+  }
+  return panel;
+}
+
+function renderInputSuggestions(input, items, onPick, emptyLabel = "可创建新项目") {
+  const panel = ensureSuggestionPanel(input, "input-suggestions");
+  const keyword = input.value.trim().toLowerCase();
+  const matches = items.filter((item) => item.name.toLowerCase().includes(keyword)).slice(0, 8);
+  panel.replaceChildren();
+  matches.forEach((item, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = item.total ? `${item.name}（${item.total}）` : item.name;
+    button.style.setProperty("--suggestion-delay", `${Math.min(index, 6) * 30}ms`);
+    button.addEventListener("click", () => {
+      onPick(item.name);
+      panel.classList.remove("is-open");
+    });
+    panel.appendChild(button);
+  });
+  if (!matches.length && input.value.trim()) {
+    const create = document.createElement("button");
+    create.type = "button";
+    create.textContent = `${emptyLabel}：${input.value.trim()}`;
+    create.addEventListener("click", () => {
+      onPick(input.value.trim());
+      panel.classList.remove("is-open");
+    });
+    panel.appendChild(create);
+  }
+  panel.classList.toggle("is-open", document.activeElement === input && Boolean(panel.children.length));
+}
+
+function appendTag(tag) {
+  const normalized = tag.trim();
+  if (!normalized) return;
+  const current = articleForm.elements.tags.value.split(/[,，]/).map((item) => item.trim()).filter(Boolean);
+  if (!current.includes(normalized)) current.push(normalized);
+  articleForm.elements.tags.value = current.join(", ");
+  articleForm.elements.tags.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function refreshEditorSuggestionPanels() {
+  if (!articleForm) return;
+  renderInputSuggestions(
+    articleForm.elements.category,
+    getCategoriesByContentType(selectedContentType()),
+    (value) => { articleForm.elements.category.value = value; },
+    "新分类",
+  );
+  renderInputSuggestions(
+    articleForm.elements.seriesName,
+    getVideoSeries(),
+    (value) => {
+      articleForm.elements.seriesName.value = value;
+      updateEpisodeHelper(true);
+    },
+    "新系列",
+  );
+  const tagInput = articleForm.elements.tags;
+  const panel = ensureSuggestionPanel(tagInput, "tag-suggestions");
+  const lastToken = tagInput.value.split(/[,，]/).pop().trim().toLowerCase();
+  const existing = tagInput.value.split(/[,，]/).map((item) => item.trim()).filter(Boolean);
+  const matches = getExistingTags()
+    .filter((item) => !existing.includes(item.name) && (!lastToken || item.name.toLowerCase().includes(lastToken)))
+    .slice(0, 8);
+  panel.replaceChildren();
+  matches.forEach((item, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = `${item.name}（${item.total}）`;
+    button.style.setProperty("--suggestion-delay", `${Math.min(index, 6) * 30}ms`);
+    button.addEventListener("click", () => appendTag(item.name));
+    panel.appendChild(button);
+  });
+  panel.classList.toggle("is-open", document.activeElement === tagInput && Boolean(matches.length));
+}
+
+function ensureEpisodeHelper() {
+  let helper = articleForm.querySelector(".episode-helper");
+  if (!helper) {
+    helper = document.createElement("p");
+    helper.className = "episode-helper";
+    articleForm.elements.episodeNumber.closest("label").appendChild(helper);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "text-button auto-episode-button";
+    button.textContent = "自动下一集";
+    button.addEventListener("click", () => updateEpisodeHelper(true));
+    helper.after(button);
+  }
+  return helper;
+}
+
+function updateEpisodeHelper(applyNext = false) {
+  const helper = ensureEpisodeHelper();
+  const button = articleForm.querySelector(".auto-episode-button");
+  const seriesName = articleForm.elements.seriesName.value.trim();
+  const isVideo = selectedContentType() === "video";
+  helper.hidden = !isVideo || !seriesName;
+  button.hidden = helper.hidden;
+  if (helper.hidden) return;
+  const episodes = getEpisodesForSeries(seriesName);
+  const next = getNextEpisodeNumber(seriesName);
+  helper.textContent = `已存在：${episodes.length ? episodes.map((number) => `第 ${number} 集`).join("、") : "暂无"}；推荐下一集：第 ${next} 集`;
+  if (applyNext && !editingArticle) articleForm.elements.episodeNumber.value = next;
+}
+
+function hasEpisodeConflict() {
+  const seriesName = articleForm.elements.seriesName.value.trim();
+  const episode = Number(articleForm.elements.episodeNumber.value);
+  if (selectedContentType() !== "video" || !seriesName || !episode) return false;
+  return articles.some((article) =>
+    !article.deleted_at &&
+    article.id !== editingArticle?.id &&
+    article.content_type === "video" &&
+    article.series_name === seriesName &&
+    Number(article.episode_number) === episode
+  );
 }
 
 function resetEditor(type = "article") {
@@ -262,12 +508,30 @@ function beginEdit(article) {
 }
 
 function renderArticleList() {
-  articleList.replaceChildren();
+  const search = (adminWorkSearch?.value || "").trim().toLowerCase();
+  const category = adminCategoryFilter?.value || "";
+  const series = adminSeriesFilter?.value || "";
+  const sort = adminSortWorks?.value || "updated-desc";
   const filtered = articles.filter((article) => {
     if (workFilter === "trash") return Boolean(article.deleted_at);
     if (article.deleted_at) return false;
-    return workFilter === "all" || (article.content_type || "article") === workFilter;
+    const typeMatch = workFilter === "all" || (article.content_type || "article") === workFilter;
+    const text = [article.title, article.excerpt, article.category, article.series_name, ...(article.tags || [])].join(" ").toLowerCase();
+    return typeMatch &&
+      (!category || article.category === category) &&
+      (!series || article.series_name === series) &&
+      (!search || text.includes(search));
   });
+  const sorters = {
+    "updated-desc": (a, b) => new Date(b.updated_at || 0) - new Date(a.updated_at || 0),
+    "published-desc": (a, b) => new Date(b.published_at || 0) - new Date(a.published_at || 0),
+    "views-desc": (a, b) => Number(b.view_count || 0) - Number(a.view_count || 0),
+  };
+  filtered.sort(sorters[sort] || sorters["updated-desc"]);
+  visibleAdminWorks = filtered;
+
+  const draw = () => {
+  articleList.replaceChildren();
   if (!filtered.length) {
     articleList.innerHTML = '<p class="article-state">当前分类还没有作品。</p>';
   } else {
@@ -287,7 +551,11 @@ function renderArticleList() {
       const title = document.createElement("h3");
       title.textContent = article.title;
       const meta = document.createElement("p");
-      meta.textContent = `${articleService.contentLabel(article)} · ${article.published ? "已发布" : "草稿"} · ${articleService.formatDate(article.updated_at)} · ${article.view_count || 0} 次浏览`;
+      const categoryText = article.category ? ` · ${article.category}` : "";
+      const seriesText = article.content_type === "video" && article.series_name
+        ? ` · ${article.series_name}${article.episode_number ? ` 第 ${article.episode_number} 集` : ""}`
+        : "";
+      meta.textContent = `${articleService.contentLabel(article)} · ${article.published ? "已发布" : "草稿"}${categoryText}${seriesText} · ${articleService.formatDate(article.updated_at)} · ${article.view_count || 0} 次浏览`;
       copy.append(title, meta);
       const actions = document.createElement("div");
       actions.className = "admin-row-actions";
@@ -328,6 +596,13 @@ function renderArticleList() {
       articleList.appendChild(row);
     });
   }
+  };
+  if (adminListReady && window.MotionCore?.animateListUpdate) {
+    window.MotionCore.animateListUpdate(articleList, draw);
+  } else {
+    draw();
+    adminListReady = true;
+  }
   const activeWorks = articles.filter((item) => !item.deleted_at);
   const articleWorks = activeWorks.filter((item) => (item.content_type || "article") === "article");
   const videoWorks = activeWorks.filter((item) => item.content_type === "video");
@@ -340,6 +615,7 @@ function renderArticleList() {
 async function loadAdminArticles() {
   articleList.innerHTML = '<p class="article-state">正在读取作品……</p>';
   articles = await articleService.listAllArticles();
+  refreshAdminSuggestions();
   renderArticleList();
 }
 
@@ -436,7 +712,7 @@ function createModerationRow(item, type) {
 }
 
 async function replyAsOwner(comment, button) {
-  const body = window.prompt(`回复 ${comment.visitor_name}：`);
+  const body = await promptOwnerReply(comment.visitor_name);
   if (!body?.trim()) return;
   button.disabled = true;
   try {
@@ -475,7 +751,7 @@ async function loadModerationContent() {
 }
 
 async function removeComment(comment, button) {
-  if (!window.confirm(`确定删除 ${comment.visitor_name} 的这条评论吗？`)) return;
+  if (!await confirmAction(`确定删除 ${comment.visitor_name} 的这条评论吗？`, true)) return;
   button.disabled = true;
   try {
     await articleService.deleteComment(comment.id);
@@ -489,7 +765,7 @@ async function removeComment(comment, button) {
 }
 
 async function removeMessage(message, button) {
-  if (!window.confirm(`确定删除 ${message.visitor_name} 的这条留言吗？`)) return;
+  if (!await confirmAction(`确定删除 ${message.visitor_name} 的这条留言吗？`, true)) return;
   button.disabled = true;
   try {
     await articleService.deleteMessage(message.id);
@@ -502,7 +778,7 @@ async function removeMessage(message, button) {
 }
 
 async function removeArticle(article, button) {
-  if (!window.confirm(`将${articleService.contentLabel(article)}《${article.title}》移入回收站吗？`)) return;
+  if (!await confirmAction(`将${articleService.contentLabel(article)}《${article.title}》移入回收站吗？`, true)) return;
   button.disabled = true;
   try {
     await articleService.deleteArticle(article.id);
@@ -516,7 +792,7 @@ async function removeArticle(article, button) {
 }
 
 async function permanentlyRemoveArticle(article, button) {
-  if (!window.confirm(`永久删除《${article.title}》及其评论和文件吗？此操作无法撤销。`)) return;
+  if (!await confirmAction(`永久删除《${article.title}》及其评论和文件吗？此操作无法撤销。`, true)) return;
   button.disabled = true;
   try {
     const commentAttachments = comments
@@ -597,6 +873,10 @@ articleForm.addEventListener("submit", async (event) => {
     setStatus("请上传视频或填写视频直链。", true);
     return;
   }
+  if (hasEpisodeConflict()) {
+    setStatus("该系列中已存在相同集数，请调整集数后再保存。", true);
+    return;
+  }
 
   button.disabled = true;
   setStatus("正在保存作品……");
@@ -673,6 +953,22 @@ document.querySelectorAll("[data-work-filter]").forEach((button) => {
     renderArticleList();
   });
 });
+let adminWorkSearchTimer = null;
+adminWorkSearch?.addEventListener("input", () => {
+  clearTimeout(adminWorkSearchTimer);
+  adminWorkSearchTimer = setTimeout(renderArticleList, 150);
+});
+adminCategoryFilter?.addEventListener("change", renderArticleList);
+adminSeriesFilter?.addEventListener("change", renderArticleList);
+adminSortWorks?.addEventListener("change", renderArticleList);
+selectVisibleWorks?.addEventListener("click", () => {
+  visibleAdminWorks.filter((article) => !article.deleted_at).forEach((article) => selectedWorks.add(article.id));
+  renderArticleList();
+});
+clearSelectedWorks?.addEventListener("click", () => {
+  selectedWorks.clear();
+  renderArticleList();
+});
 
 document.querySelector("#bulkTrashButton").addEventListener("click", async () => {
   const targets = articles.filter((article) => selectedWorks.has(article.id) && !article.deleted_at);
@@ -680,13 +976,27 @@ document.querySelector("#bulkTrashButton").addEventListener("click", async () =>
     setStatus("请先选择要移入回收站的作品。", true);
     return;
   }
-  if (!window.confirm(`将选中的 ${targets.length} 个作品移入回收站吗？`)) return;
+  if (!await confirmAction(`将选中的 ${targets.length} 个作品移入回收站吗？`, true)) return;
   await Promise.all(targets.map((article) => articleService.deleteArticle(article.id)));
   selectedWorks.clear();
   await loadAdminArticles();
   setStatus("选中作品已移入回收站。");
 });
 articleForm.elements.contentType.forEach((radio) => radio.addEventListener("change", updateEditorMode));
+["category", "seriesName", "tags"].forEach((name) => {
+  const input = articleForm.elements[name];
+  input.addEventListener("input", () => {
+    refreshEditorSuggestionPanels();
+    if (name === "seriesName") updateEpisodeHelper();
+  });
+  input.addEventListener("focus", refreshEditorSuggestionPanels);
+  input.addEventListener("blur", () => {
+    window.setTimeout(() => input.parentElement.querySelectorAll(".admin-suggestion-panel").forEach((panel) => panel.classList.remove("is-open")), 140);
+  });
+});
+articleForm.elements.episodeNumber.addEventListener("input", () => {
+  if (hasEpisodeConflict()) setStatus("该集数已被同系列其他视频占用。", true);
+});
 articleForm.elements.videoFile.addEventListener("change", () => {
   const file = articleForm.elements.videoFile.files[0];
   lastVideoFile = file || null;

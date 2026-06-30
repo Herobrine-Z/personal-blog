@@ -4,9 +4,11 @@ const videoCategory = document.querySelector("#videoCategory");
 const clearVideoFilters = document.querySelector("#clearVideoFilters");
 
 let videos = [];
+let videoFilterTimer = null;
+let videoFiltersReady = false;
 
 function renderVideoState(title, detail) {
-  videoList.innerHTML = "";
+  videoList.replaceChildren();
   const state = document.createElement("div");
   state.className = "hutao-state article-state";
   const heading = document.createElement("strong");
@@ -69,10 +71,10 @@ function createVideoCard(video) {
   return link;
 }
 
-function renderVideos() {
+function filteredVideos() {
   const keyword = videoSearch.value.trim().toLowerCase();
   const category = videoCategory.value;
-  const filtered = videos.filter((video) => {
+  return videos.filter((video) => {
     const title = video.title || "";
     const excerpt = video.excerpt || "";
     return (
@@ -80,13 +82,30 @@ function renderVideos() {
       (!category || video.category === category)
     );
   });
+}
 
+function renderVideoDom(filtered) {
   videoList.replaceChildren();
   if (!filtered.length) {
     renderVideoState("未寻得合卷视频", "换一个关键词或分类再试试，新的影像会在这里归档。");
     return;
   }
   filtered.forEach((video) => videoList.appendChild(createVideoCard(video)));
+}
+
+function renderVideos(options = {}) {
+  const filtered = filteredVideos();
+  const render = () => renderVideoDom(filtered);
+  if (options.immediate || !videoFiltersReady || !window.MotionCore?.animateListUpdate) {
+    render();
+    return;
+  }
+  window.MotionCore.animateListUpdate(videoList, render);
+}
+
+function scheduleRenderVideos(delay = 150) {
+  window.clearTimeout(videoFilterTimer);
+  videoFilterTimer = window.setTimeout(() => renderVideos(), delay);
 }
 
 async function loadVideos() {
@@ -104,17 +123,20 @@ async function loadVideos() {
       option.textContent = category;
       videoCategory.appendChild(option);
     });
-    renderVideos();
+    window.MotionCore?.setupCustomSelects?.(document.querySelector(".article-filters"));
+    videoFiltersReady = true;
+    renderVideos({ immediate: true });
   } catch (error) {
     renderVideoState("视频读取暂时受阻", error.message || "稍后再试，或检查视频服务配置。");
   }
 }
 
-videoSearch.addEventListener("input", renderVideos);
-videoCategory.addEventListener("change", renderVideos);
+videoSearch.addEventListener("input", () => scheduleRenderVideos(150));
+videoCategory.addEventListener("change", () => renderVideos());
 clearVideoFilters.addEventListener("click", () => {
   videoSearch.value = "";
   videoCategory.value = "";
+  videoCategory.dispatchEvent(new Event("change", { bubbles: true }));
   renderVideos();
 });
 

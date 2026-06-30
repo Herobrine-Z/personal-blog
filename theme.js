@@ -123,15 +123,21 @@
   const searchInput = searchDialog.querySelector("input");
   const searchResults = searchDialog.querySelector(".site-search-results");
   let searchableWorks = null;
+  let searchClosing = false;
+  let searchResultAnimation = null;
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   function workTypeLabel(work) {
     return work.content_type === "video" ? "视频" : "文章";
   }
 
   function renderSearchResults(query) {
+    searchResultAnimation?.cancel();
+    const previousItems = Array.from(searchResults.children);
     const keyword = query.trim().toLowerCase();
-    searchResults.replaceChildren();
-    if (!keyword) {
+    const draw = () => {
+      searchResults.replaceChildren();
+      if (!keyword) {
       let bookmarks = [];
       try {
         bookmarks = JSON.parse(localStorage.getItem("hutao-bookmarked-articles") || "[]");
@@ -152,16 +158,16 @@
         searchResults.appendChild(link);
       });
       return;
-    }
-    const matches = (searchableWorks || []).filter((work) => {
+      }
+      const matches = (searchableWorks || []).filter((work) => {
       const text = [work.title, work.excerpt, work.category, ...(work.tags || [])].join(" ").toLowerCase();
       return text.includes(keyword);
     }).slice(0, 8);
-    if (!matches.length) {
+      if (!matches.length) {
       searchResults.innerHTML = `<p>没有找到与“${keyword.replace(/[<>&]/g, "")}”相关的内容。</p>`;
       return;
-    }
-    matches.forEach((work) => {
+      }
+      matches.forEach((work) => {
       const link = document.createElement("a");
       link.href = window.articleService?.articleUrl(work) || `./article.html?slug=${encodeURIComponent(work.slug)}`;
       link.innerHTML = `<span></span><strong></strong><small></small>`;
@@ -169,16 +175,45 @@
       link.querySelector("strong").textContent = work.title;
       link.querySelector("small").textContent = work.category || "随笔";
       searchResults.appendChild(link);
-    });
+      });
+    };
+
+    const reduced = reducedMotionQuery.matches;
+    if (!previousItems.length || reduced) {
+      draw();
+    } else {
+      searchResultAnimation = searchResults.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        { duration: 90, easing: "ease-out", fill: "forwards" },
+      );
+      searchResultAnimation.onfinish = () => {
+        draw();
+        Array.from(searchResults.children).forEach((item, index) => {
+          item.animate(
+            [
+              { opacity: 0, transform: "translate3d(0,8px,0)" },
+              { opacity: 1, transform: "translate3d(0,0,0)" },
+            ],
+            { duration: 170, delay: Math.min(index, 6) * 34, easing: "cubic-bezier(.22,1,.36,1)", fill: "both" },
+          );
+        });
+      };
+    }
   }
 
   async function openSearch() {
+    if (searchClosing) return;
     if (!searchDialog.open) searchDialog.showModal();
+    searchDialog.classList.remove("is-closing");
+    searchDialog.classList.add("is-opening");
     document.documentElement.classList.add("search-dialog-open");
     document.body.classList.add("search-dialog-open");
     searchInput.value = "";
     renderSearchResults("");
-    searchInput.focus();
+    window.setTimeout(() => {
+      searchDialog.classList.remove("is-opening");
+      searchInput.focus({ preventScroll: true });
+    }, reducedMotionQuery.matches ? 0 : 230);
     if (searchableWorks === null && window.articleService?.configured) {
       searchResults.innerHTML = "<p>正在整理全站内容……</p>";
       try {
@@ -190,14 +225,33 @@
     }
   }
 
+  function closeSearchAnimated() {
+    if (!searchDialog.open || searchClosing) return;
+    searchClosing = true;
+    searchDialog.classList.remove("is-opening");
+    searchDialog.classList.add("is-closing");
+    window.setTimeout(() => {
+      searchDialog.close();
+      searchClosing = false;
+      searchDialog.classList.remove("is-closing");
+    }, reducedMotionQuery.matches ? 1 : 170);
+  }
+
   searchButton.addEventListener("click", openSearch);
-  searchDialog.querySelector("[data-search-close]").addEventListener("click", () => searchDialog.close());
+  searchDialog.querySelector("[data-search-close]").addEventListener("click", closeSearchAnimated);
   searchDialog.addEventListener("close", () => {
     document.documentElement.classList.remove("search-dialog-open");
     document.body.classList.remove("search-dialog-open");
   });
+  searchDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeSearchAnimated();
+  });
   searchDialog.addEventListener("click", (event) => {
-    if (event.target === searchDialog) searchDialog.close();
+    if (event.target === searchDialog) closeSearchAnimated();
+  });
+  searchResults.addEventListener("click", (event) => {
+    if (event.target.closest("a")) closeSearchAnimated();
   });
   searchInput.addEventListener("input", () => renderSearchResults(searchInput.value));
   window.addEventListener("keydown", (event) => {
@@ -221,6 +275,85 @@
 
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function setupFloatingControls() {
+    const windToggle = document.querySelector(".wind-toggle");
+    const leftControls = [button].filter(Boolean);
+    const rightControls = [windToggle, backToTop].filter(Boolean);
+    if (!leftControls.length && !rightControls.length) return;
+
+    document.body.classList.add("floating-controls-ready");
+
+    if (!finePointer) {
+      let idleTimer = 0;
+      const wake = () => {
+        document.body.classList.add("floating-controls-awake");
+        window.clearTimeout(idleTimer);
+        idleTimer = window.setTimeout(() => document.body.classList.remove("floating-controls-awake"), 2200);
+      };
+      [...leftControls, ...rightControls].forEach((control) => {
+        control.addEventListener("pointerdown", wake, { passive: true });
+        control.addEventListener("focus", wake);
+      });
+      wake();
+      return;
+    }
+
+    let frame = 0;
+    let lastX = window.innerWidth / 2;
+    let hideTimer = 0;
+    let holdTimer = 0;
+
+    const setSide = (side, visible) => {
+      document.body.classList.toggle(`floating-${side}-open`, visible);
+    };
+
+    const scheduleHide = () => {
+      window.clearTimeout(hideTimer);
+      hideTimer = window.setTimeout(() => {
+        if (Date.now() < holdTimer) {
+          scheduleHide();
+          return;
+        }
+        if (document.querySelector(".theme-toggle:hover, .wind-toggle:hover, .back-to-top:hover, .theme-toggle:focus-visible, .wind-toggle:focus-visible, .back-to-top:focus-visible")) return;
+        setSide("left", false);
+        setSide("right", false);
+      }, 1200);
+    };
+
+    const updateFromPointer = () => {
+      frame = 0;
+      const edge = Math.min(90, Math.max(72, window.innerWidth * 0.06));
+      if (lastX <= edge) setSide("left", true);
+      if (lastX >= window.innerWidth - edge) setSide("right", true);
+      scheduleHide();
+    };
+
+    window.addEventListener("pointermove", (event) => {
+      lastX = event.clientX;
+      if (!frame) frame = window.requestAnimationFrame(updateFromPointer);
+    }, { passive: true });
+
+    [...leftControls, ...rightControls].forEach((control) => {
+      control.addEventListener("pointerenter", () => {
+        if (leftControls.includes(control)) setSide("left", true);
+        if (rightControls.includes(control)) setSide("right", true);
+        window.clearTimeout(hideTimer);
+      });
+      control.addEventListener("pointerleave", scheduleHide);
+      control.addEventListener("focus", () => {
+        if (leftControls.includes(control)) setSide("left", true);
+        if (rightControls.includes(control)) setSide("right", true);
+      });
+      control.addEventListener("blur", scheduleHide);
+      control.addEventListener("click", () => {
+        holdTimer = Date.now() + 1600;
+        scheduleHide();
+      });
+    });
+  }
+
+  setupFloatingControls();
 
   if (finePointer && !reducedMotion && !document.querySelector(".ink-cursor")) {
     const cursor = document.createElement("div");

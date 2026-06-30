@@ -15,7 +15,11 @@
     mutationObservers: new Set(),
     leaving: false,
     hidden: document.hidden,
+    openSelect: null,
   };
+
+  const selectInstances = new WeakMap();
+  const listAnimations = new WeakMap();
 
   const revealSelector = [
     ".reveal",
@@ -245,11 +249,326 @@
   }
 
   function setupClickFeedback() {
-    if (document.body.classList.contains("home-page")) return;
     window.addEventListener("pointerdown", (event) => {
       if (event.button !== 0) return;
       createClickEffect(event.clientX, event.clientY, event.target);
     }, { passive: true });
+
+    document.addEventListener("pointerdown", (event) => {
+      const target = event.target.closest?.("button, a, [role='button'], [role='option'], summary");
+      if (!target || target.matches(":disabled, [aria-disabled='true']")) return;
+      target.classList.add("motion-pressing");
+    }, { passive: true });
+
+    const release = () => {
+      document.querySelectorAll(".motion-pressing").forEach((target) => {
+        target.classList.remove("motion-pressing");
+        target.classList.add("motion-released");
+        window.setTimeout(() => target.classList.remove("motion-released"), state.reduced ? 80 : 180);
+      });
+    };
+    document.addEventListener("pointerup", release, { passive: true });
+    document.addEventListener("pointercancel", release, { passive: true });
+    document.addEventListener("keyup", (event) => {
+      if (event.key === "Enter" || event.key === " ") release();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const target = event.target.closest?.("button, a, [role='button'], [role='option'], summary");
+      if (!target || target.matches(":disabled, [aria-disabled='true']")) return;
+      target.classList.add("motion-pressing");
+    });
+  }
+
+  function nextId(prefix) {
+    return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
+  }
+
+  function optionLabel(option) {
+    return option?.textContent?.trim() || option?.value || "";
+  }
+
+  function closeOpenSelect(except) {
+    if (state.openSelect && state.openSelect !== except) state.openSelect.close();
+  }
+
+  function createAnimatedSelect(select) {
+    if (!(select instanceof HTMLSelectElement)) return null;
+    const existing = selectInstances.get(select);
+    if (existing) {
+      existing.refresh();
+      return existing;
+    }
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "animated-select";
+    if (select.id) wrapper.dataset.selectId = select.id;
+    const trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.className = "animated-select__trigger";
+    const panelId = nextId(select.id || "animated-select");
+    trigger.setAttribute("aria-haspopup", "listbox");
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.setAttribute("aria-controls", panelId);
+    const value = document.createElement("span");
+    value.className = "animated-select__value";
+    const arrow = document.createElement("span");
+    arrow.className = "animated-select__arrow";
+    arrow.setAttribute("aria-hidden", "true");
+    trigger.append(value, arrow);
+
+    const panel = document.createElement("div");
+    panel.className = "animated-select__panel";
+    panel.id = panelId;
+    const listbox = document.createElement("div");
+    listbox.className = "animated-select__list";
+    listbox.setAttribute("role", "listbox");
+    panel.appendChild(listbox);
+    wrapper.append(trigger, panel);
+    select.after(wrapper);
+    select.classList.add("native-select-hidden");
+    select.dataset.animatedReady = "true";
+    select.setAttribute("aria-hidden", "true");
+    select.setAttribute("tabindex", "-1");
+    select.setAttribute("inert", "");
+    select.hidden = true;
+
+    let optionButtons = [];
+    let activeIndex = Math.max(0, select.selectedIndex);
+    let open = false;
+    let panelAnimation = null;
+    let optionAnimations = [];
+
+    function selectedIndex() {
+      const index = Array.from(select.options).findIndex((option) => option.value === select.value);
+      return Math.max(0, index);
+    }
+
+    function setSelected(index, emit = true) {
+      const option = select.options[index];
+      if (!option) return;
+      select.value = option.value;
+      activeIndex = index;
+      value.textContent = optionLabel(option);
+      optionButtons.forEach((button, buttonIndex) => {
+        const selected = buttonIndex === index;
+        button.setAttribute("aria-selected", String(selected));
+        button.tabIndex = selected ? 0 : -1;
+        button.classList.toggle("is-selected", selected);
+      });
+      if (emit) select.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    function refresh() {
+      listbox.replaceChildren();
+      optionButtons = Array.from(select.options).map((option, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "animated-select__option";
+        button.setAttribute("role", "option");
+        button.dataset.value = option.value;
+        button.textContent = optionLabel(option);
+        button.addEventListener("click", () => {
+          setSelected(index);
+          close(true);
+          trigger.focus({ preventScroll: true });
+        });
+        listbox.appendChild(button);
+        return button;
+      });
+      setSelected(selectedIndex(), false);
+    }
+
+    function cancelAnimations() {
+      panelAnimation?.cancel();
+      panelAnimation = null;
+      optionAnimations.forEach((animation) => animation.cancel());
+      optionAnimations = [];
+    }
+
+    function openPanel() {
+      if (open) return;
+      closeOpenSelect(api);
+      open = true;
+      state.openSelect = api;
+      cancelAnimations();
+      wrapper.classList.add("is-open");
+      trigger.setAttribute("aria-expanded", "true");
+      panel.style.visibility = "visible";
+      panel.style.pointerEvents = "auto";
+      const duration = state.reduced ? 1 : 210;
+      panelAnimation = panel.animate(
+        [
+          { opacity: 0, transform: "translate3d(0,-8px,0) scaleY(.94)" },
+          { opacity: 1, transform: "translate3d(0,0,0) scaleY(1)" },
+        ],
+        { duration, easing: "cubic-bezier(.22,1,.36,1)", fill: "forwards" },
+      );
+      optionButtons.forEach((button, index) => {
+        const animation = button.animate(
+          [
+            { opacity: 0, transform: "translate3d(0,6px,0)" },
+            { opacity: 1, transform: "translate3d(0,0,0)" },
+          ],
+          {
+            duration: state.reduced ? 1 : 160,
+            delay: state.reduced ? 0 : Math.min(index, 8) * 32,
+            easing: "cubic-bezier(.22,1,.36,1)",
+            fill: "forwards",
+          },
+        );
+        optionAnimations.push(animation);
+      });
+      window.setTimeout(() => optionButtons[activeIndex]?.focus({ preventScroll: true }), state.reduced ? 0 : 40);
+    }
+
+    function close(returnFocus = false) {
+      if (!open) return;
+      open = false;
+      if (state.openSelect === api) state.openSelect = null;
+      cancelAnimations();
+      wrapper.classList.remove("is-open");
+      trigger.setAttribute("aria-expanded", "false");
+      const duration = state.reduced ? 1 : 150;
+      optionButtons.forEach((button) => {
+        optionAnimations.push(button.animate(
+          [{ opacity: 1 }, { opacity: 0 }],
+          { duration: state.reduced ? 1 : 90, easing: "ease-out", fill: "forwards" },
+        ));
+      });
+      panelAnimation = panel.animate(
+        [
+          { opacity: 1, transform: "translate3d(0,0,0) scaleY(1)" },
+          { opacity: 0, transform: "translate3d(0,-6px,0) scaleY(.96)" },
+        ],
+        { duration, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" },
+      );
+      panelAnimation.onfinish = () => {
+        if (open) return;
+        panel.style.visibility = "hidden";
+        panel.style.pointerEvents = "none";
+      };
+      if (returnFocus) trigger.focus({ preventScroll: true });
+    }
+
+    function move(delta) {
+      const count = optionButtons.length;
+      if (!count) return;
+      activeIndex = (activeIndex + delta + count) % count;
+      optionButtons[activeIndex].focus({ preventScroll: true });
+    }
+
+    trigger.addEventListener("click", () => (open ? close() : openPanel()));
+    trigger.addEventListener("keydown", (event) => {
+      if (["Enter", " ", "ArrowDown", "ArrowUp"].includes(event.key)) {
+        event.preventDefault();
+        if (!open) openPanel();
+        if (event.key === "ArrowDown") move(1);
+        if (event.key === "ArrowUp") move(-1);
+      }
+    });
+    listbox.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close(true);
+      } else if (event.key === "ArrowDown") {
+        event.preventDefault();
+        move(1);
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        move(-1);
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        activeIndex = 0;
+        optionButtons[activeIndex]?.focus({ preventScroll: true });
+      } else if (event.key === "End") {
+        event.preventDefault();
+        activeIndex = optionButtons.length - 1;
+        optionButtons[activeIndex]?.focus({ preventScroll: true });
+      } else if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        setSelected(activeIndex);
+        close(true);
+      }
+    });
+    listbox.addEventListener("focusin", (event) => {
+      const index = optionButtons.indexOf(event.target);
+      if (index >= 0) activeIndex = index;
+    });
+    select.addEventListener("change", () => setSelected(selectedIndex(), false));
+
+    const api = { select, wrapper, trigger, refresh, close, open: openPanel };
+    selectInstances.set(select, api);
+    refresh();
+    return api;
+  }
+
+  function setupCustomSelects(root = document) {
+    const selectors = [
+      "select[data-animated-select]",
+      "#categoryFilter",
+      "#sortArticles",
+      "#videoCategory",
+      ".admin-enhanced-select",
+      ".editor-form select",
+    ].join(",");
+    const instances = Array.from(root.querySelectorAll?.(selectors) || [])
+      .map(createAnimatedSelect)
+      .filter(Boolean);
+    return instances;
+  }
+
+  function animateListUpdate(container, renderCallback) {
+    if (!(container instanceof HTMLElement) || typeof renderCallback !== "function") {
+      renderCallback?.();
+      return Promise.resolve();
+    }
+    listAnimations.get(container)?.abort();
+    const controller = new AbortController();
+    listAnimations.set(container, controller);
+    const previousHeight = container.offsetHeight;
+    if (previousHeight) container.style.minHeight = `${previousHeight}px`;
+    const oldItems = Array.from(container.children);
+    const reduced = state.reduced;
+    const exitAnimations = oldItems.map((item) => item.animate(
+      [
+        { opacity: 1, transform: "translate3d(0,0,0) scale(1)" },
+        { opacity: 0, transform: "translate3d(0,8px,0) scale(.985)" },
+      ],
+      { duration: reduced ? 1 : 140, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" },
+    ));
+
+    controller.signal.addEventListener("abort", () => {
+      exitAnimations.forEach((animation) => animation.cancel());
+    }, { once: true });
+
+    return Promise.allSettled(exitAnimations.map((animation) => animation.finished))
+      .then(() => {
+        if (controller.signal.aborted) return;
+        renderCallback();
+        const newItems = Array.from(container.children);
+        newItems.forEach((item, index) => {
+          item.animate(
+            [
+              { opacity: 0, transform: "translate3d(0,14px,0) scale(.98)" },
+              { opacity: 1, transform: "translate3d(0,0,0) scale(1)" },
+            ],
+            {
+              duration: reduced ? 1 : 220,
+              delay: reduced ? 0 : Math.min(index, 8) * 42,
+              easing: "cubic-bezier(.22,1,.36,1)",
+              fill: "both",
+            },
+          );
+          window.MotionCore?.revealInserted?.(item);
+        });
+      })
+      .finally(() => {
+        if (listAnimations.get(container) === controller) {
+          listAnimations.delete(container);
+          window.setTimeout(() => { container.style.minHeight = ""; }, reduced ? 0 : 260);
+        }
+      });
   }
 
   function setupCardHover() {
@@ -276,11 +595,27 @@
     document.documentElement.classList.toggle("page-hidden", state.hidden);
   });
 
+  document.addEventListener("pointerdown", (event) => {
+    if (!state.openSelect) return;
+    if (event.target.closest?.(".animated-select")) return;
+    state.openSelect.close();
+  }, { passive: true });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") state.openSelect?.close(true);
+  });
+
+  window.addEventListener("scroll", () => state.openSelect?.close(), { passive: true });
+  window.addEventListener("resize", () => state.openSelect?.close(), { passive: true });
+
   window.MotionCore = {
     state,
     ready: true,
     createClickEffect,
     revealInserted,
+    createAnimatedSelect,
+    setupCustomSelects,
+    animateListUpdate,
     cleanup,
   };
 
@@ -292,5 +627,6 @@
     setupScrollProgress();
     setupClickFeedback();
     setupCardHover();
+    setupCustomSelects();
   });
 }());

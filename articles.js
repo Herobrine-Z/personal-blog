@@ -8,9 +8,11 @@ const resultCount = document.querySelector("#articleResultCount");
 
 let allArticles = [];
 let activeTag = "";
+let articleFilterTimer = null;
+let filtersReady = false;
 
 function renderArticleState(title, detail) {
-  articleContainer.innerHTML = "";
+  articleContainer.replaceChildren();
   const state = document.createElement("div");
   state.className = "hutao-state article-state";
   const heading = document.createElement("strong");
@@ -124,9 +126,11 @@ function renderFilters() {
     });
     tagFilters.appendChild(button);
   });
+  window.MotionCore?.setupCustomSelects?.(document.querySelector(".article-filters"));
+  filtersReady = true;
 }
 
-function renderArticles() {
+function filteredArticles() {
   const keyword = searchInput.value.trim().toLowerCase();
   const category = categoryFilter.value;
   const filtered = allArticles.filter((article) => {
@@ -146,7 +150,10 @@ function renderArticles() {
     liked: (a, b) => (b.like_count || 0) - (a.like_count || 0),
   };
   filtered.sort(sorters[sortArticles.value] || sorters.newest);
+  return filtered;
+}
 
+function renderArticleDom(filtered) {
   [...tagFilters.children].forEach((button) => {
     button.classList.toggle("active", button.textContent === `# ${activeTag}`);
   });
@@ -161,6 +168,23 @@ function renderArticles() {
   filtered.forEach((article) => articleContainer.appendChild(createListCard(article)));
 }
 
+function renderArticles(options = {}) {
+  const filtered = filteredArticles();
+  resultCount.textContent = `共找到 ${filtered.length} 篇文章`;
+  updateFilterUrl();
+  const render = () => renderArticleDom(filtered);
+  if (options.immediate || !filtersReady || !window.MotionCore?.animateListUpdate) {
+    render();
+    return;
+  }
+  window.MotionCore.animateListUpdate(articleContainer, render);
+}
+
+function scheduleRenderArticles(delay = 150) {
+  window.clearTimeout(articleFilterTimer);
+  articleFilterTimer = window.setTimeout(() => renderArticles(), delay);
+}
+
 async function loadArticles() {
   if (!articleService.configured) {
     resultCount.textContent = "文章服务待配置";
@@ -172,21 +196,29 @@ async function loadArticles() {
     allArticles = await withTimeout(articleService.listPublished(), "文章服务响应超时");
     restoreFilterState();
     renderFilters();
-    renderArticles();
+    renderArticles({ immediate: true });
   } catch (error) {
     resultCount.textContent = "读取受阻";
     renderArticleState("文章读取暂时受阻", error.message || "稍后再试，或检查文章服务配置。");
   }
 }
 
-searchInput.addEventListener("input", renderArticles);
-categoryFilter.addEventListener("change", renderArticles);
-sortArticles.addEventListener("change", renderArticles);
+searchInput.addEventListener("input", () => scheduleRenderArticles(150));
+categoryFilter.addEventListener("change", () => renderArticles());
+sortArticles.addEventListener("change", () => renderArticles());
 clearFilters.addEventListener("click", () => {
   searchInput.value = "";
   categoryFilter.value = "";
   activeTag = "";
   sortArticles.value = "newest";
+  categoryFilter.dispatchEvent(new Event("change", { bubbles: true }));
+  sortArticles.dispatchEvent(new Event("change", { bubbles: true }));
+  renderArticles();
+});
+
+window.addEventListener("popstate", () => {
+  restoreFilterState();
+  window.MotionCore?.setupCustomSelects?.(document.querySelector(".article-filters"));
   renderArticles();
 });
 

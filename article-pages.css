@@ -62,6 +62,11 @@
   color: var(--ink);
 }
 
+.article-filters .animated-select,
+.editor-form .animated-select {
+  width: 100%;
+}
+
 .tag-filter-list,
 .article-tags {
   display: flex;
@@ -814,11 +819,21 @@
 }
 
 .admin-tabs {
+  position: sticky;
+  top: calc(82px + env(safe-area-inset-top));
+  z-index: 35;
   display: flex;
   margin: 1.5rem 0;
   gap: 0.5rem;
   overflow-x: auto;
   border-bottom: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(10px);
+  scrollbar-width: none;
+}
+
+.admin-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .admin-tabs button,
@@ -929,6 +944,147 @@
   display: flex;
   margin-bottom: 0.5rem;
   gap: 0.25rem;
+}
+
+.admin-work-tools {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(150px, 0.7fr) minmax(150px, 0.7fr) minmax(150px, 0.7fr) auto auto;
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--paper) 80%, transparent);
+}
+
+.admin-work-tools input {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+}
+
+.admin-work-tools .text-button {
+  min-height: 46px;
+  border: 1px solid var(--line);
+}
+
+.editor-form label {
+  position: relative;
+}
+
+.admin-suggestion-panel {
+  position: absolute;
+  z-index: 1250;
+  top: calc(100% + 7px);
+  left: 0;
+  right: 0;
+  display: grid;
+  gap: 4px;
+  max-height: 260px;
+  overflow: auto;
+  padding: 7px;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, -8px, 0) scaleY(0.96);
+  transform-origin: top center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--paper) 98%, transparent), color-mix(in srgb, var(--paper-deep) 78%, transparent)),
+    url("./assets/hutao-ink/PaperTexture.webp") center / 520px auto repeat;
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--ink) 16%, transparent);
+  transition: opacity 180ms var(--ease-ink), transform 180ms var(--ease-ink), visibility 180ms;
+}
+
+.admin-suggestion-panel.is-open {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0) scaleY(1);
+}
+
+.admin-suggestion-panel button {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--ink);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  animation: suggestionIn 170ms var(--ease-ink) both;
+  animation-delay: var(--suggestion-delay, 0ms);
+}
+
+.admin-suggestion-panel button:hover,
+.admin-suggestion-panel button:focus-visible {
+  outline: none;
+  color: var(--cinnabar);
+  background: color-mix(in srgb, var(--cinnabar) 9%, transparent);
+}
+
+.episode-helper {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.auto-episode-button {
+  justify-self: start;
+  margin-top: -12px;
+}
+
+.admin-dialog {
+  z-index: var(--z-dialog);
+  width: min(520px, calc(100% - 28px));
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: 0 28px 80px color-mix(in srgb, var(--ink) 28%, transparent);
+}
+
+.admin-dialog::backdrop {
+  background: rgba(12, 17, 15, 0.58);
+  backdrop-filter: blur(6px);
+}
+
+.admin-dialog__shell {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+}
+
+.admin-dialog h2,
+.admin-dialog p {
+  margin: 0;
+}
+
+.admin-dialog textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 80%, transparent);
+  color: var(--ink);
+}
+
+.admin-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.admin-dialog.danger .ink-button {
+  background: var(--cinnabar);
+}
+
+@keyframes suggestionIn {
+  from { opacity: 0; transform: translate3d(0, 6px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 .work-type-picker {
@@ -1262,6 +1418,7 @@ button:disabled {
   .article-filters,
   .article-filters:has(#sortArticles),
   .editor-split-fields,
+  .admin-work-tools,
   .article-neighbors,
   .related-articles > div,
   .admin-dashboard {
@@ -1414,11 +1571,14 @@ button:disabled {
   }
 
   .article-filters #categoryFilter,
-  .article-filters #videoCategory {
+  .article-filters #videoCategory,
+  .article-filters .animated-select[data-select-id="categoryFilter"],
+  .article-filters .animated-select[data-select-id="videoCategory"] {
     grid-column: 1;
   }
 
   .article-filters #sortArticles,
+  .article-filters .animated-select[data-select-id="sortArticles"],
   .article-filters #clearVideoFilters {
     grid-column: 2;
   }
@@ -1429,6 +1589,7 @@ button:disabled {
 
   .article-filters input,
   .article-filters select,
+  .article-filters .animated-select__trigger,
   .article-filters button {
     min-width: 0;
     min-height: 44px !important;
