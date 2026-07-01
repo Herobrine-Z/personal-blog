@@ -1,126 +1,29 @@
-# Haoxuan Zhang（张颢轩） Blog & Portfolio
+# 虎桃不会振刀
 
-一个基于 Next.js App Router 的本地个人博客与作品集前端。当前阶段只包含完整可浏览界面，不接数据库、登录系统、真实 CMS 或线上部署。
+一个水墨武侠风格的个人博客，使用原生 HTML、CSS 和 JavaScript 构建，并通过 GitHub Pages 发布。文章、视频、评论、留言、登录和附件存储由 Supabase 提供。
 
-> 说明：GitHub 远程仓库中原有的静态博客资源已在合并时保留；当前 Next.js 站点源码位于 `src/`、`public/`、`content/` 等目录。
+## 本地预览
 
-## 本地运行
+直接打开 `index.html`，或在项目目录运行：
 
-```bash
-npm install
-npm run dev
+```powershell
+python -m http.server 8000
 ```
 
-默认地址：
+然后访问 `http://localhost:8000`。
 
-```text
-http://localhost:3000
-```
+## 配置网站数据
 
-构建检查：
+1. 创建一个 Supabase 项目。
+2. 在 Authentication 的 Users 页面创建唯一的站长用户，关闭公开注册，并复制用户 UUID。
+3. 检查 `supabase-schema.sql` 中的站长 UUID，然后在 Supabase SQL Editor 执行完整脚本。已有项目也需要重新执行，以添加作品统计、视频系列与完播、评论点赞与置顶、作品回收站、签到和成就数据。
+4. 在 Supabase 的 Project Settings > API 中复制 Project URL 和 anon public key，填写到 `supabase-config.js`。
+5. 部署后访问 `admin.html`，使用站长邮箱和密码登录，可查看近 14 天统计与热门作品、管理文章和视频、自动保存草稿、使用回收站、置顶或回复评论。
 
-```bash
-npm run lint
-npm run build
-```
+视频支持系列与集数、自动读取时长、播放进度记忆和完播统计。评论支持点赞、站长身份标识与置顶。主页签到以匿名访客令牌计算连续签到和累计成就，不要求访客注册。
 
-## 已完成页面
+文章正文支持 Markdown 与 KaTeX 数学公式。行内公式使用 `$E = mc^2$`，块级公式使用 `$$...$$`。
 
-- `/` 首页
-- `/projects` 项目列表与分类筛选
-- `/projects/[slug]` 项目详情
-- `/blog` 博客列表、分类、标签与本地搜索
-- `/blog/[slug]` 文章详情、阅读进度和目录
-- `/resume` 在线简历与时间轴
-- `/lab` 实验室
-- `/about` 关于与联系
-- `/lottie-preview` 内部 Lottie 动画预览
-- `/robots.txt`、`/sitemap.xml` 基础 SEO 预留
+`anon key` 可以公开在前端；真正的文章管理权限由 `supabase-schema.sql` 中的 RLS 策略限制为唯一站长。评论附件仅在前端允许图片、TXT 和 PDF，单个不超过 5 MB；生产环境还应在 Supabase Storage 中配置相同的 MIME 限制。不要把 `service_role key` 写入本项目。
 
-## 主要依赖
-
-- Next.js / React / TypeScript
-- Tailwind CSS v4 / CSS Variables
-- Motion for React
-- GSAP / ScrollTrigger
-- lottie-react
-- lucide-react
-- ESLint / Prettier
-
-## 内容替换位置
-
-- 个人信息：`src/data/profile.ts`
-- 社交链接：`src/data/socials.ts`
-- 项目数据：`src/data/projects.ts`
-- 文章数据：`src/data/posts.ts`
-- 简历经历：`src/data/experience.ts`
-- 技能与能力：`src/data/skills.ts`
-- 实验室数据：`src/data/lab.ts`
-- Lottie 清单：`src/data/lottie.ts`
-
-## Lottie 资源
-
-动画已复制到：
-
-```text
-public/lottie/shared
-public/lottie/light
-public/lottie/dark
-```
-
-预览页面：
-
-```text
-http://localhost:3000/lottie-preview
-```
-
-已接入动画：
-
-- `brand-intro`：首页首次进入品牌开场、About 品牌区域
-- `hero-orbit`：首页 Hero 区域
-- `projects-stack`：首页精选项目、Projects 页面顶部
-- `resume-timeline`：Resume 页面首屏
-- `article-writing`：首页文章区域、Blog 页面顶部
-- `lab-modules`：Lab 页面首屏与实验室卡片
-- `message-success`：About 联系状态区域，仅真实成功状态播放
-- `lost-dot-404`：Next.js 404 页面
-
-`theme-tokens.json` 不是有效 Lottie 动画文件，未接入播放器。
-
-## 其他资源替换
-
-- 项目、文章和实验室封面：`public/images/`
-- PDF 简历：放入 `public/resume/haoxuan-zhang-resume.pdf`
-- 文件不存在时，下载按钮会显示合理提示，不会跳转到错误地址。
-
-## MDX 预留
-
-目录已预留：
-
-```text
-content/posts
-content/projects
-```
-
-当前正文仍来自 TypeScript 模拟数据。后续可接入 MDX frontmatter 和正文渲染。
-
-## 动效位置
-
-- Motion：按钮按压、卡片交互、移动菜单、筛选切换、搜索框反馈、进入视口 Reveal。
-- GSAP ScrollTrigger：项目详情页封面视差与图片出现、简历时间轴线条延展与节点出现。
-- Lottie：首页品牌开场、Hero Orbit、项目/文章/简历/实验室图形、联系状态、404 与内部预览页。
-
-统一组件 `src/components/animation/LottieAnimation.tsx` 支持缺失文件降级、进入视口播放、离开视口暂停、页面隐藏暂停、缓存加载和 reduced motion 静态占位。
-
-## 第二阶段可接入
-
-- MDX 内容读取与目录生成
-- 真实文章归档、RSS 和 sitemap 动态日期
-- 图片压缩流水线与 AVIF/WebP
-- 简历 PDF 生成或多语言简历
-- CMS 或 Git-based content workflow
-- 更完整的 WebGL / Live2D 展示模块
-
-## 当前检查结果
-
-`npm run lint` 与 `npm run build` 已通过，所有主要页面均已静态生成。
+页边 AI 助手使用 DeepSeek 免费网页版的安全跳转方案：它会把包含当前页面上下文的问题复制到剪贴板，并打开 `chat.deepseek.com`。免费网页端没有可供静态站点直接调用的公开免密接口，因此本站不会在前端保存 DeepSeek 账号、Cookie 或 API Key。

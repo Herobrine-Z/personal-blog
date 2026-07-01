@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Aurora Notes cover">
-  <rect width="1200" height="750" fill="#f4f4f6"/>
-  <rect x="160" y="120" width="880" height="510" rx="42" fill="#fff" stroke="#d8d8de"/>
-  <path d="M250 250h430M250 320h610M250 390h470M250 460h540" stroke="#1d1d1f" stroke-width="18" stroke-linecap="round" opacity=".72"/>
-  <circle cx="900" cy="260" r="54" fill="#8f1d2c" opacity=".88"/>
-  <path d="M820 505c78-120 158-120 240 0" fill="none" stroke="#8f1d2c" stroke-width="18" stroke-linecap="round" opacity=".38"/>
-</svg>
