@@ -11,7 +11,7 @@
         tech: ["HTML", "CSS", "JavaScript", "Supabase"],
         date: "2026-06",
         demo: "./index.html",
-        source: "https://github.com/Herobrine-Z/personal-blog",
+        source: "https://github.com/Kurimi-hutao/personal-blog",
         cover: "./assets/ink-hero-desktop.webp",
       },
       {
@@ -21,7 +21,7 @@
         tech: ["HTML", "CSS", "Lightbox"],
         date: "2026-06",
         demo: "./kurumi.html",
-        source: "https://github.com/Herobrine-Z/personal-blog",
+        source: "https://github.com/Kurimi-hutao/personal-blog",
         cover: "./assets/kurumi-portrait-red-moon.webp",
       },
       {
@@ -31,7 +31,7 @@
         tech: ["Live2D", "PixiJS", "JavaScript"],
         date: "2026-06",
         demo: "./pet.html",
-        source: "https://github.com/Herobrine-Z/personal-blog",
+        source: "https://github.com/Kurimi-hutao/personal-blog",
         cover: "./assets/hutao-entry-shanshui.webp",
       },
     ],

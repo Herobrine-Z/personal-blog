@@ -10,7 +10,7 @@ bucket_name = "personal-blog-videos"
 SUPABASE_URL = "https://your-project.supabase.co"
 SUPABASE_ANON_KEY = "your-supabase-anon-key"
 R2_PUBLIC_BASE_URL = "https://video.example.com"
-ALLOWED_ORIGINS = "https://herobrine-z.github.io,http://localhost:8000,http://127.0.0.1:8000,http://localhost:5173,http://127.0.0.1:5173"
+ALLOWED_ORIGINS = "https://kurimi-hutao.github.io,http://localhost:8000,http://127.0.0.1:8000,http://localhost:5173,http://127.0.0.1:5173"
 
 # Store OWNER_USER_ID as a secret:
 # npx wrangler secret put OWNER_USER_ID

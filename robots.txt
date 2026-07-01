@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 
-Sitemap: https://herobrine-z.github.io/personal-blog/sitemap.xml
+Sitemap: https://kurimi-hutao.github.io/personal-blog/sitemap.xml
