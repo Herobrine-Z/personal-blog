@@ -8,7 +8,7 @@
   const animationCache = new Map();
   const instances = new Set();
   const config = {
-    inkLoading: "ink-loading.json",
+    inkLoading: "ink-drop-loading.json",
   };
 
   function asset(path) {
