@@ -1,0 +1,470 @@
+{
+	"Version": 3,
+	"Parameters": [
+		{
+			"Id": "ParamAngleX",
+			"GroupId": "",
+			"Name": "角度 X"
+		},
+		{
+			"Id": "ParamAngleY",
+			"GroupId": "",
+			"Name": "角度 Y"
+		},
+		{
+			"Id": "ParamAngleZ",
+			"GroupId": "",
+			"Name": "角度 Z"
+		},
+		{
+			"Id": "ParamEyeLOpen",
+			"GroupId": "",
+			"Name": "左眼 开闭"
+		},
+		{
+			"Id": "ParamEyeLSmile",
+			"GroupId": "",
+			"Name": "左眼 微笑"
+		},
+		{
+			"Id": "ParamEyeROpen",
+			"GroupId": "",
+			"Name": "右眼 开闭"
+		},
+		{
+			"Id": "ParamEyeRSmile",
+			"GroupId": "",
+			"Name": "右眼 微笑"
+		},
+		{
+			"Id": "ParamEyeBallX",
+			"GroupId": "",
+			"Name": "眼珠 X"
+		},
+		{
+			"Id": "ParamEyeBallY",
+			"GroupId": "",
+			"Name": "眼珠 Y"
+		},
+		{
+			"Id": "ParamBrowLY",
+			"GroupId": "",
+			"Name": "左眉 上下"
+		},
+		{
+			"Id": "ParamBrowRY",
+			"GroupId": "",
+			"Name": "右眉 上下"
+		},
+		{
+			"Id": "ParamBrowLX",
+			"GroupId": "",
+			"Name": "左眉 左右"
+		},
+		{
+			"Id": "ParamBrowRX",
+			"GroupId": "",
+			"Name": "右眉 左右"
+		},
+		{
+			"Id": "ParamBrowLAngle",
+			"GroupId": "",
+			"Name": "左眉 角度"
+		},
+		{
+			"Id": "ParamBrowRAngle",
+			"GroupId": "",
+			"Name": "右眉 角度"
+		},
+		{
+			"Id": "ParamBrowLForm",
+			"GroupId": "",
+			"Name": "左眉 変形"
+		},
+		{
+			"Id": "ParamBrowRForm",
+			"GroupId": "",
+			"Name": "右眉 変形"
+		},
+		{
+			"Id": "ParamMouthOpenY",
+			"GroupId": "",
+			"Name": "嘴 开闭"
+		},
+		{
+			"Id": "ParamCheek",
+			"GroupId": "",
+			"Name": "脸颊泛红"
+		},
+		{
+			"Id": "ParamBodyAngleX",
+			"GroupId": "",
+			"Name": "身体旋转 X"
+		},
+		{
+			"Id": "ParamBodyAngleY",
+			"GroupId": "",
+			"Name": "身体旋转 Y"
+		},
+		{
+			"Id": "ParamBodyAngleZ",
+			"GroupId": "",
+			"Name": "身体旋转 Z"
+		},
+		{
+			"Id": "ParamBreath",
+			"GroupId": "",
+			"Name": "呼吸"
+		},
+		{
+			"Id": "ParamHairFront",
+			"GroupId": "",
+			"Name": "摇动 前发"
+		},
+		{
+			"Id": "ParamHairSide",
+			"GroupId": "",
+			"Name": "摇动 侧发"
+		},
+		{
+			"Id": "ParamHairBack",
+			"GroupId": "",
+			"Name": "摇动 后发"
+		},
+		{
+			"Id": "ParamShoulder",
+			"GroupId": "ParamGroupBody",
+			"Name": "Shoulder"
+		},
+		{
+			"Id": "ParamLeg",
+			"GroupId": "ParamGroupBody",
+			"Name": "Leg"
+		},
+		{
+			"Id": "ParamArmRA",
+			"GroupId": "ParamGroupArms",
+			"Name": "Arm R A"
+		},
+		{
+			"Id": "ParamArmLB",
+			"GroupId": "ParamGroupArms",
+			"Name": "Arm L B"
+		},
+		{
+			"Id": "ParamHandLB",
+			"GroupId": "ParamGroupArms",
+			"Name": "Hand L B Rotation"
+		},
+		{
+			"Id": "ParamSkirt",
+			"GroupId": "ParamGroupSway",
+			"Name": "Move Skirt"
+		},
+		{
+			"Id": "ParamSkirt2",
+			"GroupId": "ParamGroupSway",
+			"Name": "Curl Skirt"
+		},
+		{
+			"Id": "Param_Angle_Rotation_1_ArtMesh61",
+			"GroupId": "ParamGroup",
+			"Name": "[0]Hair Side Up R"
+		},
+		{
+			"Id": "Param_Angle_Rotation_2_ArtMesh61",
+			"GroupId": "ParamGroup",
+			"Name": "[1]Hair Side Up R"
+		},
+		{
+			"Id": "Param_Angle_Rotation_3_ArtMesh61",
+			"GroupId": "ParamGroup",
+			"Name": "[2]Hair Side Up R"
+		},
+		{
+			"Id": "ParamArmLA",
+			"GroupId": "ParamGroupArms2",
+			"Name": "Arm L A"
+		},
+		{
+			"Id": "ParamShoulderLRotation",
+			"GroupId": "ParamGroupArmL",
+			"Name": "左肩的旋转"
+		},
+		{
+			"Id": "ParamShoulderRRotation",
+			"GroupId": "ParamGroupArmR",
+			"Name": "右肩的旋转"
+		},
+		{
+			"Id": "ParamSkirtSway",
+			"GroupId": "ParamGroupSway2",
+			"Name": "裙子的摇动"
+		},
+		{
+			"Id": "ParamSkirtFlap",
+			"GroupId": "ParamGroupSway2",
+			"Name": "裙子的蓬松"
+		},
+		{
+			"Id": "ParamBustY",
+			"GroupId": "ParamGroupSway3",
+			"Name": "Bust Bounce"
+		},
+		{
+			"Id": "ParamArmRB",
+			"GroupId": "ParamGroupArms3",
+			"Name": "Arm R B"
+		}
+	],
+	"ParameterGroups": [
+		{
+			"Id": "ParamGroupBody",
+			"GroupId": "",
+			"Name": "Body"
+		},
+		{
+			"Id": "ParamGroupArms",
+			"GroupId": "",
+			"Name": "Arm"
+		},
+		{
+			"Id": "ParamGroupSway",
+			"GroupId": "",
+			"Name": "Move"
+		},
+		{
+			"Id": "ParamGroup",
+			"GroupId": "",
+			"Name": "Move Hair Side Up R"
+		},
+		{
+			"Id": "ParamGroupArms2",
+			"GroupId": "",
+			"Name": "Arm"
+		},
+		{
+			"Id": "ParamGroupArmL",
+			"GroupId": "",
+			"Name": "左手臂"
+		},
+		{
+			"Id": "ParamGroupArmR",
+			"GroupId": "",
+			"Name": "右手臂"
+		},
+		{
+			"Id": "ParamGroupSway2",
+			"GroupId": "",
+			"Name": "摇动"
+		},
+		{
+			"Id": "ParamGroupSway3",
+			"GroupId": "",
+			"Name": "Move"
+		},
+		{
+			"Id": "ParamGroupArms3",
+			"GroupId": "",
+			"Name": "Arm"
+		}
+	],
+	"Parts": [
+		{
+			"Id": "PartBody",
+			"Name": "Body"
+		},
+		{
+			"Id": "PartArmB",
+			"Name": "Arm B"
+		},
+		{
+			"Id": "PartArmA",
+			"Name": "Arm A"
+		},
+		{
+			"Id": "PartNeck",
+			"Name": "Neck"
+		},
+		{
+			"Id": "PartHairBack",
+			"Name": "Hair Back"
+		},
+		{
+			"Id": "PartHairFront",
+			"Name": "Hair Front"
+		},
+		{
+			"Id": "PartFace",
+			"Name": "Face"
+		},
+		{
+			"Id": "PartEye",
+			"Name": "Eye"
+		},
+		{
+			"Id": "PartBrow",
+			"Name": "Brow"
+		},
+		{
+			"Id": "PartCore",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartCore2",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartArmA2",
+			"Name": "Arm A"
+		},
+		{
+			"Id": "PartArmL",
+			"Name": "左手臂"
+		},
+		{
+			"Id": "PartArmR",
+			"Name": "右手臂"
+		},
+		{
+			"Id": "PartCore3",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartFace2",
+			"Name": "Face"
+		},
+		{
+			"Id": "PartHairBack2",
+			"Name": "Hair Back"
+		},
+		{
+			"Id": "PartNeck2",
+			"Name": "Neck"
+		},
+		{
+			"Id": "PartSkirt",
+			"Name": "裙子"
+		},
+		{
+			"Id": "PartCore4",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartFace3",
+			"Name": "Face"
+		},
+		{
+			"Id": "PartHairBack3",
+			"Name": "Hair Back"
+		},
+		{
+			"Id": "PartNeck3",
+			"Name": "Neck"
+		},
+		{
+			"Id": "PartBody2",
+			"Name": "Body"
+		},
+		{
+			"Id": "PartCore5",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartArmB2",
+			"Name": "Arm B"
+		},
+		{
+			"Id": "PartBody3",
+			"Name": "Body"
+		},
+		{
+			"Id": "PartCore6",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartArmA3",
+			"Name": "Arm A"
+		},
+		{
+			"Id": "PartCore7",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartMouth2",
+			"Name": "Mouth"
+		},
+		{
+			"Id": "PartFace4",
+			"Name": "Face"
+		},
+		{
+			"Id": "PartNeck4",
+			"Name": "Neck"
+		},
+		{
+			"Id": "PartCore8",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartMouth",
+			"Name": "Mouth"
+		},
+		{
+			"Id": "PartFace5",
+			"Name": "Face"
+		},
+		{
+			"Id": "PartNeck5",
+			"Name": "Neck"
+		},
+		{
+			"Id": "PartCore9",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartMouth3",
+			"Name": "Mouth"
+		},
+		{
+			"Id": "PartFace6",
+			"Name": "Face"
+		},
+		{
+			"Id": "PartNeck6",
+			"Name": "Neck"
+		},
+		{
+			"Id": "PartBody4",
+			"Name": "Body"
+		},
+		{
+			"Id": "PartCore10",
+			"Name": "Core"
+		},
+		{
+			"Id": "PartFace7",
+			"Name": "Face"
+		},
+		{
+			"Id": "PartEar",
+			"Name": "Ear"
+		},
+		{
+			"Id": "PartNeck7",
+			"Name": "Neck"
+		},
+		{
+			"Id": "ArtMesh61_Skinning",
+			"Name": "Hair Side Up R Skinning"
+		},
+		{
+			"Id": "Part",
+			"Name": "Hair Side Up R Rotation"
+		},
+		{
+			"Id": "PartEyeBall",
+			"Name": "Eyeball"
+		}
+	]
+}

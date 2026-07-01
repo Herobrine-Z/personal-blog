@@ -1,0 +1,82 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="虎桃不会振刀发布的全部文章。" />
+    <meta property="og:title" content="文章 | 虎桃不会振刀" />
+    <meta property="og:description" content="永劫无间、土御门胡桃与生活随笔。" />
+    <link rel="icon" href="./assets/next/favicon.ico" />
+    <link rel="apple-touch-icon" href="./assets/next/favicon_hutao_tigerhat_ink_180.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title="虎桃不会振刀 RSS" href="./rss.xml" />
+    <title>文章 | 虎桃不会振刀</title>
+    <link rel="stylesheet" href="./fonts.css?v=1" />
+    <link rel="stylesheet" href="./styles.css?v=23" />
+    <link rel="stylesheet" href="./article-pages.css?v=13" />
+    <link rel="stylesheet" href="./motion-core.css?v=5" />
+    <link rel="stylesheet" href="./lottie-core.css?v=4" />
+    <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
+    <script defer src="./lottie-core.js?v=4"></script>
+  </head>
+  <body class="inner-page" data-page="articles">
+    <div class="paper-noise" aria-hidden="true"></div>
+    <header class="site-header scrolled" data-site-header>
+      <a class="brand" href="./index.html" aria-label="返回首页">
+        <img class="brand-icon" src="./assets/icon-96.webp" width="44" height="44" alt="" />
+        <span class="brand-name">不会振刀</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="打开导航">
+        <span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav" aria-label="主导航">
+        <a href="./index.html" data-nav-page="home">卷首</a>
+        <a class="active" href="./articles.html" data-nav-page="articles">文章</a>
+        <a href="./videos.html" data-nav-page="videos">视频</a>
+        <a href="./works.html" data-nav-page="works">作品</a>
+        <a href="./kurumi.html" data-nav-page="kurumi">胡桃绘卷</a>
+        <a href="./pet.html" data-nav-page="pet">桌宠小屋</a>
+        <a href="./index.html#links" data-nav-page="links">江湖去处</a>
+        <a href="./index.html#about" data-nav-page="about">侠客志</a>
+        <a href="./index.html#message" data-nav-page="message">留墨</a>
+      </nav>
+    </header>
+    <main class="article-page-shell">
+      <section class="page-title">
+        <p class="eyebrow">All Articles</p>
+        <h1>文章</h1>
+        <p>写下游戏里的故事，也记住生活里慢下来的片刻。</p>
+      </section>
+      <section class="article-filters" aria-label="文章筛选">
+        <label>
+          <span class="sr-only">搜索文章</span>
+          <input id="articleSearch" type="search" placeholder="搜索标题或摘要……" />
+        </label>
+        <select id="categoryFilter" aria-label="按分类筛选">
+          <option value="">全部分类</option>
+        </select>
+        <select id="sortArticles" aria-label="文章排序">
+          <option value="newest">最新发布</option>
+          <option value="popular">最多阅读</option>
+          <option value="liked">最多点赞</option>
+        </select>
+        <button class="text-button" id="clearFilters" type="button">清除筛选</button>
+      </section>
+      <div class="filter-summary">
+        <div class="tag-filter-list" id="tagFilters" aria-label="按标签筛选"></div>
+        <p id="articleResultCount" role="status"></p>
+      </div>
+      <section class="all-articles-grid" id="articleList" aria-live="polite">
+        <p class="article-state">正在翻阅文章……</p>
+      </section>
+    </main>
+    <footer><p>© 2026 虎桃不会振刀</p><a href="./admin.html">站长入口</a></footer>
+    <script src="./assets/vendor/supabase/supabase-2.108.2.js"></script>
+    <script src="./supabase-config.js"></script>
+    <script src="./article-service.js?v=7"></script>
+    <script src="./theme.js?v=19"></script>
+    <script src="./articles.js?v=8"></script>
+    <script src="./motion-core.js?v=5"></script>
+    <script src="./motion-articles.js?v=2"></script>
+  </body>
+</html>

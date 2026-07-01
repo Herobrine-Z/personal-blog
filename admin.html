@@ -1,0 +1,194 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="icon" href="./assets/next/favicon.ico" />
+    <link rel="apple-touch-icon" href="./assets/next/favicon_hutao_tigerhat_ink_180.png" />
+    <title>站长工作台 | 虎桃不会振刀</title>
+    <link rel="stylesheet" href="./assets/vendor/katex/katex-0.16.22.min.css" />
+    <link rel="stylesheet" href="./fonts.css?v=1" />
+    <link rel="stylesheet" href="./styles.css?v=23" />
+    <link rel="stylesheet" href="./motion-core.css?v=5" />
+    <link rel="stylesheet" href="./lottie-core.css?v=4" />
+    <link rel="stylesheet" href="./article-pages.css?v=13" />
+    <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
+    <script defer src="./lottie-core.js?v=4"></script>
+  </head>
+  <body class="inner-page" data-page="admin">
+    <div class="paper-noise" aria-hidden="true"></div>
+    <header class="site-header scrolled" data-site-header>
+      <a class="brand" href="./index.html" aria-label="返回首页">
+        <img class="brand-icon" src="./assets/icon-96.webp" width="44" height="44" alt="" />
+        <span class="brand-name">不会振刀</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="打开导航">
+        <span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav" aria-label="管理导航"><a href="./index.html">卷首</a><a href="./articles.html">文章</a><a href="./videos.html">视频</a></nav>
+    </header>
+    <main class="admin-shell">
+      <section class="auth-panel" id="authPanel">
+        <p class="eyebrow">Owner Only</p><h1>站长登录</h1>
+        <form id="loginForm" class="editor-form">
+          <label><span>邮箱</span><input type="email" name="email" autocomplete="username" required /></label>
+          <label><span>密码</span><input type="password" name="password" autocomplete="current-password" required /></label>
+          <button class="ink-button" type="submit">登录</button>
+        </form>
+      </section>
+      <section class="editor-panel" id="editorPanel" hidden>
+        <div class="editor-heading">
+          <div><p class="eyebrow">Owner Console</p><h1>站长工作台</h1></div>
+          <button class="text-button" id="logoutButton" type="button">退出登录</button>
+        </div>
+
+        <nav class="admin-tabs" aria-label="后台功能">
+          <button class="active" type="button" data-admin-target="overviewPanel">概览</button>
+          <button type="button" data-admin-target="worksPanel">作品管理</button>
+          <button type="button" data-admin-target="interactionPanel">互动管理</button>
+          <button type="button" data-admin-target="editorWorkPanel">新建作品</button>
+        </nav>
+
+        <section class="admin-tab-panel active" id="overviewPanel">
+          <div class="admin-dashboard" aria-label="博客概览">
+            <div><strong id="articleMetric">0</strong><span>文章</span></div>
+            <div><strong id="videoMetric">0</strong><span>视频</span></div>
+            <div><strong id="viewMetric">0</strong><span>浏览 / 播放</span></div>
+            <div><strong id="reactionMetric">0</strong><span>点赞</span></div>
+            <div><strong id="pendingMetric">0</strong><span>待处理评论</span></div>
+          </div>
+          <section class="analytics-panel">
+            <div class="admin-list-heading"><h2>近 14 天趋势</h2><span>浏览 / 完播</span></div>
+            <div class="analytics-chart" id="analyticsChart"><p class="article-state">正在汇总数据……</p></div>
+          </section>
+          <section class="analytics-panel">
+            <div class="admin-list-heading"><h2>热门作品</h2><span>按浏览量排序</span></div>
+            <div class="top-works-list" id="topWorksList"></div>
+          </section>
+          <div class="admin-guide">
+            <h2>快捷操作</h2>
+            <button class="ink-button" type="button" data-new-work="article">写文章</button>
+            <button class="ink-button secondary" type="button" data-new-work="video">发视频</button>
+          </div>
+        </section>
+
+        <section class="admin-tab-panel" id="worksPanel">
+          <div class="admin-list-heading">
+            <div><p class="eyebrow">Works</p><h2>作品管理</h2></div>
+            <div class="admin-row-actions">
+              <button class="text-button" type="button" data-new-work="article">新建文章</button>
+              <button class="text-button" type="button" data-new-work="video">上传视频</button>
+            </div>
+          </div>
+          <div class="admin-filter-bar">
+            <button class="active" type="button" data-work-filter="all">全部</button>
+            <button type="button" data-work-filter="article">文章</button>
+            <button type="button" data-work-filter="video">视频</button>
+            <button type="button" data-work-filter="trash">回收站</button>
+            <button class="danger" id="bulkTrashButton" type="button">批量移入回收站</button>
+          </div>
+          <div class="admin-work-tools" aria-label="作品筛选">
+            <label><span class="sr-only">搜索作品</span><input id="adminWorkSearch" type="search" placeholder="搜索标题、摘要或标签" /></label>
+            <select id="adminCategoryFilter" class="admin-enhanced-select" aria-label="按分类筛选"><option value="">全部分类</option></select>
+            <select id="adminSeriesFilter" class="admin-enhanced-select" aria-label="按系列筛选"><option value="">全部系列</option></select>
+            <select id="adminSortWorks" class="admin-enhanced-select" aria-label="作品排序">
+              <option value="updated-desc">最近更新</option>
+              <option value="published-desc">最新发布</option>
+              <option value="views-desc">最多浏览</option>
+            </select>
+            <button class="text-button" id="selectVisibleWorks" type="button">全选当前结果</button>
+            <button class="text-button" id="clearSelectedWorks" type="button">取消全选</button>
+          </div>
+          <div id="adminArticleList"><p class="article-state">正在读取作品……</p></div>
+        </section>
+
+        <section class="admin-tab-panel" id="interactionPanel">
+          <section class="admin-content-list">
+            <div class="admin-list-heading"><h2>评论管理</h2><span id="commentCount"></span></div>
+            <div id="adminCommentList"><p class="article-state">正在读取评论……</p></div>
+          </section>
+          <section class="admin-content-list">
+            <div class="admin-list-heading"><h2>留言管理</h2><span id="messageCount"></span></div>
+            <div id="adminMessageList"><p class="article-state">正在读取留言……</p></div>
+          </section>
+        </section>
+
+        <section class="admin-tab-panel" id="editorWorkPanel">
+          <form id="articleForm" class="editor-form">
+            <div class="admin-list-heading">
+              <div><p class="eyebrow">Editor</p><h2 id="editorTitle">新建文章</h2></div>
+              <div class="admin-row-actions">
+                <span class="autosave-status" id="autosaveStatus">自动保存已开启</span>
+                <button class="text-button" id="restoreDraftButton" type="button" hidden>恢复本地草稿</button>
+                <button class="text-button" id="cancelEditButton" type="button">清空编辑器</button>
+              </div>
+            </div>
+            <input type="hidden" name="articleId" />
+            <div class="work-type-picker" role="group" aria-label="作品类型">
+              <label><input type="radio" name="contentType" value="article" checked /><span>文章</span></label>
+              <label><input type="radio" name="contentType" value="video" /><span>视频</span></label>
+            </div>
+            <label><span>标题</span><input type="text" name="title" maxlength="120" required /></label>
+            <label><span>网址标识</span><input type="text" name="slug" maxlength="120" placeholder="例如：my-first-work" required /><small>只能使用小写字母、数字和连字符。</small></label>
+            <label><span>摘要</span><textarea name="excerpt" rows="3" maxlength="300" required></textarea></label>
+            <div class="editor-split-fields">
+              <label><span>分类</span><input type="text" name="category" maxlength="30" value="随笔" required /></label>
+              <label><span>标签</span><input type="text" name="tags" maxlength="160" placeholder="胡桃, 攻略, 随笔" /></label>
+            </div>
+            <div class="editor-split-fields">
+              <label><span>发布状态</span><select name="published"><option value="true">发布</option><option value="false">保存草稿</option></select></label>
+              <label><span>定时发布</span><input type="datetime-local" name="scheduledAt" /></label>
+            </div>
+            <div class="video-editor-fields" id="videoEditorFields" hidden>
+              <label><span>上传视频</span><input type="file" name="videoFile" accept="video/mp4,video/webm,video/ogg" /><small id="videoUploadHint">支持 MP4、WebM、OGG，单个文件不超过 50 MB。</small></label>
+              <div class="video-upload-panel" id="videoUploadPanel" hidden>
+                <div><strong id="videoUploadName">等待上传</strong><span id="videoUploadSize">0 MB</span></div>
+                <p id="videoUploadStatus">等待上传</p>
+                <progress id="videoUploadProgress" value="0" max="100"></progress>
+                <div class="video-upload-meta">
+                  <span id="videoUploadPercent">0%</span>
+                  <span id="videoUploadBytes">0 MB / 0 MB</span>
+                  <span id="videoUploadPart">分片 0 / 0</span>
+                  <span id="videoUploadSpeed">0 MB/s</span>
+                  <span id="videoUploadEta">剩余 --</span>
+                </div>
+                <div class="video-upload-actions">
+                  <button class="text-button" type="button" id="cancelVideoUpload" hidden>取消上传</button>
+                  <button class="text-button" type="button" id="retryVideoUpload" hidden>重新上传</button>
+                </div>
+              </div>
+              <label><span>或填写视频直链</span><input type="url" name="videoUrl" placeholder="https://example.com/video.mp4" /></label>
+              <label><span>封面图片地址</span><input type="url" name="videoPoster" placeholder="可留空，或使用附件中的首张图片" /></label>
+              <p class="current-video" id="currentVideo" hidden></p>
+            </div>
+            <div class="editor-split-fields">
+              <label><span>系列 / 合集</span><input type="text" name="seriesName" maxlength="80" placeholder="例如：胡桃进阶课堂" /></label>
+              <label><span>集数</span><input type="number" name="episodeNumber" min="1" max="999" /></label>
+            </div>
+            <label class="video-duration-field" hidden><span>视频时长（秒）</span><input type="number" name="durationSeconds" min="1" max="86400" /><small>可留空，播放器会自动读取。</small></label>
+            <label><span id="contentFieldLabel">正文（Markdown）</span><textarea name="content" rows="16" required placeholder="# 标题&#10;&#10;支持列表、引用、链接、图片、代码块与 LaTeX 公式。"></textarea></label>
+            <section class="markdown-preview">
+              <div class="admin-list-heading"><h2>实时预览</h2><span>Markdown</span></div>
+              <div class="article-body" id="markdownPreview"></div>
+            </section>
+            <label><span>图片与附件</span><input type="file" name="attachments" multiple /><small>首张图片可作为作品封面；单个文件不超过 10 MB。</small></label>
+            <div class="existing-attachments" id="existingAttachments" hidden></div>
+            <button class="ink-button publish-button" type="submit">发布文章</button>
+          </form>
+        </section>
+      </section>
+      <p class="admin-status" id="adminStatus" role="status"></p>
+    </main>
+    <script src="./assets/vendor/supabase/supabase-2.108.2.js"></script>
+    <script src="./supabase-config.js"></script>
+    <script src="./article-service.js?v=7"></script>
+    <script src="./video-uploader.js?v=1"></script>
+    <script src="./markdown.js?v=5"></script>
+    <script defer src="./assets/vendor/katex/katex-0.16.22.min.js"></script>
+    <script defer src="./assets/vendor/katex/auto-render-0.16.22.min.js"></script>
+    <script src="./theme.js?v=19"></script>
+    <script src="./motion-core.js?v=5"></script>
+    <script src="./admin.js?v=9"></script>
+  </body>
+</html>

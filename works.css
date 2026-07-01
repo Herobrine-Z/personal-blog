@@ -1,0 +1,339 @@
+.works-page main {
+  width: min(1180px, calc(100% - 32px));
+  margin: 110px auto 72px;
+}
+
+.works-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  gap: clamp(22px, 4vw, 54px);
+  align-items: end;
+  padding: clamp(28px, 5vw, 64px) 0 34px;
+  border-bottom: 1px solid var(--line);
+}
+
+.works-hero h1 {
+  margin: 0;
+  font: 400 clamp(3.1rem, 9vw, 7rem)/0.92 var(--brush);
+  color: var(--cinnabar);
+}
+
+.works-hero p {
+  margin: 16px 0 0;
+  max-width: 680px;
+  color: var(--ink-soft);
+}
+
+.works-hero-mark {
+  min-height: 210px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 62% 42%, color-mix(in srgb, var(--cinnabar) 18%, transparent), transparent 28%),
+    linear-gradient(135deg, color-mix(in srgb, var(--paper-deep) 72%, transparent), transparent),
+    url("./assets/hutao-ink/PaperTexture.webp") center / 560px auto repeat;
+  position: relative;
+  overflow: hidden;
+}
+
+.works-hero-mark::before {
+  content: "";
+  position: absolute;
+  inset: 22px;
+  border: 2px solid color-mix(in srgb, var(--cinnabar) 44%, transparent);
+  border-radius: 50%;
+  transform: rotate(-14deg);
+}
+
+.works-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 28px 0 24px;
+}
+
+.works-toolbar button {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 16px;
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  cursor: pointer;
+}
+
+.works-toolbar button.active {
+  color: var(--paper);
+  border-color: var(--cinnabar);
+  background: var(--cinnabar);
+}
+
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  min-height: 280px;
+}
+
+.work-card {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 82%, var(--paper));
+  box-shadow: 0 18px 42px rgba(24, 32, 29, 0.08);
+}
+
+.work-card > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.work-cover {
+  aspect-ratio: 16 / 9;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--moss) 18%, transparent), transparent),
+    url("./assets/hutao-ink/PaperTexture.webp") center / 460px auto repeat;
+  display: grid;
+  place-items: center;
+}
+
+.work-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.work-cover span {
+  color: color-mix(in srgb, var(--cinnabar) 72%, var(--ink));
+  font: 400 2.6rem/1 var(--brush);
+}
+
+.work-copy {
+  padding: 18px;
+}
+
+.work-copy small {
+  color: var(--cinnabar);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.work-copy h2 {
+  margin: 8px 0 8px;
+  font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+}
+
+.work-copy p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.work-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.work-tech span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 8px;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+.work-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.work-actions a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  border-bottom: 1px solid currentColor;
+  color: var(--cinnabar);
+  font-weight: 700;
+}
+
+.works-state {
+  grid-column: 1 / -1;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  padding: 28px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.works-log {
+  margin-top: 48px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.works-log h2 {
+  margin: 0 0 18px;
+  font: 400 clamp(2rem, 4vw, 3.8rem)/1 var(--brush);
+}
+
+.works-log-list {
+  display: grid;
+  gap: 14px;
+  position: relative;
+}
+
+.works-log-item {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--paper) 84%, transparent);
+}
+
+.works-log-item time {
+  color: var(--cinnabar);
+  font-weight: 700;
+}
+
+.works-log-item h3 {
+  margin: 0 0 4px;
+}
+
+.works-log-item p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 920px) {
+  .works-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .works-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .works-page main {
+    width: min(100% - 24px, 1180px);
+    margin-top: 92px;
+  }
+
+  .works-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .works-log-item {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+/* ===== Remaining pages responsive repair v3: works ===== */
+.works-page :where(.work-card, .work-copy, .work-actions, .work-tech, .works-log-item > div) {
+  min-width: 0;
+}
+
+.works-page :where(.work-copy h2, .work-copy p, .work-actions a, .work-tech span, .works-log-item h3, .works-log-item p) {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 920px) {
+  .works-hero {
+    align-items: start;
+    padding-top: 24px;
+  }
+
+  .works-hero h1 {
+    font-size: clamp(3rem, 12vw, 5.4rem);
+    line-height: 1;
+  }
+
+  .works-hero-mark {
+    min-height: 160px;
+  }
+}
+
+@media (max-width: 620px) {
+  .works-page main {
+    margin-top: calc(104px + env(safe-area-inset-top));
+    margin-bottom: 52px;
+  }
+
+  .works-hero {
+    gap: 14px;
+    padding: 18px 0 24px;
+  }
+
+  .works-hero h1 {
+    font-size: clamp(46px, 15vw, 68px);
+  }
+
+  .works-hero p {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .works-hero-mark {
+    display: none;
+  }
+
+  .works-toolbar {
+    flex-wrap: nowrap;
+    max-width: 100%;
+    margin: 20px 0 18px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .works-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .works-toolbar button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .works-grid {
+    gap: 14px;
+  }
+
+  .work-copy {
+    padding: 16px;
+  }
+
+  .work-copy h2 {
+    font-size: 1.16rem;
+    line-height: 1.45;
+  }
+
+  .work-copy p {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .work-actions {
+    gap: 8px 12px;
+  }
+
+  .works-log {
+    margin-top: 38px;
+    padding-top: 22px;
+  }
+
+  .works-log-item {
+    padding: 14px;
+  }
+}

@@ -1,0 +1,12 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "Fireman.moc3",
+		"Textures": [
+			"Fireman.2048/texture_00.png"
+		],
+		"Physics": "Fireman.physics3.json",
+		"DisplayInfo": "Fireman.cdi3.json",
+		"MotionSync": "Fireman.motionsync3.json"
+	}
+}

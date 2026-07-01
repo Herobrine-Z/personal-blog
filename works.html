@@ -1,0 +1,69 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="虎桃不会振刀的作品卷宗，整理站内可确认的网页、Live2D 与视觉实验作品。" />
+    <link rel="icon" href="./assets/next/favicon.ico" />
+    <link rel="apple-touch-icon" href="./assets/next/favicon_hutao_tigerhat_ink_180.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <title>作品卷宗 | 虎桃不会振刀</title>
+    <link rel="stylesheet" href="./fonts.css?v=1" />
+    <link rel="stylesheet" href="./styles.css?v=23" />
+    <link rel="stylesheet" href="./motion-core.css?v=5" />
+    <link rel="stylesheet" href="./lottie-core.css?v=4" />
+    <link rel="stylesheet" href="./works.css?v=3" />
+    <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
+    <script defer src="./lottie-core.js?v=4"></script>
+  </head>
+  <body class="inner-page works-page" data-page="works">
+    <div class="paper-noise" aria-hidden="true"></div>
+    <header class="site-header scrolled" data-site-header>
+      <a class="brand" href="./index.html" aria-label="返回首页">
+        <img class="brand-icon" src="./assets/icon-96.webp" width="44" height="44" alt="" />
+        <span class="brand-name">不会振刀</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="打开导航">
+        <span></span><span></span>
+      </button>
+      <nav class="site-nav" id="siteNav" aria-label="主导航">
+        <a href="./index.html" data-nav-page="home">卷首</a>
+        <a href="./articles.html" data-nav-page="articles">文章</a>
+        <a href="./videos.html" data-nav-page="videos">视频</a>
+        <a class="active" href="./works.html" data-nav-page="works">作品</a>
+        <a href="./kurumi.html" data-nav-page="kurumi">胡桃绘卷</a>
+        <a href="./pet.html" data-nav-page="pet">桌宠小屋</a>
+        <a href="./index.html#links" data-nav-page="links">江湖去处</a>
+        <a href="./index.html#about" data-nav-page="about">侠客志</a>
+        <a href="./index.html#message" data-nav-page="message">留墨</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="works-hero">
+        <div>
+          <p class="eyebrow">Works Archive</p>
+          <h1>作品卷宗</h1>
+          <p>把已经能在仓库中确认的作品先收进一处。这里不写虚假的播放量、奖项或合作经历，只保留真实入口，方便以后继续补卷。</p>
+        </div>
+        <div class="works-hero-mark" aria-hidden="true"></div>
+      </section>
+
+      <section aria-label="作品筛选">
+        <div class="works-toolbar" id="worksToolbar"></div>
+        <div class="works-grid" id="worksGrid" aria-live="polite"></div>
+      </section>
+
+      <section class="works-log" aria-labelledby="worksLogTitle">
+        <h2 id="worksLogTitle">江湖年表</h2>
+        <div class="works-log-list" id="worksLogList"></div>
+      </section>
+    </main>
+
+    <footer><p>© 2026 虎桃不会振刀</p><a href="./admin.html">站长入口</a></footer>
+    <script src="./theme.js?v=19"></script>
+    <script src="./motion-core.js?v=5"></script>
+    <script src="./works-data.js?v=1"></script>
+    <script src="./works.js?v=3"></script>
+  </body>
+</html>
